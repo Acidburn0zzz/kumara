@@ -182,8 +182,14 @@ sub CatSearch  {
           if ($search->{'title'} ne ''){
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
+	    my $i=1;
             $query="select count(*) from biblio
-	    where title like '%$search->{'title'}%'";	 
+	    where (title like '%$key[0]%'";
+	    while ($i<$count){
+	      $query=$query." and title like '%$key[$i]%'";
+	      $i++;
+	    }
+	    $query=$query.")";
 	 }
       }
   } 
@@ -220,7 +226,7 @@ sub CatSearch  {
 	$sth1->finish;
       }
     }
-print $query;
+#print $query;
   my $sth=$dbh->prepare($query);
     $sth->execute;
   my $data=$sth->fetchrow_arrayref;
