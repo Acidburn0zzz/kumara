@@ -4,10 +4,11 @@
 
 use strict;
 use C4::Output;
+use C4::Input;
 use CGI;
 use Date::Manip;
 
-
+my %env;
 my $input = new CGI;
 #get varibale that tells us whether to show confirmation page
 #or insert data
@@ -30,8 +31,16 @@ if ($insert eq ''){
   my $string="The following compulsary fields have been left blank. Please push the back button
   and try again<p>";
   if ($data{'cardnumber'} eq ''){
-    $string.=" Cardnumber<br>";
+   
+     $string.=" Cardnumber<br>";
     $ok=1;
+  } else {
+     #check cardnumber is valid
+     my $valid=checkdigit(\%env,$data{'cardnumber'});
+     if ($valid != 1){
+       $ok=1;
+       $string.=" Invalid Cardnumber<br>";
+     }
   }
   if ($data{'sex'} eq ''){
     $string.=" Gender <br>";
