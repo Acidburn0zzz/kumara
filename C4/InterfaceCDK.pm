@@ -1,3 +1,4 @@
+
 package C4::InterfaceCDK; #asummes C4/InterfaceCDK
 
 #uses Newt
@@ -129,11 +130,11 @@ sub helptext {
 sub titlepanel{
   my ($env,$title,$title2)=@_;
   my @header;
-  @header[0] = fmtstr($env,$title,"L26");
+  @header[0] = fmtstr($env,$title,"L24");
   @header[0] = @header[0].fmtstr($env,
-    $env->{'branchname'}."-".$env->{'queue'},"C20");
-  @header[0] = @header[0].fmtstr($env,$title2,"R26");
-  my $label = new Cdk::Label ('Message' =>\@header,'Ypos'=>"TOP");
+    $env->{'branchname'}."-".$env->{'queue'},"C28");
+  @header[0] = @header[0].fmtstr($env,$title2,"R24");
+  my $label = new Cdk::Label ('Message' =>\@header,'Ypos'=>0,'Xpos'=>0);
   $label->draw();
   return $label;
   }
