@@ -60,9 +60,9 @@ print <<EOP
 <td>$results[$i]->{'isbn'}</td>
 <td><a href="newbiblio.pl?ordnum=$results[$i]->{'ordernumber'}&id=$results[$i]->{'booksellerid'}&basket=$basket">$results[$i]->{'title'}</a></td>
 <td>$results[$i]->{'author'}</td>
-<td>\$<input type=text name=rrp$i size=6 value="$results[$i]->{'rrp'}" onchange='update(this.form)'></td>
-<td>\$<input type=text name=eup$i size=6 value="$results[$i]->{'ecost'}" onchange='update(this.form)'></td>
-<td><input type=text name=quantity$i size=6 value=$results[$i]->{'quantity'} onchange='update(this.form)'></td>
+<td>\$<input type=text name=rrp$i size=6 value="$results[$i]->{'rrp'}"></td>
+<td>\$<input type=text name=eup$i size=6 value="$results[$i]->{'ecost'}"></td>
+<td><input type=text name=quantity$i size=6 value=$results[$i]->{'quantity'}></td>
 <td>\$<input type=text name=total$i size=10 value=16.95></td>
 <input type=hidden name=ordnum$i value=$results[$i]->{'ordernumber'}>
 <input type=hidden name=bibnum$i value=$results[$i]->{'biblionumber'}>
@@ -71,6 +71,7 @@ print <<EOP
 EOP
 ;
 }
+# onchange='update(this.form)'></td>
 print "<input type=hidden name=number value=$count>
 <input type=hidden name=basketno value=\"$basket\">";
 print <<EOP
