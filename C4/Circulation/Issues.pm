@@ -148,9 +148,9 @@ sub processitems {
     $i++;
     $row++;
   }
-  #my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
-#  $itemnum=uc $itemnum;
-  my ($itemnum,$reason)=&scanbook();
+  my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
+  $itemnum=uc $itemnum;
+#  my ($itemnum,$reason)=&scanbook();
   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
   my $sth=$dbh->prepare($query);  
   $sth->execute;

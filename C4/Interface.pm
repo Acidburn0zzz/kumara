@@ -126,15 +126,15 @@ sub list {
 sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$name)=@_;
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
-  my $label=Newt::Label($name);
-  my $panel = Newt::Panel(4, 4, $title);
+  my $label=Newt::Label("book");
+  my $panel = Newt::Panel(5, 5, $title);
   my $l1=Newt::Label("Previous");
   my $l2=Newt::Label("Current");
   my $l3=Newt::Label("Borrower Info");
   my $li = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $li2 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $li3 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-   $li->Add($items1->[0],$items1->[1]);
+  $li->Add($items1->[0],$items1->[1]);
   $li2->Add($items2->[0],$items2->[1]);
   $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
   "$borrower->{'city'}");
@@ -147,7 +147,7 @@ sub issuewindow {
   $panel->Add(1,2,$l2,NEWT_ANCHOR_LEFT);
   $panel->Add(1,3,$li2,NEWT_ANCHOR_LEFT);  
   $panel->Add(0,4,$label,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,5,$entry,NEWT_ANCHOR_LEFT);
+  $panel->Add(1,4,$entry,NEWT_ANCHOR_LEFT);
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
