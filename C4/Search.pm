@@ -19,7 +19,7 @@ $VERSION = 0.01;
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
 &getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle
-&addauthor &bibitems &barcodes &findguarantees); 
+&addauthor &bibitems &barcodes); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -54,24 +54,6 @@ my $priv_func = sub {
 };
 						    
 # make all your functions, whether exported or not;
-sub findguarantees{ 
-  my ($bornum)=@_; 
-  my $dbh=C4Connect;   
-  my $query="select cardnumber,borrowernumber from borrowers where     
-  guarantor='$bornum'";       
-  my $sth=$dbh->prepare($query);         
-  $sth->execute;           
-  my @dat;             
-  my $i=0;               
-  while (my $data=$sth->fetchrow_hashref){                 
-    $dat[$i]=$data;                   
-    $i++;                       
-  }                           
-  $sth->finish;                             
-  $dbh->disconnect; 
-  return($i,\@dat);     
-}
-
 
 sub NewBorrowerNumber {           
   my $dbh=C4Connect;        
@@ -345,12 +327,11 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio,biblioitems 
-	 left join additionalauthors on biblio.biblionumber=additionalauthors.biblionumber
+         biblio,biblioitems
          where biblioitems.biblionumber=biblio.biblionumber 
-	 and biblio.author ne '' and
+	 and
          ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%'
-	   )";    
+	 	 )";    
 	 while ($i < $count){ 
            $query=$query." and (biblio.author like '$key[$i]%' or biblio.author like '% $key[$i]%'
 	   )";
@@ -495,7 +476,7 @@ sub CatSearch  {
 	$sth1->finish;
       }
   }
-print $query;
+#print $query;
 
 
   my $sth=$dbh->prepare($query);
