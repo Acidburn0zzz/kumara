@@ -100,17 +100,77 @@ sub reconcileaccount {
   output (1,$row,$text);
   #get amount paid and update database
   my ($data,$reason)=&dialog("Amount to pay");
-#  &updateaccounts($bornumber,$dbh,$data);
+#  &recordpayment($bornumber,$dbh,$data);
   #Check if the boorower still owes
 #  $total=&checkaccount($bornumber,$dbh);
   return($total);
 
 }
 
-sub updateaccounts{
+sub recordpayment{
   #here we update both the accountoffsets and the account lines
   my ($bornumber,$dbh,$data)=@_;
-  
+  my $updquery = "";
+  my $newamtos = 0;
+  my $amountleft = $data;
+  # begin transaction
+  my $sth = $dbh->prepare("begin");
+  $sth->execute;
+  my $nextaccntno = getnextaccount($bornumber,$dbh);
+  # get lines with outstanding amounts to offset
+  my $query = "select * from accountlines 
+  where (borrowernumber = '$bornumber') and (amountoutstanding # '0')
+  order by date";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  # offset transactions
+  while ((my $accdata=$sth->fetchrow_hashref) and ($amountleft>0)){
+     if ($accdata->{'amountoutstanding}) > $amountleft) {
+        $newamtos = 0;
+	$amountleft -= $accdata->{'amountoutstanding'};
+     }  else {
+        $newamtos = $accdata->{'amountoutstanding'} - $amtleft;
+	$amountleft = 0;
+     }
+     $updquery = "update accountlines where (borrowernumber = '$bornumber')
+     and (accountno = '$accdata->{'accountno'}')	
+     set amountoutstanding = $newamtos";
+     my $usth = $dbh->prepare($query);
+     $usth->execute;
+     $updquery = "insert into accountoffsets 
+     (BorrowerNumber, AccountNo, OffSetAccount,  OffsetAmount)
+     values ($bornumber,$accdata->{'accountno'},$nextaccntno,$newtos";
+     my $usth = $dbh->prepare($query);
+     $usth->execute;
+  }
+  # create new line
+  $updquery = "insert into accountlines 
+  (BorrowerNumber, AccountNo,Date,Amount,Description,AccountType,AmountOutstanding)  
+  values ($bornumber,$accdata->{'accountno'},localtime(),0-$data,"Payment, thanks",
+  "Pay",0-$amountleft)";
+  my $usth = $dbh->prepare($updquery);
+  $usth->execute;
+  $usth->finish;
+  $sth->finish;
+  $query = "commit";
+  $sth = $dbh->prepare;
+  $sth->execute;
+  $sth-finish;
+}
+
+sub getnextacctno {
+  my ($bornumber,$dbh)=@_;
+  $mynextaccntno = 1;
+  my $query = "select * from accountlines
+  where (borrowernumber = '$bornumber')
+  order by desc accountno";
+  $sth = $dbh->prepare($query);
+  $sth->execute;
+  if (my$accdata=$sth->fetchro_hashref){
+    $nextaccntno = #accdata->{'accountno'} + 1;
+  }
+  $sth->finish;
+  return $nextacctno
 }
 			
 END { }       # module clean-up code here (global destructor)
