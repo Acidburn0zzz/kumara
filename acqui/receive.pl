@@ -66,7 +66,8 @@ my $total;
 my $tototal;
 for (my$i=0;$i<$count;$i++){
  $total=($results[$i]->{'unitprice'} + $results[$i]->{'freight'}) * $results[$i]->{'quantityreceived'};
- print <<EOP
+$results[$i]->{'unitprice'}+=0;
+print <<EOP
 <tr valign=top bgcolor=#ffffcc>
 <td>$results[$i]->{'basketno'}</td>
 <td>$results[$i]->{'isbn'}</td>
