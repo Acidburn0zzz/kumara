@@ -51,26 +51,27 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub Start_circ{
+  my (%env)=@_;
   #connect to database
   #start interface
-  startint('Circulation');
+  startint(\%env,'Circulation');
   my ($reason,$data)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
   my $donext;
   if ($data eq 'Issues'){  
-    $donext=Issue();
+    $donext=Issue(\%env);
   } else {
-    &endint();
+    &endint(\%env);
   }
   if ($donext eq 'Circ'){
-    Start_circ();
+    Start_circ(\%env);
   } else {
-    &endint();
+    &endint(\%env);
   }
 }
 
 sub pastitems{
   #Get list of all items borrower has currently on issue
-  my ($bornum,$dbh)=@_;
+  my (%env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio
   where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
   and items.biblionumber=biblio.biblionumber");
@@ -86,7 +87,7 @@ sub pastitems{
 
 sub checkoverdues{
   #checks whether a borrower has overdue items
-  my ($bornum,$dbh)=@_;
+  my (%env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio where
   borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
   items.biblionumber=biblio.biblionumber");
@@ -101,7 +102,7 @@ sub checkoverdues{
 }
 
 sub previousissue {
-  my ($itemnum,$dbh,$bornum)=@_;
+  my (%env,$itemnum,$dbh,$bornum)=@_;
   my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
@@ -111,12 +112,14 @@ sub previousissue {
   $sth->finish;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
-      output(1,24,"Book is marked as issue to curent borrower");
+      output(1,24,"Book is marked as issue to current borrower");
+  
     } else {
       my $text="book is issued to borrower $borrower->{'firstname'} $borrower->{'surname'} borrowernumber $borrower->{'borrowernumber'}";    
       output(1,24,$text);
     }
   } 
+  return($borrower->{'borrowernumber'});
 }
 
 sub checkreserve{
@@ -126,7 +129,7 @@ sub checkwaiting{
 }
 
 sub scanbook {
-  my ($interface)=@_;
+  my (%env,$interface)=@_;
   #scan barcode
 #  my $number='L01781778';  
   my ($number,$reason)=dialog("Book Barcode:");
@@ -135,7 +138,7 @@ sub scanbook {
 }
 
 sub scanborrower {
-  my ($interface)=@_;
+  my (%env,$interface)=@_;
   #scan barcode
 #  my $number='V00126643';  
   my ($number,$reason)=&dialog("Borrower Barcode:");

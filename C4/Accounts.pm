@@ -50,12 +50,13 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub displayaccounts{
+  my (%env)=@_;
 }
 
 sub checkaccount  {
   #take borrower number
   #check accounts and list amounts owing
-  my ($bornumber,$dbh)=@_;
+  my (%env,$bornumber,$dbh)=@_;
   my $sth=$dbh->prepare("Select sum(amountoutstanding) from accountlines where
   borrowernumber=$bornumber and amountoutstanding<>0");
   $sth->execute;
@@ -68,7 +69,7 @@ sub checkaccount  {
   if ($total > 0){
     output(1,2,"borrower owes $total");
     if ($total > 5){
-      reconcileaccount($dbh,$bornumber,$total);
+      reconcileaccount(\%env,$dbh,$bornumber,$total);
     }
   }
 #  pause();
@@ -77,7 +78,7 @@ sub checkaccount  {
 
 sub reconcileaccount {
   #print put money owing give person opportunity to pay it off
-  my ($dbh,$bornumber,$total)=@_;
+  my (%env,$dbh,$bornumber,$total)=@_;
   #get borrower information
   my $sth=$dbh->prepare("Select * from accountlines where 
   borrowernumber=$bornumber and amountoutstanding<>0 order by date");   
@@ -104,10 +105,10 @@ sub reconcileaccount {
   #get amount paid and update database
   my ($data,$reason)=&dialog("Amount to pay");
   if ($data>0) {
-    &recordpayment($bornumber,$dbh,$data);
+    &recordpayment(\%env,$bornumber,$dbh,$data);
   #Check if the borrower still owes
 #  pause();
-    $total=&checkaccount($bornumber,$dbh);
+    $total=&checkaccount(\%env,$bornumber,$dbh);
   }
   return($total);
 
@@ -115,7 +116,7 @@ sub reconcileaccount {
 
 sub recordpayment{
   #here we update both the accountoffsets and the account lines
-  my ($bornumber,$dbh,$data)=@_;
+  my (%env,$bornumber,$dbh,$data)=@_;
   my $updquery = "";
   my $newamtos = 0;
   my $accdata = "";
@@ -123,7 +124,7 @@ sub recordpayment{
   # begin transaction
 #  my $sth = $dbh->prepare("begin");
 #  $sth->execute;
-  my $nextaccntno = getnextacctno($bornumber,$dbh);
+  my $nextaccntno = getnextacctno(\%env,$bornumber,$dbh);
   # get lines with outstanding amounts to offset
   my $query = "select * from accountlines 
   where (borrowernumber = '$bornumber') and (amountoutstanding<>0)
@@ -169,7 +170,7 @@ sub recordpayment{
 }
 
 sub getnextacctno {
-  my ($bornumber,$dbh)=@_;
+  my (%env,$bornumber,$dbh)=@_;
   my $nextaccntno = 1;
   my $query = "select * from accountlines
   where (borrowernumber = '$bornumber')

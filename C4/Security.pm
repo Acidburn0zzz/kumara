@@ -1,4 +1,4 @@
-ackage C4::Security; #asummes C4/Security
+package C4::Security; #asummes C4/Security
 
 #requires DBI.pm to be installed
 #uses DBD:Pg
@@ -13,7 +13,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&CheckAccess);
+@EXPORT = qw(&Login &CheckAccess);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -49,8 +49,14 @@ my $priv_func = sub {
   };
    
 # make all your functions, whether exported or not;
-    
+ 
+sub Login {
+  my (%env)=@_;
+  $env{usercode} = "test";
+  $env{branchcode} = "test";
+  }
 sub CheckAccess {
+  my (%env)=@_;
   }
     
 END { }       # module clean-up code here (global destructor)
