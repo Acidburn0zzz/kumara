@@ -22,7 +22,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&findborrower &Borenq &findoneborrower);
+@EXPORT = qw(&findborrower &Borenq &findoneborrower &NewBorrowerNumber);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -284,6 +284,14 @@ sub modifyuser {
   #return;
 }
 
-
+sub NewBorrowerNumber {
+  my $dbh=C4Connect;
+  my $sth=$dbh->prepare("Select max(borrowernumber) from borrowers");
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $data->{'max(borrowernumber)'}++;
+  return($data->{'max(borrowernumber)'});
+}
 
 END { }       # module clean-up code here (global destructor)

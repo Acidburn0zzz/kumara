@@ -16,7 +16,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
-&OpacSearch &borrdata2); 
+&OpacSearch &borrdata2 &NewBorrowerNumber); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -51,6 +51,16 @@ my $priv_func = sub {
 };
 						    
 # make all your functions, whether exported or not;
+
+sub NewBorrowerNumber {           
+  my $dbh=C4Connect;        
+  my $sth=$dbh->prepare("Select max(borrowernumber) from borrowers");     
+  $sth->execute;            
+  my $data=$sth->fetchrow_hashref;                                  
+  $sth->finish;                   
+  $data->{'max(borrowernumber)'}++;         
+  return($data->{'max(borrowernumber)'}); 
+}    
 
 sub OpacSearch {
   my ($env,$type,$search,$num,$offset)=@_;

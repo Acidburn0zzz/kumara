@@ -195,6 +195,9 @@ sub mkformnotable{
     if ($inputs[$i][0] eq 'reset'){
       $string.="<input type=reset name=$inputs[$i][1] value=\"$inputs[$i][2]\">";
     }    
+    if ($inputs[$i][0] eq 'submit'){
+      $string.="<input type=submit name=$inputs[$i][1] value=\"$inputs[$i][2]\">";
+    }    
   }
   $string=$string."</form>";
 }

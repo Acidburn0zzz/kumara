@@ -11,6 +11,9 @@ use C4::Search;
 
 my $input = new CGI;
 my $member=$input->param('bornum');
+if ($member eq ''){
+  $member=NewBorrowerNumber();
+}
 my $type=$input->param('type');
 
 print $input->header;
@@ -28,8 +31,14 @@ print <<printend
 
 <input type=hidden name=type value="borrowers">
 <input type=hidden name=borrowernumber="$member">
-<input type=hidden name=updtype value="M">
-
+printend
+;
+if ($type eq 'Add'){
+  print "<input type=hidden name=updtype value=I>";
+} else {
+  print "<input type=hidden name=updtype value=M>";
+}
+print <<printend
 
 <table border=0 cellspacing=0 cellpadding=5 >
 
