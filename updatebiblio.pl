@@ -38,9 +38,15 @@ if ($class =~/[0-9]+/){
 #   print $class;
    $dewey= $class;
    $dewey=~ s/[a-z]+//gi;
-   my @temp=split(/[0-9]+\.[0-9]+/,$class);
+   my @temp;
+   if ($class =~ /\./){
+     @temp=split(/[0-9]+\.[0-9]+/,$class);
+   } else {
+     @temp=split(/[0-9]+/,$class);
+   }
    $classification=$temp[0];
    $subclass=$temp[1];
+#   print $classification,$dewey,$subclass;
 }else{
   $dewey='';
 }
