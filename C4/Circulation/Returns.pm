@@ -280,7 +280,8 @@ sub find_reserves {
   my ($env,$dbh,$itemno) = @_;
   my $itemdata = itemnodata($env,$dbh,$itemno);
   my $query = "select * from reserves where found is null 
-  and biblionumber = $itemdata->{'biblionumber'} order by priority,reservedate ";
+  and biblionumber = $itemdata->{'biblionumber'} and cancellationdate is NULL
+  order by priority,reservedate ";
   my $sth = $dbh->prepare($query);
   $sth->execute;
   my $resfound = "n";
