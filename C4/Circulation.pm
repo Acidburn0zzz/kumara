@@ -5,7 +5,6 @@ package C4::Circulation; #asummes C4/Circulation
 use strict;
 require Exporter;
 use DBI;
-use C4::Interface;
 use C4::Database;
 use C4::Circulation::Issues;
 
