@@ -352,12 +352,21 @@ sub CatSearch  {
     my $count=@key;
     my $i=1;
     $query="select distinct(subject) from bibliosubject where( subject like
-    '$key[0]%' or subject like '% $key[0]%' or subject like '%($key[0])%')";
+    '$key[0] %' or subject like '% $key[0] %' or subject like '% $key[0]' or subject like '%($key[0])%')";
     while ($i<$count){
-      $query.=" and (subject like '$key[$i]]%' or subject like '% $key[$i]%'
+      $query.=" and (subject like '$key[$i] %' or subject like '% $key[$i] %'
+      or subject like '% $key[$i]'
       or subject like '%($key[$i])%')";
       $i++;
     }
+    if ($search->{'subject'} eq 'NZ' || $search->{'subject'} eq 'nz'){ 
+      $query.= " or (subject like 'NEW ZEALAND %' or subject like '% NEW ZEALAND %'
+      or subject like '% NEW ZEALAND' or subject like '%(NEW ZEALAND)%' ) ";
+    } elsif ( $search->{'subject'} =~ /^nz /i || $search->{'subject'} =~ / nz /i || $search->{'subject'} =~ / nz$/i){
+      $query=~ s/ nz/ NEW ZEALAND/ig;
+      $query=~ s/nz /NEW ZEALAND /ig;
+      $query=~ s/\(nz\)/\(NEW ZEALAND\)/gi;
+    }  
   }
   if ($type eq 'precise'){
       $query="select count(*) from items,biblio ";
