@@ -98,9 +98,26 @@ sub findborrower  {
 	   ($bornum,$borrower) = selborrower($env,$dbh,@borrows,@bornums);
         }   	   
         if ($bornum eq '') {
-          output(1,1,"Borrower not found, please rescan or reenter borrower code");
+          output(1,1,"Borrower not found, please rescan or re-enter borrower code");
         }
       }
+    } elsif ($book ne "") {
+      my $query = "select * from issues,items where (barcode = '$book') 
+        and (items.itemnumber = issues.itemnumber) 
+        and (issues.returndate is null)";
+      my $iss_sth=$dbh->prepare($query);
+      $iss_sth->execute;
+      if (my $issdata  = $iss_sth->fetchrow_hashref) {
+         $bornum=$issdata->{'borrowernumber'};
+	 $iss_sth->finish;
+	 $sth = $dbh->prepare("Select * from borrowers 
+	   where borrowernumber =  '$bornum'");
+	 $sth->execute;
+	 $borrower=$sth->fetchrow_hashref;
+	 $sth->finish;
+       } else {
+         error_msg($env,"Item $book not found");
+       } 
     }
   }
   my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
