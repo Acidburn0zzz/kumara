@@ -83,19 +83,26 @@ sub CalcFine {
   my $data=$sth->fetchrow_hashref;
   $sth->finish;
   my $amount=0;
-  if ($difference >= $data->{'firstremind'}){
-      if ($data->{'chargeperiod'} != 0){
-        my $temp=$difference % $data->{'chargeperiod'};
-        $difference=$difference - $temp;
-        $amount=($difference / $data->{'chargeperiod'}) * $data->{'fine'};
-      }
+  my $printout;
+  if ($difference == $data->{'firstremind'}){
+    $amount=$data->{'fine'};
+    $printout="First Notice";
+  }
+  my $second=$data->{'firstremind'}+$data->{'chargeperiod'};
+  if ($difference == $second){
+    $amount=$data->{'fine'}*2;
+    $printout="Second Notice";
+  }
+  if ($difference == $data->{'accountsent'}){
+    $amount=5;
+    $printout="Final Notice";
   }
   $dbh->disconnect;
-  return($amount,$data->{'chargename'});
+  return($amount,$data->{'chargename'},$printout);
 }
 
 sub UpdateFine {
-  my ($itemnum,$bornum,$amount,$type)=@_;
+  my ($itemnum,$bornum,$amount,$type,$due)=@_;
   my $dbh=C4Connect;
   my $query="Select * from accountlines where itemnumber=$itemnum and
   borrowernumber=$bornum and (accounttype='FU' or accounttype='O' or
@@ -105,10 +112,10 @@ sub UpdateFine {
   $sth->execute;
 
   if (my $data=$sth->fetchrow_hashref){
-    print "in accounts ...";
+#    print "in accounts ...";
     if ($data->{'amount'} != $amount){
       
-      print "updating";
+#      print "updating";
       my $diff=$amount - $data->{'amount'};
       my $out=$data->{'amountoutstanding'}+$diff;
       my $query2="update accountlines set date=now(), amount=$amount,
@@ -119,7 +126,7 @@ sub UpdateFine {
       $sth2->execute;
       $sth2->finish;      
     } else {
-      print "no update needed $data->{'amount'}"
+#      print "no update needed $data->{'amount'}"
     }
   } else {
     my $query2="select title from biblio,items where items.itemnumber=$itemnum
@@ -128,7 +135,7 @@ sub UpdateFine {
     $sth4->execute;
     my $title=$sth4->fetchrow_hashref;
     $sth4->finish;
-    print "not in account";
+ #   print "not in account";
     my $query2="Select max(accountno) from accountlines";
     my $sth3=$dbh->prepare($query2);
     $sth3->execute;
@@ -139,7 +146,7 @@ sub UpdateFine {
     $query2="Insert into accountlines
     (borrowernumber,itemnumber,date,amount,
     description,accounttype,amountoutstanding,accountno) values
-    ($bornum,$itemnum,now(),$amount,'$type $title->{'title'}','FU',
+    ($bornum,$itemnum,now(),$amount,'$type $title->{'title'} $due','FU',
     $amount,$accountno[0])";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;

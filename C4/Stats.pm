@@ -169,15 +169,19 @@ sub TotalPaid {
 sub getcharges{
   my($borrowerno,$timestamp)=@_;
   my $dbh=C4Connect;
+  my $timestamp2=$timestamp-1;
   my $query="Select * from accountlines where borrowernumber=$borrowerno
-  and timestamp => $timestamp and accounttype <> 'Pay'";
+  and timestamp < '$timestamp' and accounttype <> 'Pay'";
   my $sth=$dbh->prepare($query);
+#  print $query,"<br>";
   $sth->execute;
   my $i=0;
   my @results;
   while (my $data=$sth->fetchrow_hashref){
-    $results[$i]=$data;
-    $i++;
+    if ($data->{'timestamp'} == $timestamp){
+      $results[$i]=$data;
+      $i++;
+    }
   }
   $dbh->disconnect;
   return(@results);
