@@ -51,6 +51,7 @@ my $subtitle=$input->param('Subtitle');
 modsubtitle($bibnum,$subtitle);
 
 my $subject=$input->param('Subject');
+$subject=uc $subject;
 my @sub=split(/\|/,$subject);
 #print @sub;
 #
