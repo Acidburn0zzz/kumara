@@ -65,25 +65,48 @@ sub findborrower  {
   my $sth = "";
   my $borcode = "";
   my $reason = "";
+  my $book;
   while ($bornum eq '') {
     #get borrowerbarcode from scanner
-    ($borcode,$reason)=&scanborrower();
+    ($borcode,$reason,$book)=&scanborrower();
     if ($borcode ne '') {
       #  output(1,1,$borcode);
-      $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
+      my $ucborcode = uc $borcode;
+      $sth=$dbh->prepare("Select * from borrowers where cardnumber='$ucborcode'");
       $sth->execute;
-      $borrower=$sth->fetchrow_hashref;
-      $bornum=$borrower->{'borrowernumber'};
-      $sth->finish;
-      if ($bornum eq '') {
-        output(1,1,"Borrower not found, please rescan or reenter borrower code");
+      if ($borrower=$sth->fetchrow_hashref) {
+        $bornum=$borrower->{'borrowernumber'};
+        $sth->finish;
+      } else {
+        $sth->finish;
+	my $borquery = "Select * from borrowers where surname like '$borcode'";
+	my $sthb =$dbh->prepare($borquery);
+	$sthb->execute;
+	my $cntbor = 0;
+	my @borrows;
+        my @bornums;
+        while ($borrower= $sthb->fetchrow_hashref) {
+	   $borrows[$cntbor]=
+	     fmtstr(($borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
+	     ', '.$borrower->{'othernames'}),"L50");
+	   $bornums[$cntbor]=$borrower->{'borroernumber'};
+	   $cntbor++
+	}
+	if ($cntbor == 1)  {
+           $bornum = $bornums[0];
+	} elsif ($cntbor > 0) {
+	   my $bornum = selborrower($env,$dbh,@borrows,@bornums);
+	}   	   
+        if ($bornum eq '') {
+          output(1,1,"Borrower not found, please rescan or reenter borrower code");
+        }
       }
     }
   }
-  my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},
-  $borrower->{'surname'}));
+  my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
   output(1,1,$borrowers);
   my $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
+  
   return ($bornum, $issuesallowed,$borrower,$reason);
 }  
 

@@ -191,6 +191,7 @@ sub scanborrower {
   #scan barcode
   my ($number,$reason,$book)=&borrower_dialog($env);
   $number=uc $number;
+  $book=uc $book;
   return ($number,$reason,$book);
 }
 
