@@ -22,7 +22,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
-&selborrower &fmtstr &fmtdec &returnwindow);
+&selborrower &fmtstr &fmtdec &returnwindow &logondialog);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -322,23 +322,23 @@ sub dialog {
   
 sub logondialog {
    my ($env,$title,$branches)=@_;
-   my $entry1=Newt::Entry(10,NEWT_FLAG_SCROLL );
+   my $entry1=Newt::Entry(10,NEWT_FLAG_SCROLL  | NEWT_FLAG_RETURNEXIT);
    my $label1=Newt::Label("User Name");  
    my $label2=Newt::Label("Password");
-   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL );       
-   my $panel1=Newt::Panel(2,4,$title);
-   my $panel2=Newt::Panel(5,1,''); 
+   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT );       
+   my $panel1=Newt::Panel(2,1,$title);
+   my $panel2=Newt::Panel(1,5,''); 
    my $listbx=Newt::Listbox(12, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT |
 NEWT_FLAG_MULTIPLE | NEWT_FLAG_BORDER );
    $panel1->AddHotKey(NEWT_KEY_F11);
    $panel1->AddHotKey(NEWT_KEY_F10);   
-   $panel1->Add(0,0,$panel2,NEWT_ANCHOR_LEFT); 
+   $panel1->Add(0,0,$panel2,NEWT_ANCHOR_TOP); 
    $panel1->Add(1,0,$listbx,NEWT_ANCHOR_LEFT);   
    $panel2->Add(0,0,$label1,NEWT_ANCHOR_LEFT);
-   $panel2->Add(1,0,$entry1,NEWT_ANCHOR_LEFT);
-   $panel2->Add(2,0,$label2,NEWT_ANCHOR_LEFT);
-   $panel2->Add(3,0,$entry2,NEWT_ANCHOR_LEFT);
-   $listbx->Add($branches);	
+   $panel2->Add(0,1,$entry1,NEWT_ANCHOR_LEFT);
+   $panel2->Add(0,2,$label2,NEWT_ANCHOR_LEFT);
+   $panel2->Add(0,3,$entry2,NEWT_ANCHOR_LEFT);
+   $listbx->Add(@$branches);	
    my ($reason,$data)=$panel1->Run();
    my ($username) = $entry1->Get();
    my ($password) = $entry2->Get();

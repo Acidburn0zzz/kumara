@@ -7,6 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Interface;
+use C4::Database;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 # set the version for version checking
@@ -52,9 +53,44 @@ my $priv_func = sub {
  
 sub Login {
   my ($env)=@_;
-  $env->{usercode} = "test";
-  $env->{branchcode} = "test";
+  my $dbh=C4Connect;
+  my @branches;
+  my $query = "select * from branches order by branchname";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $branchrec=$sth->fetchrow_hashref) {
+    my $branchdet = 
+     fmtstr($env,$branchrec->{'branchcode'},"L2")." ".$branchrec->{'branchname'};
+    push @branches,$branchdet;
   }
+  $sth->finish;
+  my $valid = "f";
+  &startint($env,"Logging In");
+  until ($valid eq "t") {
+    my ($reason,$username,$password,$branch) = 
+      logondialog ($env,"Logon to System",\@branches);
+    $username = uc $username;
+    $password = uc $password;
+    my $query = "select * from users 
+      where usercode = '$username' and password ='$password'";
+    #sth->prepare($query);
+    $sth->execute;
+    if (my $userrec = $sth->fetchrow_hashref) {
+      if ($branch ne "") {
+        $valid = "t";
+        my @dummy = split ' ', $branch;
+        $branch = @dummy[0];
+        $env->{usercode} = $username;
+        $env->{branchcode} = $branch;
+      }
+    } else {
+      debug_msg("","not found");
+    }
+    $sth->finish;
+  }
+  &endint();
+}
+  
 sub CheckAccess {
   my ($env)=@_;
   }
