@@ -9,6 +9,7 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::InterfaceCDK;
+use C4::Interface::FlagsCDK;
 use C4::Circulation::Main;
 use C4::Circulation::Issues;
 use C4::Scan;
@@ -210,7 +211,6 @@ sub process_traps {
   my $issuesallowed = 0;
   my $x = 0;
   my %traps;
-  debug_msg($env,"In traps");
   while (@$traps_set[$x] ne "") {
     $traps{'@$traps_set[$x]'} = 1; 
     $x++;
@@ -220,6 +220,16 @@ sub process_traps {
      $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
      if ($trapact eq "FINES") {
        &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
+     } elsif  ($trapact eq "NOTES") {
+       my $notes = trapsnotes($env,$bornum,$borrower,$amount);
+       if ($notes ne $borrower->{'borrowernotes'}) {
+          my $query = "update borrowers set borrowernotes = '$notes' 
+	    where borrowernumber = $bornum";
+	  my $sth = $dbh->prepare($query);
+	  $sth->execute();
+	  $sth->finish();
+          $borrower->{'borrowernotes'} = $notes;
+       }	  
      }
   }
   return ($issuesallowed);

@@ -18,7 +18,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
 &selborrower &returnwindow &logondialog &borrowerwindow &titlepanel
-&borrbind &borrfill &preeborr);
+&borrbind &borrfill &preeborr &borrowerbox);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -270,7 +270,7 @@ sub issuewindow {
   $scroll2->erase();
   $scroll1->erase();
   $loanlength->erase(); 
-  debug_msg($env,"exiting");    
+  #debug_msg($env,"exiting");    
   return $barcode,$reason;
 }  
 sub actscroll1 {
@@ -330,6 +330,7 @@ sub preloanlen {
 sub borrowerbox {
   my ($env,$borrower,$amountowing,$odues) = @_;
   my @borrinfo;
+  #debug_msg($env,"borrbox");
   my $line = "$borrower->{'cardnumber'} ";
   $line = $line."$borrower->{'surname'}, ";
   $line = $line."$borrower->{'title'} $borrower->{'firstname'}";
@@ -354,7 +355,7 @@ sub borrowerbox {
   }
   $borrinfo[2]=$line;
   if ($borrower->{'borrowernotes'} ne "" ) {
-    $borrinfo[3]=substr($borrower->{'borrowernotes'},1,40);     
+    $borrinfo[3]=substr($borrower->{'borrowernotes'},0,40);     
   }
   my $borrbox = new Cdk::Label ('Message' =>\@borrinfo,
     'Ypos'=>3, 'Xpos'=>"RIGHT");
