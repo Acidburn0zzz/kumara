@@ -115,16 +115,27 @@ sub mkform{
       $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
     } else {
       my $text;
-      if ($data[0] eq 'radio'){
+      if ($data[0] eq 'radio') {
         $text="<input type=radio name=$key value=$data[1]>$data[1]
 	<input type=radio name=$key value=$data[2]>$data[2]";
       }
-      if ($data[0] eq 'text'){
+      if ($data[0] eq 'text') {
         $text="<input type=$data[0] name=$key value=\"$data[1]\">";
       }
-      if ($data[0] eq 'textarea'){
+      if ($data[0] eq 'textarea') {
         $text="<textarea name=$key wrap=physical cols=40 rows=4>$data[1]</textarea>";
       }
+      if ($data[0] eq 'select') {
+        $text="<select name=$key>";
+	my $i=1;
+       	while ($data[$i] ne "") {
+	  my $val = $data[$i+1];
+	   
+	  $text = $text."<option value=$data[$i]>$val";
+	  $i = $i+2;
+	}
+	$text=$text."</select>";
+      }	
       $string=$string.mktablerow(2,'white',$key,$text);
     }
   }

@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect &sqlinsert &getmax);
+@EXPORT = qw(&C4Connect &sqlinsert &getmax &makelist);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -91,6 +91,18 @@ sub getmax {
   $dbh->disconnect;
   return($data);
 }
-  
 
+sub makelist {
+  my ($table,$kfld,$dfld)=@_;
+  my $data;
+  my $dbh=C4Connect;
+  my $sth=$dbh->prepare("Select $kfld,$dfld from $table order by $dfld");
+  $sth->execute;
+  while (my $drec=$sth->fetchrow_hashref) {
+    $data = $data."\t".$drec->{$kfld}."\t".$drec->{$dfld};
+  }	
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
+}
 END { }       # module clean-up code here (global destructor)
