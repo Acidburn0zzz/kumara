@@ -127,15 +127,14 @@ sub Issue  {
     }
     #deal with alternative loans
     #now check items 
-    #print borrower info on screen
-    clearscreen();
-    my $text="$borrower->{'title'} $borrower->{'firstname'} $borrower->{'lastname'}";
-    output(0,2,$text);
-    output(0,3,$borrower->{'streetaddress'});
-    output(0,4,$borrower->{'city'});
-    my $done=&processitems($bornum);
+ #   clearscreen();
+ #   my $text="$borrower->{'title'} $borrower->{'firstname'} $borrower->{'lastname'}";
+ #   output(0,2,$text);
+ #   output(0,3,$borrower->{'streetaddress'});
+ #   output(0,4,$borrower->{'city'});
+    my $done=&processitems($bornum,$borrower);
     while ($done eq 'No'){
-      $done=&processitems($bornum);
+      $done=&processitems($bornum,$borrower);
     }    
     $dbh->disconnect;  
     if ($done ne 'Circ'){
@@ -149,15 +148,14 @@ sub Issue  {
 sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($bornum,$dbh)=@_;
-  my $sth=$dbh->prepare("Select * from issues,item,biblio,biblioitems
-  where borrowernumber=$bornum and issues.itemnumber=item.itemnumber
-  and item.biblionumber=biblioitems.biblioitemnumber
-  and biblioitems.biblionumber=biblio.biblionumber");
+  my $sth=$dbh->prepare("Select * from issues,items,biblio
+  where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
+  and items.biblionumber=biblio.biblionumber");
   $sth->execute;
   my $i=0;
   my @items;
-  while (my $data->fetchrow_hashref){
-     $items[$i]="$data->{'title'} $data->{'author'};    
+  while (my $data=$sth->fetchrow_hashref){
+     $items[$i]="$data->{'title'} $data->{'author'}";    
      $i++;
   }
   return(\@items);
@@ -165,25 +163,20 @@ sub pastitems{
  
 
 sub processitems {
-  #process a uses items
+  #process a users items
 #  clearscreen();
-
   output(1,1,"Processing Items");
   helptext("F11 Ends processing for current borrower  F10 ends issues");
-  my ($bornum)=@_;
-  my ($itemnum,$reason)=&scanbook();
+  my ($bornum,$borrower)=@_;
   my $dbh=&C4Connect;  
   my $items=pastitems($bornum,$dbh);
-  issueswindow('Issues',$items,$items);
-  pause();
+  issuewindow('Issues',$items,$items,$borrower);
+#  pause();
+  my ($itemnum,$reason)=&scanbook();
   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
   my $sth=$dbh->prepare($query);  
   $sth->execute;
   my $item=$sth->fetchrow_hashref;  
-  #output item info
-  output(0,6,$item->{'title'});
-  output(0,7,$item->{'author'});
-#  output(0,30,$query);
   $sth->finish;
   #check if item is restricted
   if ($item->{'restricted'} == 1 ){
