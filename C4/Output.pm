@@ -73,6 +73,8 @@ sub startmenu{
     open (FILE,'/usr/local/www/hdl/htdocs/includes/members-top.inc') || die;
   } elsif ($type eq 'acquisitions'){
     open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-top.inc') || die;
+  } elsif ($type eq 'report'){
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/reports-top.inc') || die;
   } else {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc') || die;
   }
@@ -94,6 +96,8 @@ sub endmenu{
     open (FILE,'/usr/local/www/hdl/htdocs/includes/members-bottom.inc') || die;
   } elsif ($type eq 'acquisitions') {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-bottom.inc') || die;
+  } elsif ($type eq 'report') {
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/reports-bottom.inc') || die;
   } else {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc') || die;
   }
