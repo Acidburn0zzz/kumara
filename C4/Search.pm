@@ -57,22 +57,24 @@ sub CatSearch  {
   if ($type eq 'loose') {
       $query="Select count(*) from biblio,catalogueentry"; 
       if ($search->{'author'} ne ''){
-        $query=$query." where (catalogueentry.catalogueentry = biblio.author)
+        $query=$query." where ((catalogueentry.catalogueentry = biblio.author)
          and (catalogueentry.catalogueentry like '$search->{'author'}%') 
-         and (entrytype = 'a')";
-      }
-      if ($search->{'title'} ne ''){
-         if ($query =~ /where/){
-	    $query=$query." and ";
-	 } else {
-   	    $query=$query." where ";
+         and (entrytype = 'a'))";
+         if ($search->{'title'} ne ''){
+    	   $query=$query."((catalogueentry.catalogueentry = biblio.title)
+           and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
+           and (entrytype = 't'))";
 	 }
-	 $query=$query."((catalogueentry.catalogueentry = biblio.title)
-         and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
-         and (entrytype = 't'))";
+      } else {
+          if ($search->{'title'} ne ''){
+    	   $query=$query." where ((catalogueentry.catalogueentry = biblio.title)
+           and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
+           and (entrytype = 't'))";
+	 }
       }
   } 
   if ($type eq 'subject'){
+      $query="Select distinct(subject) from catalogueentry,bibliosubject"; 
       if ($search->{'subject'} ne ''){
          if ($query =~ /where/){
 	    $query=$query." and ";
@@ -80,11 +82,9 @@ sub CatSearch  {
    	    $query=$query." where ";
 	 }
 	 $search->{'subject'}=uc $search->{'subject'};
-	 $query=~ s/biblio,catalogueentry/biblio,catalogueentry,bibliosubject/;
-	 $query=$query." ((catalogueentry.catalogueentry = bibliosubject.subject)
-         and (bibliosubject.biblionumber = biblio.biblionumber)                 
+	 $query=$query." ((catalogueentry.catalogueentry = bibliosubject.subject)        
 	 and (catalogueentry.catalogueentry like '$search->{'subject'}%') 
-	 and (entrytype like 's%'))"; 
+	 and (entrytype = 's'))"; 
       }
    }
    if ($type eq 'precise'){
@@ -95,42 +95,67 @@ sub CatSearch  {
         items.biblionumber=biblio.biblionumber ";
       }
       if ($search->{'isbn'} ne ''){
+        $query="select count(*) from items,biblio,biblioitems ";
         my $search2=uc $search->{'isbn'};
-        $query=$query." where isbn='$search2' and
-        items.biblionumber=biblio.biblionumber ";
+        $query=$query." where biblioitems.isbn='$search2' and
+        items.biblioitemnumber=biblioitems.biblioitemnumber 
+	and biblioitems.biblionumber=biblio.biblionumber";
       }
     }
-#  print "$query\n";
+  print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  my $count=$sth->fetchrow_hashref;
+  my $count2=0;
+  if ($type ne 'subject'){
+    my $count=$sth->fetchrow_hashref;
+    $count2=$count->{'count'};
+  } else {
+    while (my $count = $sth->fetchrow_hashref){
+      $count2++;
+    }
+  }
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
-  if ($type ne 'precise'){
+  if ($type ne 'precise' && $type ne 'subject'){
     $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
+  } else {
+    if ($type eq 'subject'){
+      $query=$query." order by subject limit $num,$offset";
+    }
   }
   $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
   my @results;
   while (my $data=$sth->fetchrow_hashref){
-#   print "$data->{'catalogueentry'}
-#   $data->{'biblionumber'} \n";
-#    $results[$i]=ItemInfo($env,$data->{'biblionumber'}); 
+   if ($type ne 'subject'){
     $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
     $data->{'author'}";
+   } else {
+    $results[$i]="$data->{'biblionumber'}\t$data->{'subject'}\t
+    $data->{'author'}";
+   }
     $i++;
   }
   $sth->finish;
+  #only update stats if search is from opac
+#  updatesearchstats($dbh,$query);
   $dbh->disconnect;
-  return($count->{'count'},@results);
+  return($count2,@results);
+}
+
+sub updatesearchstats{
+  my ($dbh,$query)=@_;
+  
 }
 
 sub ItemInfo {
-  my ($env,$biblionumber,$title)=@_;
+  my ($env,$biblionumber)=@_;
   my $dbh = &C4Connect;
-  my $query="Select * from items 
-  where (biblionumber = '$biblionumber')";
+  my $query="Select * from items,biblio,biblioitems 
+  where (items.biblioitemnumber = biblioitems.biblioitemnumber)
+  and biblioitems.biblionumber=biblio.biblionumber
+  and biblio.biblionumber='$biblionumber'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
@@ -146,7 +171,8 @@ sub ItemInfo {
       $datedue = $idata->{'date_due'};
     }
     $isth->finish;
-     $results[$i]="$title\t$data->{'itemnumber'}\t$datedue";
+
+$results[$i]="$data->{'title'}\t$data->{'itemnumber'}\t$datedue\t$data->{'isbn'}";
      $i++;
   }
   $sth->finish;
