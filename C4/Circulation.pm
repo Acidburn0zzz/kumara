@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&Start_circ);
+@EXPORT = qw(&Start_circ &Issue);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -53,21 +53,17 @@ my $priv_func = sub {
 
 sub Start_circ{
   #connect to database
-  my $dbh=&C4Connect;  
   #start interface
-  my $interface=startint('console','Circulation');
-  my @buttons = ('< Test 1 >', '< Test 2 >', '< Test 3 >');
-  my $active='';
-   my $choice=&button($interface,@buttons,$active);
-#  if ($choice==1){
-#    &Issue($dbh,$interface);
-#  }
-  $dbh->disconnect;
+  my @menu=('Issues','Quit');
+  my @functions=('',\&Issue,\&quit);
+  &startint('console','Circ',\@menu,\@functions); 
   &endint();
 }
 
 sub Issue  {
-  my ($dbh,$interface)=@_;
+    my $dbh=&C4Connect;  
+#  my ($dbh)=@_;
+   my ($interface)=@_;
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower($interface);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
@@ -77,7 +73,8 @@ sub Issue  {
 
   if ($bornum eq ''){
     #borrower not found
-    &resultout('console',"Borrower not found",$interface);
+    &out('console',"Borrower not found",$interface);
+#    print "notfound";
   }
   $sth->finish;
   #process borrower traps (could be function)
@@ -89,13 +86,13 @@ sub Issue  {
   #check if member has a card reported as lost
   if ($borrower[22] ==1){
     #updae member info
-    &resultout('console',"Whoop whoop lost card",$interface);
+#    &resultout('console',"Whoop whoop lost card");
   }
   #check the notes field if notes exist display them
   if ($borrower[26] ne ''){
     #display notes
     #deal with notes as issue_process.doc
-    &resultout('console',"$borrower[26]",$interface);
+#    &resultout('console',"$borrower[26]",$interface);
   }
   #check if borrower has overdue items
   #call overdue checker
@@ -111,7 +108,11 @@ sub Issue  {
   #deal with alternative loans
   #now check items 
   &processitems($bornum,$interface);
+  my $borrowers=join(' ',@borrower);
+  &output('console',$borrowers,$interface);
+  $dbh->disconnect;
   return (@borrower);
+ 
 }    
 
 sub processitems { 
@@ -166,7 +167,7 @@ sub previousissue {
   $sth->finish;
   if ($borrower[0] ne ''){
     my $text="book is issued to borrower $borrower[0] $borrower[1] borrowernumber  $borrower[2]";
-    &resultout('console',$text,$interface);
+#    &resultout('console',$text,$interface);
     return("out");
   } 
 }
@@ -180,16 +181,16 @@ sub checkwaiting{
 sub scanbook {
   my ($interface)=@_;
   #scan barcode
-#  my $number='L01781778';  
-  my $number=&userdialog('console','Please enter a book barcode',$interface);
+  my $number='L01781778';  
+#  my $number=&userdialog('console','Please enter a book barcode',$interface);
   return ($number);
 }
 
 sub scanborrower {
   my ($interface)=@_;
   #scan barcode
-#  my $number='L01781778';  
-  my $number=&userdialog('console','Please enter a borrower barcode',$interface);
+  my $number='V00126643';  
+#  my $number=&userdialog('console','Please enter a borrower barcode',$interface);
   return ($number);
 }
 
