@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-use C4::InterfaceCDK;
+#use C4::InterfaceCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -54,37 +54,25 @@ my $priv_func = sub {
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
-  my $query="(Select * from biblio,catalogueentry
-  where (catalogueentry.catalogueentry=biblio.author and
-  catalogueentry.entrytype='a' and catalogueentry.catalogueentry ~*
-  '$search->{'keyword'}') union select * from biblio,catalogueentry where 
-  (catalogueentry.catalogueentry=biblio.title and 
-  catalogueentry.entrytype='t' and catalogueentry.catalogueentry ~*
-  '$search->{'keyword'}')) order by biblio.title"; 
-  my $query ="Select * from biblio where author ~* '$search->{'keyword'}' or
-title ~* '$search->{'keyword'}'";
+  my $query ="Select count(*) from biblio where author ~* '$search->{'keyword'}' or
+  title ~* '$search->{'keyword'}'";
+#    print $query;
   my $sth=$dbh->prepare($query);
-#  print $query;
-  $sth->execute;
+#  $sth->execute;
+  my $count2=$sth->fetchrow_hashref;
+  $sth->finish;  
   my $i=0;
-  my $i2=0;
-  my $limit=$num+$offset;
-  my $count=0;
+  my $count=$count2->{'count'};
   my @results;
-  while (my $data=$sth->fetchrow_hashref){
-    $count++;
-  }
-  $sth->finish;
-#  $query=$query." limit $num,$offset";
+  $query=~ s/count\(\*\)/\*/;
+  $query=$query." order by title limit $num,$offset";
   $sth=$dbh->prepare($query);
   $sth->execute;
-#  print $query;
-  while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
-    if ($i >= $offset){
-      $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
-      $i2++;
-    }
-    $i++;
+#
+  while (my $data=$sth->fetchrow_hashref){
+
+    $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
+        $i++;
   }
   $sth->finish;
   $dbh->disconnect;
@@ -97,46 +85,17 @@ sub CatSearch  {
   my $query = '';
   my $title = lc($search->{'title'}); 
   if ($type eq 'loose') {
-#      $query="Select count(*) from biblio,catalogueentry"; 
       if ($search->{'author'} ne ''){
         $query="select biblio.biblionumber,title,author from
-         biblio,catalogueentry
-         where (catalogueentry.entrytype='a' and 
-	 (catalogueentry.catalogueentry = biblio.author)	 
-         and (lower(catalogueentry.catalogueentry) ~* lower('$search->{'author'}'))) union
-	 select biblio.biblionumber,title,author from biblio,biblioanalysis
-         where	 biblioanalysis.analyticalauthor ~* '$search->{'author'}'
-	 and biblioanalysis.biblionumber=
-	 biblio.biblionumber";
-#         if ($search->{'title'} ne ''){
-#	 }
+         biblio
+         where biblio.author ~* '$search->{'author'}'";     
+         if ($search->{'title'} ne ''){ 
+	   $query=$query. " and title ~* '$search->{'title'}'";
+	 }
       } else {
           if ($search->{'title'} ne ''){
-    	    $query="select biblio.biblionumber,title,author
-       	    from biblio,catalogueentry where
-	    (lower(catalogueentry.catalogueentry) = '$title'
-	    and entrytype = 't') 
-	    and
-	    (catalogueentry.catalogueentry = biblio.title)"
-	   #union select
-           #biblio.biblionumber,title,author from
-	   #biblioanalysis,biblio where analyticaltitle ~*
-           #'^$search->{'title'}' and
-           #biblio.biblionumber=biblioanalysis.biblionumber
-           #union select biblio.biblionumber,title,author from
-           #biblio,bibliosubtitle where subtitle ~* '^$search->{'title'}' and
-           #biblio.biblionumber=bibliosubtitle.biblionumber";
-	   #$query="select biblio.biblionumber,title,author from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
-           #and (lower(catalogueentry.catalogueentry) ~* lower('^$search->{'title'}')) 
-           #and (entrytype = 't')) union select
-           #biblio.biblionumber,title,author from
-	   #biblioanalysis,biblio where analyticaltitle ~*
-           #'^$search->{'title'}' and
-           #biblio.biblionumber=biblioanalysis.biblionumber
-           #union select biblio.biblionumber,title,author from
-           #biblio,bibliosubtitle where subtitle ~* '^$search->{'title'}' and
-           #biblio.biblionumber=bibliosubtitle.biblionumber";
-	 
+            $query="select biblionumber,title,author from biblio
+	    where title ~* '$search->{'title'}'";	 
 	 }
       }
   } 

@@ -2,11 +2,6 @@
 
 use strict;
 #use DBI;
-use C4::Interface2;
+use C4::Search;
 
-
-
-startint("Circulation");
-my $data=dialog("Borrower");
-print $data;
-endint();
+print "hello";
