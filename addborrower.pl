@@ -11,6 +11,7 @@ use C4::Database;
 my $input = new CGI;
 print $input->header;
 my $data;
+my $cardnumber;
 my $action=$input->param('act');
 if ($action eq "M") {
   my $cardnumber =$input->param('item');
