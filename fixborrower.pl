@@ -29,6 +29,30 @@ while (my $data=$sth->fetchrow_hashref){
 
 }
 
+$query = "Select * from categories where (categorycode like 'V%') and (categorycode <>'HR' 
+and categorycode <> 'ST')";
+my $sth=$dbh->prepare($query);
+$sth->execute;
+while (my $data=$sth->fetchrow_hashref){
+  #update borrowers corresponding
+  #update categories
+#    my $temp=substr($data->{'categorycode'},0,1);
+  $query="update borrowers set area='H' where categorycode='$data->{'categorycode'}'";
+  my $sth2=$dbh->prepare($query);
+  $sth2->execute;
+  $sth2->finish;
+  $temp=substr($data->{'categorycode'},1,1);
+  $query="update borrowers set categorycode='$temp' where categorycode='$data->{'categorycode'}'"; 
+  $sth2=$dbh->prepare($query);
+  $sth2->execute;
+  $sth2->finish;
+   $query="delete from categories where categorycode='$data->{'categorycode'}'";
+  $sth2=$dbh->prepare($query);
+  $sth2->execute;
+  $sth2->finish;
+
+}
+
 my $query = "Select * from categories where categorycode = 'ST'";
 my $sth=$dbh->prepare($query);
 $sth->execute;

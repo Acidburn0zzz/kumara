@@ -89,6 +89,7 @@ sub CreateReserve {
   #eval {                                                           
   # updates take place here             
   if ($fee > 0) {           
+#    print $fee;
     my $nextacctno = &getnextacctno($env,$borrnum,$dbh);   
     my $updquery = "insert into accountlines       
     (borrowernumber,accountno,date,amount,description,accounttype,amountoutstanding)                                              
@@ -198,6 +199,7 @@ sub CalcReserveFee {
       }   
     }             
   }                   
+#  print "fee $fee";
   $dbh->disconnect();   
   return $fee;                                      
 }                   
