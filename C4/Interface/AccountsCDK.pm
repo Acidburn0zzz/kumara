@@ -70,10 +70,8 @@ sub accountsdialog {
      'Xpos'=>"1",'Ypos'=>"4",
      'Type'=>"INT");
   #$amountentry->set('Value'=>$amountowing);
-  my $amount =$amountentry->activate();
-                                                                
+  my $amount =$amountentry->activate();                                                                
   #debug_msg($env,"accounts $amount");
-  
   if (!defined $amount) {
      #debug_msg($env,"escaped");
      #$reason="Finished user";

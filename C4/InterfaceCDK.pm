@@ -382,7 +382,8 @@ sub borrowerbox {
     $line = $line." </R>NOTES<!R>";
   }
   if ($amountowing > 0) {
-    $line = $line." </B>$amountowing";
+    #$amountowing=fmtdec($env,$amountowing);
+    $line = $line." </B>\$$amountowing";
   }
   $borrinfo[2]=$line;
   if ($borrower->{'borrowernotes'} ne "" ) {
