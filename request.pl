@@ -27,7 +27,7 @@ my ($count,$reserves)=FindReserves($bib);
 
 print <<printend
 
-<FONT SIZE=6><em>Requesting: <a href=biblio.html>$dat->{'title'}</a> ($dat->{'author'})</em></FONT><P>
+<FONT SIZE=6><em>Requesting: <a href=/cgi-bin/koha/detail.pl?bib=$bib>$dat->{'title'}</a> ($dat->{'author'})</em></FONT><P>
 <p>
 <form action="placerequest.pl" method=post>
 <INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=187 BORDER=0 src="/images/place-request.gif" align=right >
@@ -116,7 +116,7 @@ for ($i=0;$i<$count2;$i++){
 print <<printend
 </table>
 </p>
-<form>
+</form>
 <p>&nbsp; </p>
 <!-----------MODIFY EXISTING REQUESTS----------------->
 
@@ -126,7 +126,7 @@ print <<printend
 
 <td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=6><B>MODIFY EXISTING REQUESTS </b></TD>
 </TR>
-<form action=placerequest.pl method=post>
+<form action=modrequest.pl method=post>
 <TR VALIGN=TOP>
 
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Rank</b></TD>
@@ -145,23 +145,46 @@ my $bor=$reserves->[$i]{'firstname'}."%20".$reserves->[$i]{'surname'};
 $bor=~ s/ /%20/g;
 my @temp=split('-',$reserves->[$i]{'reservedate'});
 $date="$temp[2]/$temp[1]/$temp[0]";
+my $type=$reserves->[$i]{'constrainttype'};
+if ($type eq 'a'){
+  $type='Next Available';
+} elsif ($type eq 'o'){
+  $type='This type only';
+}
 print "<tr VALIGN=TOP  >
 <TD><select name=rank-request>
-<option value=1>1
-<option value=2>2
-<option value=3>3
-<option value=\"\">Del
-</select>
+";
+for (my $i2=1;$i2<=$count;$i2++){
+  print "<option value=$i2";
+  if ($reserves->[$i]{'priority'} eq $i2){
+    print " selected";
+  }
+  print">$i2";
+}
+print "<option value=del>Del";
+print "</select>
 </td>
 <TD><a href=/cgi-bin/koha/member.pl?member=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=levin>Levin
-<option value=foxton>Foxton
-<option value=Shannon>Shannon
+<option value=levin";
+if ($reserves->[$i]{'branchcode'} eq 'L'){
+  print " selected";
+}
+print ">Levin
+<option value=foxton";
+if ($reserves->[$i]{'branchcode'} eq 'F'){
+  print " selected";
+}
+print ">Foxton
+<option value=Shannon";
+if ($reserves->[$i]{'branchcode'} eq 'S'){
+  print " selected";
+}
+print">Shannon
 </select>
 </td>
-<TD>Next Available</td>
+<TD>$type</td>
 <TD><select name=itemtype>
 <option value=next>Next Available
 <option value=change>Change Selection
