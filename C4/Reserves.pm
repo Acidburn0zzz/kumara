@@ -187,7 +187,71 @@ sub CalcReserveFee {
   #check for issues;
   my $dbh = &C4Connect;
   my $const = lc substr($constraint,0,1);
-  my $query = "select * from borrowers";
+  my $query = "select * from borrowers,categories 
+    where (borrowernumber = '$borrnum') 
+    and (borrowers.categorycode = categories.categorycode)";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  my $data = $sth->fetchrow_hashref;
+  $sth->finish();
+  my $fee = $data->{'reservefee'};
+  my $cntitems = @$bibitems;
+  if ($fee > 0) {
+    # check for items on issue
+    # first find biblioitem records
+    my @biblioitems;
+    my $query1 = "select * from biblio,biblioitems 
+       where biblionunmber = '$biblionumber'";
+    my $sth1 = $dbh->prepare($query1);
+    $sth1->execute();
+    while (my $data1=$sth1->fetchrow_hashref) {
+      if ($const eq "a") {
+        push @biblioitems,$data;
+      } else {
+        my $found = 0;
+        my $x = 0;
+	while ($x < $cntitems) {
+          if (@$bibitems->{'biblioitemnumber'} == $data->{'biblioitemnumber'}) {
+	    $found = 1;
+	  }
+	  $x++;
+        } 
+	if ($const eq 'o') { 
+	  if ($found == 1) {
+	    push @biblioitems,$data;
+	  }
+	} else {
+	  if ($found == 0) {
+	    push @biblioitems,$data;
+	  }
+	}
+      }
+    }
+    $sth1->finish;
+    my $cntitemsallowed = @biblioitems;
+    my $issues = 0;
+    my $x = 0;
+    my $allissued = 1;
+    while ($x < $cntitemsallowed) {
+      my $bitdata = @biblioitems[$x]; 
+      my $query2 = "select * from items 
+        where biblioitemnumber = '$bitdata->{'biblioitemnumber'}'"; 
+      my $sth2 = $dbh->prepare($query2);
+      $sth->execute;
+      while (my $itdata=$sth2->fetchrow_hashref) { 
+        my $query3 = "select * from issues 
+           where itemnumber = '$itdata->{'itemnumber'}";
+        my $sth3 = $dbh->prepare($query3);
+	$sth3->execute();
+	if (my $isdata=$sth3->fetchrow_hashref) {
+	  } else { $allissued = 0; }
+	}
+      $x++;
+    }
+    if ($allissued == 0) { $fee = 0;}
+  }
+  $dbh->disconnect();
+  return $fee;
   
 }
 
