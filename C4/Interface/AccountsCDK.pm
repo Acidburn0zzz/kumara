@@ -69,6 +69,7 @@ sub accountsdialog {
      'Max'=>"10",'Width'=>"10",
      'Xpos'=>"1",'Ypos'=>"4",
      'Type'=>"INT");
+  $amountentry->preProcess ('Function' => sub{preamt(@_,$env,$acctlist);});
   #$amountentry->set('Value'=>$amountowing);
   my $amount =$amountentry->activate();                                                                
   #debug_msg($env,"accounts $amount");
@@ -78,6 +79,21 @@ sub accountsdialog {
   }
   #debug_msg($env,"exit");
   return($amount,$reason);
+}
+
+sub preamt {
+  my ($input,$env,$acctlist)= @_;
+  my $key_tab  = chr(9);
+  if ($input eq $key_tab) {
+    actlist ($env,$acctlist);
+    return 0;
+  }
+  return 1;
+}
+
+sub actlist {
+  my ($env,$acctlist) = @_;
+  $acctlist->activate();
 }
 
 
