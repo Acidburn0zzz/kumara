@@ -43,35 +43,6 @@ my $priv_var    = '';
 my %secret_hash = ();
 
 #defining keystrokes used for screens
-my $lastval = chr(18);
-my $key_tab  = chr(9);
-my $key_ctla = chr(1);
-my $key_ctlb = chr(2);
-my $key_ctlc = chr(3);
-my $key_ctld = chr(4);
-my $key_ctle = chr(5);
-my $key_ctlf = chr(6);
-my $key_ctlg = chr(7);
-my $key_ctlh = chr(8);
-my $key_ctli = chr(9);
-my $key_ctlj = chr(10);
-my $key_ctlk = chr(11);
-my $key_ctll = chr(12);
-my $key_ctlm = chr(13);
-my $key_ctln = chr(14);
-my $key_ctlo = chr(15);
-my $key_ctlp = chr(16);
-my $key_ctlq = chr(17);
-my $key_ctlr = chr(18);
-my $key_ctls = chr(19);
-my $key_ctlt = chr(20);
-my $key_ctlu = chr(21);
-my $key_ctlv = chr(22);
-my $key_ctlw = chr(23);
-my $key_ctlx = chr(24);
-my $key_ctly = chr(25);
-my $key_ctlz = chr(26);
-my $lastval = $key_ctlr;
 
 # here's a file-private function as a closure,
 # callable as &$priv_func;  it cannot be prototyped.

@@ -1,6 +1,5 @@
 package C4::Interface::FlagsCDK; #asummes C4/Interface/FlagsCDK
 
-#uses Newt
 use C4::Format;
 use C4::InterfaceCDK;
 use strict;
@@ -67,6 +66,9 @@ sub trapscreen {
   } else {
     $action = @$traps_set[$act];
   }   
+  undef $titlepanel;
+  undef $flagsset;
+  undef $borpabel;
   return($action);
 }
 
@@ -89,6 +91,9 @@ sub trapsnotes {
   if (!defined $notes) { 
     $notes = $borrower->{'borrowernotes'}; 
   }
+  undef $notesbox;
+  undef $borpanel;
+  undef $titlepanel;
   return $notes;
 }
 
@@ -109,7 +114,10 @@ sub reservesdisplay {
   }
   my $reslist = new Cdk::Scroll('Title'=>"",'List'=>\@itemslist,
     'Height'=>10,'Width'=>76,'Xpos'=>1,'Ypos'=>10);
-  $reslist->activate();    
+  $reslist->activate();
+  undef $reslist;
+  undef $borpanel;
+  under $titlepanel;
 }
 
 END { }       # module clean-up code here (global destructor)
