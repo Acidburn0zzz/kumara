@@ -14,11 +14,11 @@ use C4::Circulation::Returns;
 
 
 my %env = (                                                                                      
-  branchcode => $ARGV[0], usercode => $ARGV[1], proccode => "lgon", borrowernumber => "",        
-    logintime  => "", lasttime => "", tempuser => "", debug => "9",                                
-      telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5]               
-            );  
-my ($env)=%env;
+branchcode => $ARGV[0], usercode => $ARGV[1], proccode => "lgon", borrowernumber => "",        
+logintime  => "", lasttime => "", tempuser => "", debug => "9",                                
+telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5]               
+);  
+my $env=\%env;
 
 
 my $dbh=&C4Connect;
