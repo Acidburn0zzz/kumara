@@ -148,12 +148,27 @@ sub previousissue {
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
       my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
-      my $resp = &msg_yn($env,"Book is issued to this borrower", "Renew?");
-      if ($resp eq "Y") {
-        $newdate = &renewbook($env,$dbh,$bornum,$itemnum);
-	$canissue = "R";
+      my ($resbor,$resrec) = checkreserve($env,$dbh,$itemnum);
+      if ($renewstatus == "0") {
+        info_msg($env,"</S>Issued to this borrower - No renewals<!S>");
+	$canissue = "N";
+      } elsif ($resbor ne "") {
+        my $resp = msg_ny($env,"Book is issued to this borrower",
+	  "and is reserved - Renew?");
+        if ($resp eq "Y") {
+	  $newdate = &renewbook($env,$dbh,$bornum,$itemnum);
+	  $canissue = "R";
+	} else {
+	  $canissue = "N";
+	}
       } else {
-        $canissue = "N"
+        my $resp = &msg_yn($env,"Book is issued to this borrower", "Renew?");
+        if ($resp eq "Y") {
+          $newdate = &renewbook($env,$dbh,$bornum,$itemnum);
+     	  $canissue = "R";
+        } else {
+          $canissue = "N";
+        }
       }    
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    

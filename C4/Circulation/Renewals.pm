@@ -11,6 +11,9 @@ use C4::Format;
 use C4::Accounts;
 use C4::InterfaceCDK;
 use C4::Interface::RenewalsCDK;
+use C4::Circulation::Issues;
+use C4::Circulation::Main;
+
 use C4::Search;
 use C4::Scan;
 use C4::Stats;
@@ -88,7 +91,6 @@ sub renewstatus {
     $sth2->finish;
   }   
   $sth1->finish;
-  #  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   return($renewokay);    
 }
 
@@ -107,7 +109,6 @@ sub renewbook {
     if (my $data=$sth->fetchrow_hashref) {
       $loanlength = $data->{'loanlength'}
     }
-    #C4::InterfaceCDK::debug_msg($env,$loanlength);
     $sth->finish;
     my $ti = time;
     my $datedu = time + ($loanlength * 86400);
@@ -128,6 +129,7 @@ sub renewbook {
     where borrowernumber='$bornum' and
     itemnumber='$itemno' and returndate is null";
   my $sth=$dbh->prepare($updquery);
+  
   $sth->execute;
   $sth->finish;
   return($odatedue);
@@ -144,11 +146,25 @@ sub bulkrenew {
   my @renewdef;
   my $x;
   my @barcodes;
+  my @rstatuses;
   while (my $issrec = $sth->fetchrow_hashref) {
      my $itemdata = C4::Search::itemnodata($env,$dbh,$issrec->{'itemnumber'});
      my @date = split("-",$issrec->{'date_due'});
      #my $line = $issrec->{'date_due'}." ";
      my $line = @date[2]."-".@date[1]."-".@date[0]." ";
+     my $renewstatus = renewstatus($env,$dbh,$bornum,$issrec->{'itemnumber'});
+     my ($resbor,$resrec) = C4::Circulation::Main::checkreserve($env,
+        $dbh,$issrec->{'itemnumber'});
+     if ($resbor ne "") {
+       $line = $line."R";
+       $rstatuses[$x] ="R";
+     } elsif ($renewstatus == 0) {
+       $line = $line."N";
+       $rstatuses[$x] = "N";
+     } else {
+       $line = $line."Y";
+       $rstatuses[$x] = "Y";
+     }  
      $line = $line.fmtdec($env,$issrec->{'renewals'},"20")." ";
      $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
      $items[$x] = $line;
@@ -163,10 +179,10 @@ sub bulkrenew {
      $x++;
   }  
   if ($x < 1) { 
-     #C4::InterfaceCDK::debug_msg($env,"no issues");
      return;
   }   
-  my $renews = C4::Interface::RenewalsCDK::renew_window($env,\@items,$borrower,$amount,$odues);
+  my $renews = C4::Interface::RenewalsCDK::renew_window($env,
+     \@items,$borrower,$amount,$odues);
   my $isscnt = $x;
   $x =0;
   my $y = 0;
@@ -174,7 +190,22 @@ sub bulkrenew {
   while ($x < $isscnt) {
     if (@$renews[$x] == 1) {
       my $issrec = $issues[$x];
-      renewbook($env,$dbh,$issrec->{'borrowernumber'},$issrec->{'itemnumber'},"");
+      if ($rstatuses[$x] eq "Y") {
+        renewbook($env,$dbh,$issrec->{'borrowernumber'},$issrec->{'itemnumber'},"");
+        my $charge = C4::Circulation::Issues::calc_charges($env,$dbh,
+           $issrec->{'itemnumber'},$issrec->{'borrowernumber'});
+        if ($charge > 0) {
+          C4::Circulation::Issues::createcharge($env,$dbh,
+	  $issrec->{'itemnumber'},$issrec->{'borrowernumber'},$charge);
+        }
+        &UpdateStats($env,$env->{'branchcode'},'renew',$charge);
+      } elsif ($rstatuses[$x] eq "N") {
+        C4::InterfaceCDK::info_msg($env,
+	   "</S>$barcodes[$x] - can't renew");	
+      } else {
+        C4::InterfaceCDK::info_msg($env,
+	   "</S>$barcodes[$x] - on reserve");
+      }
     }  
     $x++;
   }
