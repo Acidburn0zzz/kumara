@@ -7,6 +7,7 @@
 use CGI;
 use C4::Database;
 use C4::Input;
+use Date::Manip;
 use strict;
 
 my $input= new CGI;
@@ -33,10 +34,11 @@ if ($data{'type'} eq 'biblio'){
   $data{'biblionumber'}=$num;
 } elsif ($data{'type'} eq 'borrowers') {
   # required fields
+  $data{dateofbirth} = &UnixDate(&ParseDate($data{dateofbirth}),"%Y-%m-%d");
   my @reqflds = ("cardnumber","surname","firstname",
     "streetaddress","phone","altstreetaddress","altphone","dateofbirth","contactname");       
   my $probflds = checkflds($env,\@reqflds,\%data);
-  if ($probflds ne "") {
+  if (@$probflds[0] ne "") {
     $problems = "The following required fields are missing: <br>";
     $problems = $problems.join(", ",@$probflds)."<br>";
   }

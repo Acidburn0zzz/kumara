@@ -351,16 +351,20 @@ sub BornameSearch  {
   my $dbh = &C4Connect;
   my $query="Select * from borrowers where surname like
   '%$searchstring%' or firstname like '%$searchstring%' or othernames like 
-  '%$searchstring'";
-  print $query,"\n";
+  '%$searchstring' order by surname,firstname";
+  #print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  while (my @data=$sth->fetchrow_array){
-    print "$data[0] $data[2]\n";
+  my @results;
+  my $cnt=0;
+  while (my $data=$sth->fetchrow_hashref){
+    push(@results,$data);
+    $cnt ++;
   }
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
+  return ($cnt,\@results);
 }
 
 sub borrdata {

@@ -96,9 +96,9 @@ sub sqlupdate {
   $query=$query.$fsets." WHERE $keyfld = '$keyval'";
 #  $query=~ s/\,$/\)/;
   print $query;
-#  my $sth=$dbh->prepare($query);
-#  $sth->execute;
-#  $sth->finish;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
   $dbh->disconnect;
 }
 
