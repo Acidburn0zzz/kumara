@@ -17,7 +17,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
-&getboracctrecord); 
+&getboracctrecord &ItemType); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -365,10 +365,12 @@ sub ItemInfo {
     my $class = $data->{'classification'};
     my $dewey = $data->{'dewey'};
     $dewey =~ s/0+$//;
-    
+    if ($dewey eq "000.") { $dewey = "";};    
     if ($dewey < 10){$dewey='00'.$dewey;}
     if ($dewey < 100 && $dewey > 10){$dewey='0'.$dewey;}
-    if ($dewey eq "000.") { $dewey = "";};
+    if ($dewey <= 0){
+      $dewey='';
+    }
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
@@ -439,12 +441,12 @@ sub itemdata {
 }
 
 sub bibdata {
-  my ($bibnum)=@_;
+  my ($bibnum,$type)=@_;
   my $dbh=C4Connect;
   my $query="Select * from biblio,biblioitems,bibliosubject,bibliosubtitle where biblio.biblionumber=$bibnum
   and biblioitems.biblionumber=$bibnum and
-(bibliosubject.biblionumber=$bibnum or bibliosubject.biblionumber=1) and
-(bibliosubtitle.biblionumber=$bibnum or bibliosubtitle.biblionumber=1)";
+(bibliosubject.biblionumber=$bibnum or bibliosubject.biblionumber=1) and 
+(bibliosubtitle.biblionumber=$bibnum)"; 
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -671,8 +673,18 @@ sub itemcount {
   $sth->finish; 
   $dbh->disconnect;                   
   return ($count,$lcount,$nacount,$fcount,$scount); 
+}
 
-
+sub ItemType {
+  my ($type)=@_;
+  my $dbh=C4Connect;
+  my $query="select description from itemtypes where itemtype='$type'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $dat=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return ($dat->{'description'});
 }
 END { }       # module clean-up code here (global destructor)
 

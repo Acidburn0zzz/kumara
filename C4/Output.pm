@@ -66,13 +66,13 @@ sub gotopage{
 sub startmenu{
   my ($type)=@_;
   if ($type eq 'issue') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/issues-top.inc');
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-top.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/opac-top.inc');
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-top.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/members-top.inc');
   } else {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/cat-top.inc');
   }
   my @string=<FILE>;
   close FILE;
@@ -85,13 +85,13 @@ sub startmenu{
 sub endmenu{
   my ($type)=@_;
   if ($type eq 'issue'){
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/issues-bottom.inc');
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-bottom.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/opac-bottom.inc');
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-bottom.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/members-bottom.inc');
   } else {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc');
+    open (FILE,'/usr/local/www/koha/htdocs/includes/cat-bottom.inc');
   }
   my @string=<FILE>;
   close FILE;

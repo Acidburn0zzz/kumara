@@ -28,14 +28,16 @@ print startmenu($type);
 my $blah;
 my $bib=$input->param('bib');
 my $title=$input->param('title');
-print "<a href=request.pl?bib=$bib><img height=42  WIDTH=120 BORDER=0 src=\"/images/requests.gif\" align=right border=0></a>";
-
+if ($type ne 'opac'){
+  print "<a href=request.pl?bib=$bib><img height=42  WIDTH=120 BORDER=0 src=\"/images/requests.gif\" align=right border=0></a>";
+}
 
 
 my @items=ItemInfo(\$blah,$bib,$title);
 my $dat=bibdata($bib);
 my $count=@items;
-print mkheadr(3,$dat->{'title'});
+my @temp=split('\t',$items[0]);
+print mkheadr(3,"$title ($dat->{'author'}) $temp[4]");
 print <<printend
 
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width="220">
@@ -46,7 +48,14 @@ print <<printend
 
 <TR VALIGN=TOP>
 
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BIBLIO RECORD $bib</TD></TR>
+<td  bgcolor="$main" 
+printend
+;
+if ($type ne 'opac'){
+ print "background=\"/images/background-mem.gif\"";
+}
+print <<printend
+><B>BIBLIO RECORD $bib</TD></TR>
 
 
 <tr VALIGN=TOP  >
@@ -66,7 +75,12 @@ Analytical Title: <br>
 Serial: $dat->{'serial'}<br>
 Total Number of Items: $count
 <p>
-<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
+printend
+;
+if ($type ne 'opac'){
+  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
+}
+print <<printend
 </font></TD>
 </TR>
 
@@ -83,7 +97,7 @@ my $i=0;
 print center();
 print mktablehdr;
 if ($type eq 'opac'){
-  print mktablerow(6,$main,'Itemtype','Class','Location','DateDue','Lastseen','Barcode'); 
+  print mktablerow(5,$main,'Itemtype','Class','Branch','DateDue','Lastseen'); 
 } else {
   print mktablerow(6,$main,'Itemtype','Class','Location','DateDue','Lastseen','Barcode',"/images/background-mem.gif"); 
 }
@@ -96,11 +110,21 @@ while ($i < $count){
   if ($results[2] eq ''){
     $results[2]='Available';
   }
-  if ($colour == 1){                                                                          
-    print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                        
+  if ($colour == 1){
+    if ($type ne 'opac'){
+      print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);
+    } else {
+       $results[6]=ItemType($results[6]);
+       print mktablerow(5,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7]);
+    } 
     $colour=0;                                                                                
   } else{                                                                                     
-    print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
+    if ($type ne 'opac'){
+      print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
+    } else {
+      $results[6]=ItemType($results[6]);
+      print mktablerow(5,'white',$results[6],$results[4],$results[3],$results[2],$results[7]);                                          
+    }
     $colour=1;                                                                                
   }
    $i++;

@@ -98,21 +98,22 @@ sub UpdateFine {
   my ($itemnum,$bornum,$amount)=@_;
   my $dbh=C4Connect;
   my $query="Select * from accountlines where itemnumber=$itemnum and
-borrowernumber=$bornum and accounttype='FU'";
+  borrowernumber=$bornum and (accounttype='FU' or accounttype='O' or
+accounttype='F')";
   my $sth=$dbh->prepare($query);
+#  print "$query\n";
   $sth->execute;
   if (my $data=$sth->fetchrow_hashref){
     print "in accounts ...";
-    if ($data->{'amount'} != $amount){
+    if ($data->{'amount'} != $amount && ($data->{'accounttype'} ne 'F'){
       print "updating";
       my $diff=$amount - $data->{'amount'};
       my $out=$data->{'amountoutstanding'}+$diff;
       my $query2="update accountlines set date=now(), amount=$amount,
-      amountoutstanding=$out where accountno=$data->{'accountno'}";
+      amountoutstanding=$out,accounttype='FU' where accountno=$data->{'accountno'}";
       my $sth2=$dbh->prepare($query2);
       $sth2->execute;
-      $sth2->finish;
-      
+      $sth2->finish;      
     } else {
       print "no update needed $data->{'amount'}"
     }

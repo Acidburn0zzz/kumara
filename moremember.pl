@@ -26,7 +26,7 @@ print <<printend
 
 <form action=/cgi-bin/koha/wmemberentry.pl method=post>
 
-<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left>
+<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=270>
 
 <TR VALIGN=TOP>
 
