@@ -13,7 +13,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&UpdateStats &statsreport &Count &Overdues &TotalOwing);
+@EXPORT = qw(&UpdateStats &statsreport &Count &Overdues &TotalOwing
+&TotalPaid);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -129,7 +130,7 @@ sub TotalOwing{
   my $dbh=C4Connect;
   my $query="Select sum(amountoutstanding) from accountlines";
   if ($type eq 'fine'){
-    $query=$query." where accounttype='F'";
+    $query=$query." where accounttype='F' or accounttype='FN'";
   }
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -139,6 +140,20 @@ sub TotalOwing{
   return($total->{'sum'});
 }
 
+sub TotalPaid {
+  my ($time)=@_;
+  my $dbh=C4Connect;
+  my $query="Select sum(amount) from accountlines where accounttype='Pay'";
+  if ($time eq 'today'){
+    $query=$query." and datetime(date::date) >= datetime('yesterday'::date)";
+  }
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+   my $total=$sth->fetchrow_hashref;
+   $sth->finish;
+  $dbh->disconnect; 
+  return($total->{'sum'});
+}
 END { }       # module clean-up code here (global destructor)
   
     

@@ -8,6 +8,6 @@ use CGI;
 
 my $input=new CGI;
 print $input->header;
-my $count=TotalOwing('fine');
-$count=$count*1;
+my $count=TotalPaid('today');
+$count=$count*-1;
 print $count;
