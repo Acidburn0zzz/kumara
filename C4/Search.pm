@@ -97,7 +97,8 @@ sub CatSearch  {
       $query="Select * from biblio,catalogueentry,bibliosubject
       where (catalogueentry.catalogueentry = bibliosubject.subject)
       and (bibliosubject.biblionumber = biblio.biblionumber)
-      and (catalogueentry.catalogueentry like '%$searchstring%')
+#     and (catalogueentry.catalogueentry like '%$searchstring%')
+      and (catalogueentry.catalogueentry *~ '%$searchstring%')
       and (entrytype like '$type%')";
       last SWITCH;
     };
@@ -109,8 +110,9 @@ sub CatSearch  {
   my $sth=$dbh->prepare($query);
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
-    print "$data->{'catalogueentry'}
-    $data->{'biblionumber'} \n";
+#   print "$data->{'catalogueentry'}
+#   $data->{'biblionumber'} \n";
+    ItemInfo($data->{'biblionumber'}); 
   }
   $sth->execute;
   $sth->finish;
@@ -118,20 +120,27 @@ sub CatSearch  {
 }    
 
 sub ItemInfo {
-  my ($bibliono)=@_;
+  my ($biblionumber)=@_;
   my $dbh = &C4Connect;
-  my $query="Select * from items,issues,biblioitems 
-  where (items.bibliono = '%$bibliono%') 
-  and (items.itemnumber = issues.itemnumber)
-  and (issues.returndate is null)
-  and (";
-  print $query,"\n";
+  my $query="Select * from items 
+  where (biblionumber = '$biblionumber')";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
-    print "$data->{'catalogueentry'}
-    $data->{'biblionumber'}"
+    my $iquery = "Select * from issues
+    where itemnumber = '$data->{'itemnumber'}'
+    and returndate is null";
+    my $datedue = '';
+    my $isth=$dbh->prepare($iquery);
+    $isth->execute;
+    if (my $idata=$isth->fetchrow_hashref){
+      $datedue = $idata->{'date_due'};
+    }
+    $isth->execute;
+    $isth->finish;
+    print "$data->{'itemnumber'} $datedue\n";
   }
+  $sth->execute;
   $sth->finish;
   $dbh->disconnect;
 }
