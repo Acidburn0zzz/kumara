@@ -83,19 +83,16 @@ sub menu2 {
   my ($title,@items)=@_;
   my $numitems=@items;
   my $panel = Newt::Panel(1, 4, $title);
-  my $b0 = Newt::Button(fmtstr("",@items[0],"C30"),1);
-  my $b1 = Newt::Button(fmtstr("",@items[1],"C30"),1);
-  my $b2 = Newt::Button(fmtstr("",@items[2],"C30"),1);
-  my $b3 = Newt::Button(fmtstr("",@items[3],"C30"),1);
-  $b0->Tag(@items[0]);
-  $b1->Tag(@items[1]);
-  $b2->Tag(@items[2]);
-  $b3->Tag(@items[3]); 
-  $panel->Add(0,0,$b0);
-  $panel->Add(0,1,$b1);
-  $panel->Add(0,2,$b2);
-  $panel->Add(0,3,$b3);
+  my @buttons;
+  my $i=0;
+  while ($i < $numitems) {
+    $buttons[$i] =  Newt::Button(fmtstr("",@items[$i],"C20"),1);
+    $buttons[$i]->Tag(@items[$i]);
+    $panel->Add(0,$i,$buttons[$i]);
+    $i++;
+  }
   $panel->AddHotKey(NEWT_KEY_F11);
+  Newt::PushHelpLine('F11 exits');
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
@@ -143,14 +140,14 @@ sub helptext {
 
 
 sub selborrower {
-  my ($env,$dbh,@borrows,@bornums)=@_;
+  my ($env,$dbh,$borrows,$bornums)=@_;
   my $panel = Newt::Panel(1, 4, "Select Borrower");
-  my $numbors = @borrows;
+  my $numbors = @$borrows;
   if ($numbors>15) {
     $numbors = 15;
   }
   my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE | NEWT_FLAG_RETURNEXIT);
-  $li->Add(@borrows);
+  $li->Add(@$borrows);
   my $bdata;
 #  my $butt = Newt::Button("Okay");
   $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
@@ -189,6 +186,7 @@ sub returnwindow {
   $panel->Add(0,2,$li1,NEWT_ANCHOR_LEFT);
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
+  Newt::PushHelpLine('F11 Menu');
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
@@ -231,7 +229,7 @@ sub borrowerwindow {
   $panel->Add(1,9,$bt2);  
   my ($reason,$data)=$panel->Run();
   $stuff=$data->Tag();
-#  debug_msg("",$stuff);
+# debug_msg("",$stuff);
   return($reason,$stuff);
 }  
   
@@ -337,8 +335,8 @@ sub logondialog {
    my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT );       
    my $panel1=Newt::Panel(2,1,$title);
    my $panel2=Newt::Panel(1,5,''); 
-   my $listbx=Newt::Listbox(12, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT |
-NEWT_FLAG_MULTIPLE | NEWT_FLAG_BORDER );
+   my $listbx=Newt::Listbox(12, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_BORDER );
+   #my $listbx=Newt::Listbox(12, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT |  NEWT_FLAG_BORDER );
    $panel1->AddHotKey(NEWT_KEY_F11);
    $panel1->AddHotKey(NEWT_KEY_F10);   
    $panel1->Add(0,0,$panel2,NEWT_ANCHOR_TOP); 
@@ -351,8 +349,11 @@ NEWT_FLAG_MULTIPLE | NEWT_FLAG_BORDER );
    my ($reason,$data)=$panel1->Run();
    my ($username) = $entry1->Get();
    my ($password) = $entry2->Get();
-   my @stuff=$listbx->Get();
+   my @stuff  = $listbx->Get();
+   #my $stuff = $listbx->Get();
+   #my $branch=$stuff;
    my ($branch)   = $stuff[0];
+   #debug_msg($branch);
    if ($reason eq NEWT_EXIT_HOTKEY) {
       if ($data eq NEWT_KEY_F11) {
 	 $reason="Cancelled Input ";
@@ -373,26 +374,20 @@ sub borrower_dialog {
   my $label2=Newt::Label(" Book: ");
   my $panel1=Newt::Panel(4,4,$name,1,1);
   $panel1->AddHotKey(NEWT_KEY_F11);
-  $panel1->AddHotKey(NEWT_KEY_F10);  
-  $panel1->AddHotKey(NEWT_KEY_F9);
   $panel1->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel1->Add(1,0,$entry,NEWT_ANCHOR_LEFT);
   $panel1->Add(2,0,$label2,NEWT_ANCHOR_LEFT);
   $panel1->Add(3,0,$entry2,NEWT_ANCHOR_LEFT);
   my ($reason,$data)=$panel1->Run();
+  Newt::PushHelpLine('F11 Menu');
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
       $reason="Circ";         
     }
-    if ($data eq NEWT_KEY_F10) {  
-      $reason="Finished issues";         
-    }
     if ($data eq NEWT_KEY_F12){
       $reason="Quit";
     }
-    if ($data eq NEWT_KEY_F9) {
-    }
-  }
+   }
 #  Newt::Finished();
   my $stuff=$entry->Get();
   my $stuff2=$entry2->Get();
@@ -423,11 +418,12 @@ sub msg_yn {
 
 sub debug_msg {
   my ($env,$text)=@_;
-  my $panel1=Newt::Panel(4,4,"*** D E B U G ***");
+  my $panel1=Newt::Panel(1,2,"*** D E B U G ***");
   my $label1=Newt::Label($text);
-  my $butt=Newt::Button("Okay");
+  my $butt=Newt::Button("Okay",1);
   $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
   $panel1->Add(0,1,$butt,NEWT_ANCHOR_TOP);
+  $panel1->Move(1,20);
   my ($reason,$data) =$panel1->Run();
   return();
 }
@@ -440,6 +436,7 @@ sub error_msg {
   $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
   $panel1->Add(0,1,$butt,NEWT_ANCHOR_TOP);
   my ($reason,$data) =$panel1->Run();
+  $panel1->DESTROY();
   return();
 }
 

@@ -103,7 +103,8 @@ sub reconcileaccount {
   while (my $data=$sth->fetchrow_hashref){
     my $line=$i+1;
     my $amount=0+$data->{'amountoutstanding'};
-    $line=$data->{'date'}." ".fmtdec($env,$amount,"52");
+    $line= 
+     $data->{'date'}." ".fmtdec($env,$amount,"52")." ".fmtstr($data->{'description'},"L15");
     push @accountlines,$line;
 #    $text="$line\t$data->{'date'}\t$amount\t$data->{'description'}";
 #    output (1,$row,$text);
