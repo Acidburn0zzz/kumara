@@ -14,6 +14,7 @@ my $input = new CGI;
 #print $input->header;
 
 my @bibitems=$input->param('biblioitem');
+my @reqbib=$input->param('reqbib');
 my $biblio=$input->param('biblio');
 my $borrower=$input->param('member');
 my $branch=$input->param('pickup');
@@ -21,7 +22,7 @@ my @rank=$input->param('rank-request');
 my $type=$input->param('type');
 my $bornum=borrdata($borrower);
 if ($type eq 'str8' && $bornum ne ''){
- my $count=@bibitems;
+my $count=@bibitems;
 @bibitems=sort @bibitems;
 my $i2=1;
 my @realbi;
@@ -39,12 +40,18 @@ my $env;
 my $const;
 if ($input->param('request') eq 'any'){
   $const='a';
+  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi,$rank[0]);
+} elsif ($reqbib[0] ne ''){
+  $const='o';
+  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@reqbib,$rank[0]);
+} else {
+  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,'a',\@realbi,$rank[0]);
 }
-CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi,$rank[0]);
 #print @realbi;
 
 print $input->redirect("request.pl?bib=$biblio");
 } elsif ($bornum eq ''){
   print $input->header();
   print "Invalid card number please try again";
+  print $input->dump;
 }
