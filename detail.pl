@@ -29,12 +29,13 @@ my $blah;
 my $bib=$input->param('bib');
 my $title=$input->param('title');
 print "<a href=request.pl?bib=$bib><img height=42  WIDTH=120 BORDER=0 src=\"/images/requests.gif\" align=right border=0></a>";
-print mkheadr(3,$title);
+
 
 
 my @items=ItemInfo(\$blah,$bib,$title);
 my $dat=bibdata($bib);
 my $count=@items;
+print mkheadr(3,$dat->{'title'});
 print <<printend
 
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width="220">
@@ -45,24 +46,24 @@ print <<printend
 
 <TR VALIGN=TOP>
 
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BIBLIO RECORD</TD></TR>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BIBLIO RECORD $bib</TD></TR>
 
 
 <tr VALIGN=TOP  >
 <TD>
 <br>
 <FONT SIZE=2  face="arial, helvetica">
-Biblio Number: $bib<br>
-Author: $dat->{'author'}<br>
-Title: $title<br>
-Copyright:$dat->{'copyrightdate'}<br>
 Subtitle: $dat->{'subtitle'}<br>
-Unititle: $dat->{'unititle'}<br>
-Notes: $dat->{'notes'}<br>
-Serial: $dat->{'serial'}<br>
+Author: $dat->{'author'}<br>
+Additional Author: <br>
 Seriestitle: $dat->{'seriestitle'}<br>
 Subject: $dat->{'subject'}<br>
-Groups: $dat->{'classification'}<br>
+Copyright:$dat->{'copyrightdate'}<br>
+Notes: $dat->{'notes'}<br>
+Unititle: $dat->{'unititle'}<br>
+Analytical Author: <br>
+Analytical Title: <br>
+Serial: $dat->{'serial'}<br>
 Total Number of Items: $count
 <p>
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 

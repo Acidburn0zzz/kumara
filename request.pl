@@ -139,7 +139,12 @@ print <<printend
 printend
 ;
 $count--;
+
 for ($i=0;$i<$count;$i++){
+my $bor=$reserves->[$i]{'firstname'}."%20".$reserves->[$i]{'surname'};
+$bor=~ s/ /%20/g;
+my @temp=split('-',$reserves->[$i]{'reservedate'});
+$date="$temp[2]/$temp[1]/$temp[0]";
 print "<tr VALIGN=TOP  >
 <TD><select name=rank-request>
 <option value=1>1
@@ -148,8 +153,8 @@ print "<tr VALIGN=TOP  >
 <option value=\"\">Del
 </select>
 </td>
-<TD><a href=/cgi-bin/koha/members.pl>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
-<TD>$reserves->[$i]{'reservedate'}</td>
+<TD><a href=/cgi-bin/koha/member.pl?member=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
+<TD>$date</td>
 <TD><select name=pickup>
 <option value=levin>Levin
 <option value=foxton>Foxton

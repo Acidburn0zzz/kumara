@@ -250,15 +250,22 @@ sub CatSearch  {
 #print $query;
   my $sth=$dbh->prepare($query);
     $sth->execute;
-  my $data=$sth->fetchrow_arrayref;
-  my $count=$data->[0];
+  my $count=0;
+  if ($type eq 'subject'){ 
+    while (my $data=$sth->fetchrow_arrayref){
+      $count++;
+    }
+  } else {
+    my $data=$sth->fetchrow_arrayref;
+    $count=$data->[0];
+  }
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
   if ($type ne 'precise' && $type ne 'subject'){
     if ($search->{'author'} ne ''){
       $query=$query." order by author,title limit $offset,$num";
     } else {
-          $query=$query." order by title limit $offset,$num";
+      $query=$query." order by title limit $offset,$num";
      }
   } else {
     if ($type eq 'subject'){
@@ -462,13 +469,21 @@ sub itemnodata {
 sub BornameSearch  {
   my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
+  my @data=split(' ',$searchstring);
+  my $count=@data;
   my $query="Select * from borrowers 
-  where surname like '%$searchstring%' 
-  or firstname  like '%$searchstring%' 
-  or othernames like '%$searchstring%'
-  or cardnumber = '$searchstring'
+  where ((surname like '%$data[0]%' 
+  or firstname  like '%$data[0]%' 
+  or othernames like '%$data[0]%')
+  ";
+  for (my $i=1;$i<$count;$i++){
+    $query=$query." and (surname like '%$data[$i]%'                   
+    or firstname  like '%$data[$i]%'                     
+    or othernames like '%$data[$i]%')";
+  }
+  $query=$query.") or cardnumber = '$searchstring'
   order by surname,firstname";
-  #print $query,"\n";
+  print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
