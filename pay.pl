@@ -7,6 +7,7 @@ use strict;
 use C4::Output;
 use CGI;
 use C4::Search;
+use C4::Accounts2;
 my $input=new CGI;
 
 
@@ -18,7 +19,7 @@ my $data=borrdata('',$bornum);
 #get account details
 my %bor;
 $bor{'borrowernumber'}=$bornum;                            
-my ($numaccts,$accts,$total)=getboracctrecord('',\%bor);   
+
 
 my @names=$input->param;
 my %inp;
@@ -30,8 +31,13 @@ for (my $i=0;$i<@names;$i++){
     $check=1;
   }
 }
+my %env;
+my $total=$input->param('total');
 if ($check ==0){
-  
+  if ($total ne ''){
+    recordpayment(\%env,$bornum,$total);
+  }
+my ($numaccts,$accts,$total)=getboracctrecord('',\%bor);     
 print $input->header;
 print startpage();
 print startmenu('member');
