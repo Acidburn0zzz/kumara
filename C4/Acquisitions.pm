@@ -302,7 +302,7 @@ sub modbibitem {
 }
 
 sub newbiblioitem {
-  my ($bibnum,$itemtype,$isbn)=@_;
+  my ($bibnum,$itemtype,$isbn,$volinf)=@_;
   my $dbh=C4Connect;
   my $query="Select max(biblioitemnumber) from biblioitems";
   my $sth=$dbh->prepare($query);
@@ -312,9 +312,9 @@ sub newbiblioitem {
   $bibitemnum++;
   $sth->finish;
   $query="insert into biblioitems (biblionumber,biblioitemnumber,
-  itemtype,isbn) 
+  itemtype,isbn,volumeddesc) 
   values
-  ($bibnum,$bibitemnum,'$itemtype','$isbn')";
+  ($bibnum,$bibitemnum,'$itemtype','$isbn','$volinf')";
   $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
@@ -494,6 +494,7 @@ sub makeitems {
   $sth->finish;
   $item++;
   for (my $i=0;$i<$count;$i++){
+    $barcodes[$i]=uc $barcodes[$i];
     my $query="Insert into items (biblionumber,biblioitemnumber,itemnumber,barcode,
     booksellerid,dateaccessioned,homebranch,holdingbranch,price,replacementprice,
     replacementpricedate) values

@@ -36,6 +36,12 @@ if ($quantrec != 0){
 
 my $gst=$input->param('gst');
 my $freight=$input->param('freight');
+my $volinf=$input->param('volinf');
+if ($volinf ne ''){
+#  print "$bibitemno";
+  $bibitemno=newbiblioitem($biblio,$itemtype,$isbn,$volinf);
+#  print "here $bibitemno";
+}
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
 modbiblio($biblio,$title,$author,$copyright);
 modbibitem($bibitemno,$itemtype,$isbn);

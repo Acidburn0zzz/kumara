@@ -106,6 +106,13 @@ Shopping Basket For: $booksellers[0]->{'name'}
 <td><input type=text size=20 name=barcode>
 </td>
 </tr>
+
+<TR VALIGN=TOP bgcolor=#ffffcc >
+<TD><B>Volume Info (for serials) *</B></td>
+
+<td><input type=text size=20 name=volinf>
+</td>
+</tr>
 </table>
 
 
