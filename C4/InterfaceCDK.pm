@@ -5,6 +5,7 @@ use C4::Format;
 use C4::Interface::Funkeys;
 use strict;
 use Cdk;
+use Date::Manip;
 #use C4::Circulation;
 
 require Exporter;
@@ -295,15 +296,18 @@ sub actloanlength {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
   $loanlength->preProcess ('Function' =>
     sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
-  $validdate = "N"
+  my $validdate = "N";
   while ($validdate = "N") {
     my $loanlength = $loanlength->activate();
     if (!defined $loanlength) {
       $env->{'loanlength'} = "";
       $validdate = "Y";
     } else {
-      ***************
-      $env->{'loanlength'} = $loanlength;
+#      ***************
+      if (my $date=ParseDate($loanlength) > ParseDate('today')){
+        $validdate="Y";
+        $env->{'loanlength'} = $date;
+      }
     }
   }  
   return;
