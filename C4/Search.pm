@@ -677,7 +677,11 @@ sub itemissues {
       $data->{'date_due'}=$data2->{'date_due'};
       $data->{'card'}=$data2->{'cardnumber'};
     } else {
-      $data->{'date_due'}='Available';
+      if ($data->{'wthdrawn'} eq '1'){
+        $data->{'date_due'}='Cancelled';
+      } else {
+        $data->{'date_due'}='Available';
+      }
     }
     $sth2->finish;
     $query2="select * from issues,borrowers where itemnumber='$data->{'itemnumber'}'
