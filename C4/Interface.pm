@@ -72,11 +72,32 @@ sub startint {
 sub menu {
   my ($type,$title,@items)=@_;
   if ($type eq 'console'){
-    my ($reason,$data)=list($title,@items);
-    return($reason,$data);
+#  my ($reason,$data)=list($title,@items);
+ my ($reason,$data)=menu2($title,@items);
+ 
+  return($reason,$data);
   } 
 }
 
+sub menu2 {
+  my ($title,@items)=@_;
+  my $numitems=@items;
+  my $panel = Newt::Panel(1, 4, $title);
+  my $radio = Newt::VRadiogroup(@items);
+  my $okay  = Newt::Button("Okay");
+  $panel->Add(0,0,$radio,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,1,$okay);
+  $panel->AddHotKey(NEWT_KEY_F11);
+  my ($reason,$data)=$panel->Run();
+  $stuff = @items[$radio->Get()];
+  if ($reason eq NEWT_EXIT_HOTKEY) {
+    if ($data eq NEWT_KEY_F11) {
+       $stuff="Quit";
+    }
+  }
+  return($reason,$stuff);
+}
+  
 sub clearscreen{
   Newt::Cls();
 }
@@ -118,8 +139,7 @@ sub list {
 #  if ($reason eq NEWT_EXIT_HOTKEY) {   
 #    if ($data eq NEWT_KEY_F11) {  
 #        $reason="Quit";         
-#    }
-#  }
+#    } my $numitems=@items;
   my @stuff=$li->Get();
   $data=$stuff[0];
   return($reason,$data);

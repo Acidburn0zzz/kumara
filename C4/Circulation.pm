@@ -132,7 +132,7 @@ sub previousissue {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
       my $resp = &msg_yn($text,"Mark as returned?");
       if ($resp == "y") {
-        &returnrecord($env,$dbh,$bornum,$itemnum);
+        &returnrecord($env,$dbh,$borrower->{'borrowernumber'},$itemnum);
 	# can issue
       } else {
         # can't issue

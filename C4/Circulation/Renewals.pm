@@ -62,6 +62,7 @@ sub Return  {
 sub renewstatus {
   # check renewal status
   my ($env,$dbh,$bornum,$itemno)=@_;
+  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   return();
 }
 

@@ -121,7 +121,7 @@ sub issueitem{
    my $canissue = 1;
    ##  my ($itemnum,$reason)=&scanbook();
    my $query="Select * from items,biblio where (barcode='$itemnum') and
-       (items.biblionumber=biblio.biblionumber)";
+      (items.biblionumber=biblio.biblionumber)";
    my $item;
    my $sth=$dbh->prepare($query);  
    $sth->execute;
@@ -144,6 +144,9 @@ sub issueitem{
        my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});    
        #if charge deal with it
      }   
+     if ($canissue == 1) {
+       my $charge = calc_charges($env,$dbh,$itemnum,$bornum);
+     }
      if ($canissue == 1) {
        #now mark as issued
        &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum)
@@ -177,6 +180,13 @@ sub updateissues{
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
+}
+
+sub calc_charges {
+  # calculate charges due
+  my ($env, $dbh, $itemno, $bornum)=@_;
+  my $charge;
+  return ($charge);
 }
 
 END { }       # module clean-up code here (global destructor)

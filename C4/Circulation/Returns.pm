@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&returnrecord);
+@EXPORT = qw(&returnrecord &calc_odues);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -54,24 +54,27 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
-
-sub Return  {
-  
-}    
-
+    
 sub returnrecord {
   # mark items as returned
   my ($env,$dbh,$bornum,$itemno)=@_;
+  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   my @datearr = localtime(time);
   my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
   my $query = "update issues 
-  set returndate = $dateret, branchcode = $env->{'branchcode'}
+  set returndate = '$dateret', branchcode = '$env->{'branchcode'}'
   where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
   and (returndate is null)";  
   my $sth = $dbh->prepare($query);
   $sth->execute;
-  return();
+  return($amt_owing);
 }
 
+sub calc_odues {
+  # calculate overdue fees
+  my ($env,$dbh,$bornum,$itemno)=@_;
+  my $amt_owing;
+  return($amt_owing);
+}  
 
 END { }       # module clean-up code here (global destructor)
