@@ -12,7 +12,7 @@ use strict;
 my $input=new CGI;
 print $input->header();
 my $id=$input->param('id');
-my ($count,@booksellers)=bookseller($id); 
+
 print startpage;
 
 print startmenu('acquisitions');
@@ -22,7 +22,8 @@ my $invoice=$input->param('invoice');
 my $freight=$input->param('freight');
 my $gst=$input->param('gst');
 my ($count,@results)=ordersearch($search);
-print $count;
+my ($count2,@booksellers)=bookseller($results[0]->{'booksellerid'}); 
+#print $count;
 
 
 if ($count == 1){
@@ -47,11 +48,12 @@ win.document.write("</font></body></html>");
 <input type=hidden name=biblio value=$results[0]->{'biblionumber'}>
 <input type=hidden name=ordnum value=$results[0]->{'ordernumber'}>
 <input type=hidden name=biblioitemnum value=$results[0]->{'biblioitemnumber'}>
+<input type=hidden name=bookseller value=$results[0]->{'booksellerid'}>
 <input type=hidden name=freight value=$freight>
 <input type=hidden name=gst value=$gst>
 <input type=image  name=submit src=/images/save-changes.gif border=0 width=187 height=42 align=right>
 <FONT SIZE=6><em>$results[0]->{'ordernumber'} - Recieve Order</em></FONT><br>
-Shopping Basket For: Whitcoulls New Zealand
+Shopping Basket For: $booksellers[0]->{'name'}
 <P>
 <CENTER>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width="40%">
@@ -90,10 +92,10 @@ Shopping Basket For: Whitcoulls New Zealand
 <TR VALIGN=TOP>
 <TD>Branch</td>
 <td><select name=branch size=1>
-<option value=1 selected>District
-<option value=1>Levin
-<option value=1>Foxton
-<option value=1>Shannon
+<option value=D selected>District
+<option value=C>Levin
+<option value=F>Foxton
+<option value=S>Shannon
 </select>
 </td>
 </tr>

@@ -13,7 +13,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&getorders &bookseller &breakdown &basket &newbasket &bookfunds
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
- &bookfundbreakdown &curconvert &updatesup &insertsup);
+ &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -126,7 +126,7 @@ sub ordersearch {
      $sth2->finish;
      $data->{'author'}=$data2->{'author'};
      $sth2=$dbh->prepare("Select * from aqorderbreakdown where
-ordernumber='$data->{'ordernumber'}");
+    ordernumber='$data->{'ordernumber'}");
     $sth2->execute;
     $data2=$sth2->fetchrow_hashref;
     $sth2->finish;
@@ -273,11 +273,13 @@ sub newbiblio {
 sub modbiblio {
   my ($bibnum,$title,$author,$copyright)=@_;
   my $dbh=C4Connect;
+  $title=~ s/\'/\\\'/g;
+  $author=~ s/\'/\\\'/g;
   my $query="update biblio set title='$title',
   author='$author',copyrightdate='$copyright' where
   biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
-#  print $query;
+#    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
@@ -380,11 +382,11 @@ sub newordernum {
 }
 
 sub receiveorder {
-  my ($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno)=@_;
+  my ($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight)=@_;
   my $dbh=C4Connect;
   my $query="update aqorders set quantityreceived='$quantrec',
   datereceived=now(),booksellerinvoicenumber='$invoiceno',
-  biblioitemnumber=$bibitemno,unitprice=$cost
+  biblioitemnumber=$bibitemno,unitprice=$cost,freight=$freight
   where biblionumber=$biblio and ordernumber=$ordnum
   ";
 #  print $query;
@@ -448,6 +450,29 @@ sub insertsup {
   return($data->{'id'});
 }
 
+sub makeitems {
+  my ($count,$bibitemno,$biblio,$replacement,$price,$booksellerid,$branch,@barcodes)=@_;
+  my $dbh=C4Connect;
+  my $sth=$dbh->prepare("Select max(itemnumber) from items");
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  my $item=$data->{'max(itemnumber)'};
+  $sth->finish;
+  $item++;
+  for (my $i=0;$i<$count;$i++){
+    my $query="Insert into items (biblionumber,biblioitemnumber,itemnumber,barcode,
+    booksellerid,dateaccessioned,homebranch,holdingbranch,price,replacementprice,
+    replacementpricedate) values
+    ($biblio,$bibitemno,$item,'$barcodes[$i]','$booksellerid',now(),'$branch',
+    '$branch',$price,$replacement,now())";
+    my $sth=$dbh->prepare($query);
+    $sth->execute;
+    $sth->finish;
+    $item++;
+#    print $query;
+  }
+  $dbh->disconnect;
+}
 END { }       # module clean-up code here (global destructor)
   
     
