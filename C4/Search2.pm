@@ -343,7 +343,7 @@ sub CatSearch  {
         my @key=split(' ',$search->{'author'});
 	my $count=@key;
 	my $i=1;
-        $query="select *,biblio.author from
+        $query="select *,biblio.author,biblio.biblionumber from
          biblioitems,biblio
 	 left join additionalauthors
 	 on additionalauthors.biblionumber =biblio.biblionumber
