@@ -222,7 +222,7 @@ sub borrowerwindow {
   $panel->Add(0,6,$bt1);
   $panel->Add(1,6,$bt2);  
   my ($reason,$data)=$panel->Run();
-  $stuff=$data->Tag()
+  $stuff=$data->Tag();
   return($stuff);
 }  
   

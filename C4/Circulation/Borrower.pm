@@ -131,7 +131,7 @@ sub findborrower  {
   my $issuesallowed;
   if ($reason ne "Finished issues") {
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
-    output(1,1,$borrowers);
+#    output(1,1,$borrowers);
     $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
   }
   return ($bornum, $issuesallowed,$borrower,$reason);
