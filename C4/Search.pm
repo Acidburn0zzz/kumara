@@ -266,7 +266,7 @@ $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$
   }
   $sth->finish;
   $dbh->disconnect;
-  $i--;
+#  $i--;
   return($i,@res2);
 }
 
