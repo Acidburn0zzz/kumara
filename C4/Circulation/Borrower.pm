@@ -23,7 +23,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&findborrower &Borenq &findoneborrower &NewBorrowerNumber);
+@EXPORT = qw(&findborrower &Borenq &findoneborrower &NewBorrowerNumber
+&findguarantees);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -361,4 +362,21 @@ sub NewBorrowerNumber {
   $dbh->disconnect;
 }
 
+sub findguarantees{
+  my ($bornum)=@_;
+  my $dbh=C4Connect;
+  my $query="select cardnumber,borrowernumber from borrowers where 
+  guarantor='$bornum'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @dat;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $dat[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@dat);
+}
 END { }       # module clean-up code here (global destructor)
