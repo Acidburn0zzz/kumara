@@ -18,7 +18,7 @@ $VERSION = 0.01;
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
 &getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle
-&addauthor &bibitems); 
+&addauthor &bibitems &barcodes); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -974,6 +974,24 @@ sub bibitems {
   return($i,@results);
 }
 
+sub barcodes{
+  my ($biblioitemnumber)=@_;
+  my $dbh=C4Connect;
+  my $query="Select barcode from items where
+   biblioitemnumber='$biblioitemnumber'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @barcodes;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $barcodes[$i]=$data->{'barcode'};
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return(@barcodes);
+  
+}
 END { }       # module clean-up code here (global destructor)
 
 

@@ -88,7 +88,7 @@ print <<printend
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Item Type</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Classification</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Volume</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Number</b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>ISBN</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Copyright</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pubdate</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Copies</b></TD>
@@ -96,22 +96,26 @@ print <<printend
 printend
 ;
 my $blah;
-my @data=ItemInfo(\$blah,$bib,'intra');
-my $count2=@data;
+my ($count2,@data)=bibitems($bib);
 for ($i=0;$i<$count2;$i++){
-  my @stuff=split('\t',$data[$i]);
+  my @barcodes=barcodes($data[$i]->{'biblioitemnumber'});
+  if ($data[$i]->{'dewey'} == 0){
+    $data[$i]->{'dewey'}="";
+  }
+  $data[$i]->{'dewey'}=~ s/\.0000$//;
+  $data[$i]->{'dewey'}=~ s/00$//;
+  my $class="$data[$i]->{'classification'}$data[$i]->{'dewey'}$data[$i]->{'subclass'}";
   print "<tr VALIGN=TOP  >
-  <TD><input type=checkbox name=reqbib value=$stuff[8]>
-  <input type=hidden name=biblioitem value=$stuff[8]>
+  <TD><input type=checkbox name=reqbib value=$data[$i]->{'biblioitemnumber'}>
+  <input type=hidden name=biblioitem value=$data[$i]->{'biblioitemnumber'}>
   </td>
-  <TD>$stuff[6]</td>
-  <TD>$stuff[4]
-  </td>																								
-  <td>$stuff[9]</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td>$stuff[1], $stuff[2] </td>
+  <TD>$data[$i]->{'description'}</td>
+  <TD>$class</td>																								
+  <td>$data[$i]->{'volumeddesc'}</td>
+  <td>$data[$i]->{'isbn'}</td>
+  <td>$dat->{'copyrightdate'}</td>
+  <td>$data[$i]->{'publicationyear'}</td>
+  <td>@barcodes</td>
   </tr>";
 }
 print <<printend
@@ -144,8 +148,9 @@ $count--;
 for ($i=0;$i<$count;$i++){
 print "<input type=hidden name=borrower value=$reserves->[$i]{'borrowernumber'}>";
 print "<input type=hidden name=biblio value=$reserves->[$i]{'biblionumber'}>";
-my $bor=$reserves->[$i]{'firstname'}."%20".$reserves->[$i]{'surname'};
-$bor=~ s/ /%20/g;
+#my $bor=$reserves->[$i]{'firstname'}."%20".$reserves->[$i]{'surname'};
+#$bor=~ s/ /%20/g;
+my $bor=$reserves->[$i]{'borrowernumber'};
 my @temp=split('-',$reserves->[$i]{'reservedate'});
 $date="$temp[2]/$temp[1]/$temp[0]";
 my $type=$reserves->[$i]{'constrainttype'};
@@ -170,7 +175,7 @@ for (my $i2=1;$i2<=$count;$i2++){
 print "<option value=del>Del";
 print "</select>
 </td>
-<TD><a href=/cgi-bin/koha/member.pl?member=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
+<TD><a href=/cgi-bin/koha/moremember.pl?bornum=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
 <TD>$date</td>
 <TD><select name=pickup>
 <option value=C";
