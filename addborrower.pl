@@ -32,7 +32,7 @@ $inputs{'altcity'}="text\t";
 $inputs{'altphone'}="text\t";
 $inputs{'category'}="select".$catlist;
 $inputs{'dateofbirth'}="text\t";
-$inputs{'contactnotes'}="text\t";
+$inputs{'contactname'}="text\t";
 $inputs{'borrowernotes'}="textarea\t";
 $inputs{'type'}="hidden\tborrowers";
 print mkform('/cgi-bin/kumara/insertdata.pl',%inputs);
