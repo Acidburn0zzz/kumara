@@ -166,9 +166,18 @@ sub mkform2{
         $text="<input type=radio name=$key value=$data[1]>$data[1]
 	<input type=radio name=$key value=$data[2]>$data[2]";
       } elsif ($data[0] eq 'text') {
-        $text="<input type=$data[0] name=$key value=\"$data[1]\">";
+        my $size = $data[1];
+        if ($size eq "") {
+          $size=40;
+        }
+        $text="<input type=$data[0] name=$key size=$size value=\"$data[2]\">";
       } elsif ($data[0] eq 'textarea') {
-        $text="<textarea name=$key wrap=physical cols=40 rows=4>$data[1]</textarea>";
+        my @size=split("x",$data[1]);
+        if ($data[1] eq "") {
+          $size[0] = 40;
+          $size[1] = 4;
+        }
+        $text="<textarea name=$key wrap=physical cols=$size[0] rows=$size[1]>$data[2]</textarea>";
       } elsif ($data[0] eq 'select') {
         $text="<select name=$key>";
 	my $sel=$data[1];

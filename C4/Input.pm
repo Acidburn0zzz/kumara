@@ -49,7 +49,7 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
  
 sub checkflds {
-  my ($reqflds,$data) = @_;
+  my ($env,$reqflds,$data) = @_;
   my $numrflds = @$reqflds;
   my @probarr;
   my $i = 0;
@@ -57,27 +57,31 @@ sub checkflds {
     if ($data->{@$reqflds[$i]} eq "") {
       push(@probarr, @$reqflds[$i]);
     }  
+    $i++
   }
   return (\@probarr);
 }
 
 sub checkdigit {
-  my ($infl) =  @_;
+  my ($env,$infl) =  @_;
   $infl = uc $infl;
-  my @weightings = (9,4,6,3,5,2,1);
+  my @weightings = (8,4,6,3,5,2,1);
   my $sum;
   my $i = 1;
   my $valid = 0;
+  #  print $infl."<br>";
   while ($i <8) {
-    $sum = $sum + $weightings[$i-1] * substr($infl,$i,1);
-    print "$i\t$infl\t$sum\t$weightings[$i-1]\t".substr($infl,$i,1)."\n";
+    my $temp1 = $weightings[$i-1];
+    my $temp2 = substr($infl,$i,1);
+    $sum = $sum + ($temp1*$temp2);
+   # print "$sum $temp1 $temp2<br>";
     $i++;
   }
   my $rem = ($sum%11);
-  print $rem;
   if ($rem == 10) {
     $rem = "X";
   }  
+  #print $rem."<br>";
   if ($rem eq substr($infl,8,1)) {
     $valid = 1;
   }
