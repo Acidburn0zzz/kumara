@@ -90,6 +90,13 @@ Shopping Basket For: $booksellers[0]->{'name'}
 </tr>
 
 <TR VALIGN=TOP>
+
+<TD>Series</td>
+<td><input type=text size=20 name=Series value="$results[0]->{'seriestitle'}">
+</td>
+</tr>
+
+<TR VALIGN=TOP>
 <TD>Branch</td>
 <td><select name=branch size=1>
 <option value=D selected>District

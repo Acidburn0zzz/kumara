@@ -24,6 +24,7 @@ my $branch=$input->param('branch');
 my $bookfund=$input->param('bookfund');
 my $itemtype=$input->param('format');
 my $isbn=$input->param('ISBN');
+my $series=$input->param('Series');
 my $bookseller=$input->param('bookseller');
 $id=$bookseller;
 my $title=$input->param('title');
@@ -44,7 +45,7 @@ if ($volinf ne ''){
 #  print "here $bibitemno";
 }
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
-modbiblio($biblio,$title,$author,$copyright);
+modbiblio($biblio,$title,$author,$copyright,$series);
 modbibitem($bibitemno,$itemtype,$isbn,$volinf,$class);
 my $barcode=$input->param('barcode');
 my @barcodes;

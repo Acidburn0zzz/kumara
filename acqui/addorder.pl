@@ -26,6 +26,7 @@ my $ordnum=$input->param('ordnum');
 my $basketno=$input->param('basket');
 my $quantity=$input->param('quantity');
 my $listprice=$input->param('list_price');
+my $series=$input->param('Series');
 if ($listprice eq ''){
   $listprice=0;
 }
@@ -44,14 +45,14 @@ if ($existing eq 'no'){
   $bibnum=newbiblio($title,$author,$copyright);
   $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
   newsubtitle($bibnum);
-
+  modbiblio($bibnum,$title,$author,$copyright,$series);
 } else {
   $bibnum=$input->param('biblio');
   $bibitemnum=$input->param('bibitemnum');
   if ($bibitemnum eq ''){
     $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
   }
-  modbiblio($bibnum,$title,$author,$copyright);
+  modbiblio($bibnum,$title,$author,$copyright,$series);
 
 }
 neworder($bibnum,$title,$ordnum,$basketno,$quantity,$listprice,$supplier,$who,$notes,$bookfund,$bibitemnum,$rrp,$ecost,$gst);
