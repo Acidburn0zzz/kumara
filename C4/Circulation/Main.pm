@@ -70,6 +70,14 @@ sub getbranch {
     push @branches,$data;
   }
   brmenu ($env,\@branches);
+  my $query = "select * from branches  
+    where branchcode = '$env->{'branchcode'}'";
+  $sth = $dbh->prepare($query);
+  $sth->execute;
+  my $data = $sth->fetchrow_hashref;
+  $env->{'brdata'} = $data;
+  $sth->finish;
+  $dbh->disconnect;
 }
 
 sub getprinter {
@@ -83,6 +91,8 @@ sub getprinter {
     push @printers,$data;
   }
   prmenu ($env,\@printers);
+  $sth->finish;
+  $dbh->disconnect;
   }
 		      
 sub pastitems{

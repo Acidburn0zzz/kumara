@@ -68,6 +68,7 @@ sub Issue  {
    #clearscreen();
    my $done;
    my ($items,$items2,$amountdue);
+   my $itemsdet;
    $env->{'sysarea'} = "Issues";
    $done = "Issues";
    while ($done eq "Issues") {
@@ -89,9 +90,9 @@ sub Issue  {
        $done = "No";
        my $it2p=0;
        while ($done eq 'No'){
-         ($done,$items2,$it2p,$amountdue) =
+         ($done,$items2,$it2p,$amountdue,$itemsdet) =
             &processitems($env,$bornum,$borrower,$items,
-	    $items2,$it2p,$amountdue);
+	    $items2,$it2p,$amountdue,$itemsdet);
        }
      }
    }   
@@ -102,7 +103,7 @@ sub Issue  {
 
 sub processitems {
   #process a users items
-   my ($env,$bornum,$borrower,$items,$items2,$it2p,$amountdue,$odues)=@_;
+   my ($env,$bornum,$borrower,$items,$items2,$it2p,$amountdue,$itemsdet,$odues)=@_;
    my $dbh=&C4Connect;  
    $env->{'newborrower'} = "";
    my ($itemnum,$reason) = 
@@ -114,6 +115,9 @@ sub processitems {
      if ($datedue ne "") {
        my $line = formatitem($env,$item,$datedue,$charge);
        $items2->[$it2p] = $line;
+       $item->{'datedue'} = $datedue;
+       $item->{'charge'} = $charge;
+       $itemsdet->[$it2p] = $item;
        $it2p++;
        $amountdue += $charge;
      }
@@ -124,19 +128,20 @@ sub processitems {
    if ($env->{'newborrower'} ne "") {$reason = "Finished user";} 
    if ($reason eq 'Finished user'){
      if (@$items2[0] ne "") {
-       remoteprint($env,$items2,$borrower);
+       remoteprint($env,$itemsdet,$borrower);
        if ($amountdue > 0) {
          &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
        }
      }  
      @done = ("Issues");
    } elsif ($reason eq "Print"){
-     remoteprint($env,$items2,$borrower);
+     remoteprint($env,$itemsdet,$borrower);
      @done = ("No",$items2,$it2p);
    } else {
      if ($reason ne 'Finished issues'){
-       #return No to let them know that we wish to process more Items for borrower
-       @done = ("No",$items2,$it2p,$amountdue);
+       #return No to let them know that we wish to 
+       # process more Items for borrower
+       @done = ("No",$items,$it2p,$amountdue,$itemsdet);
      } else  {
        @done = ("Circ");
      }

@@ -1,3 +1,4 @@
+
 package C4::Print; #asummes C4/Print.pm
 
 use strict;
@@ -49,6 +50,9 @@ my $priv_func = sub {
 
 sub remoteprint {
   my ($env,$items,$borrower)=@_;
+  #open (FILE,">/tmp/olwen");
+  #print FILE "queue $env->{'queue'}";
+  #close FILE;
   #debug_msg($env,"In print");
   my $file=time;
   my $queue = $env->{'queue'};
@@ -56,16 +60,26 @@ sub remoteprint {
 #  print $queue;
   #open (FILE,">/tmp/$file");
   my $i=0;
+  my $brdata = $env->{'brdata'};
+  print PRINTER "Horowhenua Library Trust\r\n";
+  print PRINTER "$brdata->{'branchname'}\r\n";
+  print PRINTER "Phone: 368-1953\r\n";   
+  print PRINTER "Fax:    367-9218\r\n";   
+  print PRINTER "Email:  renewals\@library.org.nz\r\n\r\n\r\n";
   print PRINTER "$borrower->{'cardnumber'}\r\n";
   print PRINTER "$borrower->{'firstname'} $borrower->{'surname'}\r\n";
   while ($items->[$i]){
-    print PRINTER "$items->[$i]\r\n";
+    my $itemdata = $items->[$i];
+    print PRINTER "$itemdata->{'title'}\r\n";
+    print PRINTER "$itemdata->{'barcode'}";
+    print PRINTER " "x15;
+    print PRINTER "$itemdata->{'datedue'}\r\n";
     $i++;
   }
   print PRINTER "\r\n\r\n";
   if ($env->{'printtype'} eq "docket"){
-    print chr(7);
-  }
+    print chr(27).chr(105);
+  } 
   close PRINTER;
   #system("lpr /tmp/$file");
 }
@@ -89,7 +103,7 @@ sub printreserve {
   print PRINTER "$itemdata->{'author'}";
   print PRINTER "\r\n\r\n";
   if ($env->{'printtype'} eq "docket"){ 
-    print chr(7);
+    print chr(27).char(105);
   }  
   close PRINTER;
   #system("lpr /tmp/$file");
