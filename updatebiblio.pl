@@ -29,10 +29,16 @@ my $class=$input->param('Class');
 my $classification;
 my $dewey;
 my $subclass;
-if ($itemtype eq 'PER'){
+if ($itemtype ne 'NF'){
   $classification=$class;
 }
-if ($class =~/0-9/){
+if ($class =~/[0-9]+/){
+   print $class;
+   $dewey= $class;
+   $dewey=~ s/[a-z]+//gi;
+   my @temp=split(/[0-9]+\.[0-9]+/,$class);
+   $classification=$temp[0];
+   $subclass=$temp[1];
 }else{
   $dewey='';
 }
