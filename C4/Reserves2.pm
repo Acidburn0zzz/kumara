@@ -235,13 +235,33 @@ sub updatereserves{
     $query.="set  priority='$rank' where
     biblionumber=$biblio and borrowernumber=$borrower";
   } else {
-    $query.="set cancellationdate=now() where biblionumber=$biblio 
-    and borrowernumber=$borrower";
+    $query="Select * from reserves where biblionumber=$biblio and
+    borrowernumber=$borrower";
+    my $sth=$dbh->prepare($query);
+    $sth->execute;
+    my $data=$sth->fetchrow_hashref;
+    $sth->finish;
+    $query="Select * from reserves where biblionumber=$biblio and 
+    priority > $data->{'priority'} and cancellationdate is NULL 
+    order by priority";
+    my $sth2=$dbh->prepare($query) || die $dbh->errstr;
+    $sth2->execute || die $sth2->errstr;
+    while (my $data=$sth2->fetchrow_hashref){
+      $data->{'priority'}--;
+      $query="Update reserves set priority=$data->{'priority'} where
+      biblionumber=$data->{'biblionumber'} and
+      borrowernumber=$data->{'borrowernumber'}";
+      my $sth3=$dbh->prepare($query);
+      $sth3->execute || die $sth3->errstr;
+      $sth3->finish;
+    }
+    $sth2->finish;
+    $query="update reserves set cancellationdate=now() where biblionumber=$biblio 
+    and borrowernumber=$borrower";    
   }
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  $sth->finish;
-  
+  $sth->finish;  
   $dbh->disconnect;
 }
 

@@ -15,7 +15,7 @@ $VERSION = 0.01;
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
 &getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
-&findall &needsmod &delitem);
+&findall &needsmod &delitem &delbibitem);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -700,6 +700,30 @@ sub delitem{
   $sth->execute;
   $sth->finish;
   $query = "Delete from items where itemnumber=$itemnum";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub delbibitem{
+  my ($itemnum)=@_;
+  my $dbh=C4Connect;
+  my $query="select * from biblioitems where biblioitemnumber=$itemnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @data=$sth->fetchrow_array;
+  $sth->finish;
+  $query="Insert into deletedbibitems values (";
+  foreach my $temp (@data){
+    $query=$query."'$temp',";
+  }
+  $query=~ s/\,$/\)/;
+#  print $query;
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $query = "Delete from biblioitems where biblioitemnumber=$itemnum";
   $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;

@@ -55,6 +55,7 @@ print <<printend
 <p>
 <form action=/cgi-bin/koha/modbibitem.pl>
 <input type=hidden name=bibitem value=$bi>
+<input type=hidden name=biblio value=$bib>
 <!-------------------BIBLIO ITEM------------>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left>
 <TR VALIGN=TOP>
@@ -63,7 +64,7 @@ print <<printend
 <tr VALIGN=TOP  >
 <TD width=210 >
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
-<INPUT TYPE="image" name="submit"  VALUE="delete" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
+<INPUT TYPE="image" name="delete"  VALUE="delete" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
 <br>
 <FONT SIZE=2  face="arial, helvetica">
 <b>Biblionumber:</b> $bib<br>
