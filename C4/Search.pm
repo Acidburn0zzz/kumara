@@ -196,8 +196,8 @@ sub subsearch {
   my ($env,$subject)=@_;
   my $dbh=C4Connect();
   my $query="Select * from biblio,bibliosubject where
-biblio.biblionumber=bibliosubject.biblionumber and
-bibliosubject.subject='$subject'";
+  biblio.biblionumber=bibliosubject.biblionumber and
+  bibliosubject.subject='$subject'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
