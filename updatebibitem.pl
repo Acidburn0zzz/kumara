@@ -78,7 +78,7 @@ if ($existing eq 'YES'){
         $flag2="leastone";
       }
    }
-   if ($flag eq 'notall'){
+   if ($flag eq 'notall' && $flag2 eq 'leastone'){
       $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
       modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
       for (my $i=0;$i<$count;$i++){
