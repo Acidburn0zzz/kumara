@@ -215,9 +215,13 @@ sub breakdown {
 sub basket {
   my ($basketno)=@_;
   my $dbh=C4Connect;
-  my $query="Select *,biblio.title from aqorders,biblio,biblioitems where basketno='$basketno'
+  my $query="Select *,biblio.title from aqorders,biblio,biblioitems 
+  where basketno='$basketno'
   and biblio.biblionumber=aqorders.biblionumber and biblioitems.biblioitemnumber
-  =aqorders.biblioitemnumber group by aqorders.ordernumber";
+  =aqorders.biblioitemnumber 
+  and (datecancellationprinted is NULL or datecancellationprinted =
+  '0000-00-00')
+  group by aqorders.ordernumber";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -515,7 +519,8 @@ sub neworder {
 sub delorder {
   my ($bibnum,$ordnum)=@_;
   my $dbh=C4Connect;
-  my $query="Delete from aqorders where biblionumber='$bibnum' and
+  my $query="update aqorders set datecancellationprinted=now()
+  where biblionumber='$bibnum' and
   ordernumber='$ordnum'";
   my $sth=$dbh->prepare($query);
 #  print $query;
