@@ -252,6 +252,11 @@ sub issuewindow {
   my $loanlength = new Cdk::Entry('Label'=>"Due Date:      ",
     'Max'=>"30",'Width'=>"11",
     'Xpos'=>0,'Ypos'=>5,'Type'=>"UMIXED");
+  my $x = 0;
+  while ($x < length($env->{'loanlength'})) {
+     $loanlength->inject('Input'=>substr($env->{'loanlength'},$x,1));
+     $x++;
+  }
   my $borrbox = borrowerbox($env,$borrower,$amountowing);
   my $entryBox = new Cdk::Entry('Label'=>"Book Barcode:  ",
      'Max'=>"11",'Width'=>"11",
@@ -260,7 +265,8 @@ sub issuewindow {
   $scroll1->draw(); 
   $loanlength->draw(); 
   $borrbox->draw();   
-  $env->{'loanlength'} = "";
+  #$env->{'loanlength'} = "";
+  #debug_msg($env,"clear len");
   my $x;
   my $barcode;
   $entryBox->preProcess ('Function' => 
@@ -297,16 +303,23 @@ sub actloanlength {
   $loanlength->preProcess ('Function' =>
     sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   my $validdate = "N";
-  while ($validdate = "N") {
+  while ($validdate eq "N") {
     my $loanlength = $loanlength->activate();
     if (!defined $loanlength) {
       $env->{'loanlength'} = "";
       $validdate = "Y";
-    } else {
-#      ***************
-      if (my $date=ParseDate($loanlength) > ParseDate('today')){
+    } elsif ($loanlength eq "") {
+      $env->{'loanlength'} = "";
+      $validdate = "Y";
+    } else {    
+      my $date = ParseDate($loanlength);
+      if ( $date > ParseDate('today')){
         $validdate="Y";
-        $env->{'loanlength'} = $date;
+	my $fdate = substr($date,0,4).'-'.substr($date,4,2).'-'.substr($date,4,2);
+	#debug_msg($env,"$date $fdate");
+        $env->{'loanlength'} = $fdate;
+      } else { 
+        error_msg($env,"Invalid date"); 
       }
     }
   }  

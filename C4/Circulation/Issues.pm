@@ -72,6 +72,7 @@ sub Issue  {
     while ($done eq "Issues") {
       my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);      
       #C4::Circulation::Borrowers
+      $env->{'loanlength'}="";
       if ($reason ne "") {
         $done = $reason;
       } elsif ($issuesallowed eq "0") {
@@ -89,7 +90,7 @@ sub Issue  {
           ($done,$items2,$it2p) =
              &processitems($env,$bornum,$borrower,$items,
 	     $items2,$it2p,$amountdue);
-        }    
+        }
         #debug_msg("","after processitems done = $done");
       }
       #debug_msg($env,"after borrd $done");
@@ -113,7 +114,8 @@ sub processitems {
          $items2->[$it2p] = $line;
 	 $it2p++;
          $amountdue += $charge;
-      }  
+      }
+      $env->{'loanlength'}="";
    }
    $dbh->disconnect;
    #check to see if more books to process for this user
@@ -160,7 +162,7 @@ sub issueitem{
       (items.biblioitemnumber=biblioitems.biblioitemnumber) ";
    my $item;
    my $charge;
-   my $datedue;
+   my $datedue = $env->{'loanlength'};
    my $sth=$dbh->prepare($query);  
    $sth->execute;
    if ($item=$sth->fetchrow_hashref) {
@@ -178,7 +180,11 @@ sub issueitem{
      #check if item is on issue already
      if ($canissue == 1) {
        my ($currbor,$issuestat) = &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
-       #if ($issuestat ) {$canissue = 0;};
+       if ($issuestat eq "N") { 
+         $canissue = 0;
+       } elsif ($issuestat eq "R") {
+         $canissue = -1;
+       }  
      } 
      if ($canissue == 1) {
        #check reserve
@@ -196,7 +202,7 @@ sub issueitem{
        $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);        
        #debug_msg("","date $datedue");
        &UpdateStats($env,$env->{'branchcode'},'issue');
-     } else {
+     } elsif ($canissue == 0) {
        debug_msg($env,"can't issue");
      }  
    } else {
@@ -219,19 +225,25 @@ sub updateissues{
   if (my $data=$sth->fetchrow_hashref) {
     $loanlength = $data->{'loanlength'}
   }
-  $sth->finish;
-  my $ti = time;
-  my $datedue = time + ($loanlength * 86400);
-  my @datearr = localtime($datedue);
-  my $dateduef = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
+  $sth->finish;	        
+  my $dateduef;
+  if ($env->{'loanlength'} eq "") {
+    my $ti = time;
+    my $datedue = time + ($loanlength * 86400);
+    my @datearr = localtime($datedue);
+    $dateduef = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
+  } else {
+    $dateduef = $env->{'loanlength'};
+  }  
   $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
   values ($bornum,$itemno,'$dateduef','$env->{'branchcode'}')";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
   #my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($datedue);
-  my $dateret=$datearr[3]."-".($datearr[4]+1)."-".(1900+$datearr[5]);
-  debug_msg($env,"returning $dateret");
+  my @datearr = split('-',$dateduef);
+  my $dateret = join('-',$datearr[2],$datearr[1],$datearr[0]);
+  #debug_msg($env,"returning $dateret");
   return($dateret);
 }
 
