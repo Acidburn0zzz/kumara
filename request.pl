@@ -141,6 +141,8 @@ printend
 $count--;
 
 for ($i=0;$i<$count;$i++){
+print "<input type=hidden name=borrower value=$reserves->[$i]{'borrowernumber'}>";
+print "<input type=hidden name=biblio value=$reserves->[$i]{'biblionumber'}>";
 my $bor=$reserves->[$i]{'firstname'}."%20".$reserves->[$i]{'surname'};
 $bor=~ s/ /%20/g;
 my @temp=split('-',$reserves->[$i]{'reservedate'});
