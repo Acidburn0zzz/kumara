@@ -135,7 +135,7 @@ sub getallorders {
 sub ordersearch {
   my ($search,$biblio)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from aqorders,biblioitems,biblio
+  my $query="Select *,biblio.title from aqorders,biblioitems,biblio
   where aqorders.biblioitemnumber=
   biblioitems.biblioitemnumber and biblio.biblionumber=aqorders.biblionumber 
   and ((";
