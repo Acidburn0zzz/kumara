@@ -12,6 +12,9 @@ my $input=new CGI;
 
 
 my $bornum=$input->param('bornum');
+if ($bornum eq ''){
+  $bornum=$input->param('bornum0');
+}
 #get borrower details
 my $data=borrdata('',$bornum);
 my $user=$input->remote_user;
