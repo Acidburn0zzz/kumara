@@ -75,12 +75,15 @@ sub pastitems{
   my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio
   where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
-  and items.biblionumber=biblio.biblionumber");
+  and items.biblionumber=biblio.biblionumber
+  and returndate is null
+  order by date_due");
   $sth->execute;
   my $i=0;
   my @items;
   while (my $data=$sth->fetchrow_hashref){
-     $items[$i]="$data->{'title'} $data->{'date_due'}";    
+     my $line = "$data->{'date_due'} $data->{'title'}".(" "x30);
+     $items[$i]=substr($line,0,40);
      $i++;
   }
   return(\@items);
@@ -115,11 +118,10 @@ sub previousissue {
     if ($bornum eq $borrower->{'borrowernumber'}){
       # output(1,24,"Book is marked as issue to current borrower");       
       my $resp = &msg_yn("Book is issued to this borrower", "Renew?");
-  
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
       # output(1,24,$text);
-      my $resp = &msg_yn($text,"Return");
+      my $resp = &msg_yn($text,"Return?");
     }
   } 
   return($borrower->{'borrowernumber'});

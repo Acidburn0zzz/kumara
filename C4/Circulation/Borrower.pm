@@ -58,15 +58,16 @@ my $priv_func = sub {
 
 sub findborrower  {
   my ($env,$dbh) = @_;
-  my $dbh=&C4Connect;
   helptext('');
   clearscreen();
   my $bornum = "";
   my $borrower = "";
   my $sth = "";
+  my $borcode = "";
+  my $reason = "";
   while ($bornum eq '') {
     #get borrowerbarcode from scanner
-    my ($borcode,$reason)=&scanborrower();
+    ($borcode,$reason)=&scanborrower();
     if ($borcode ne '') {
       #  output(1,1,$borcode);
       $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
@@ -83,7 +84,7 @@ sub findborrower  {
   $borrower->{'surname'}));
   output(1,1,$borrowers);
   my $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
-  return ($bornum, $issuesallowed,$borrower);
+  return ($bornum, $issuesallowed,$borrower,$reason);
 }  
 
 sub checktraps {

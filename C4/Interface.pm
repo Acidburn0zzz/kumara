@@ -19,7 +19,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&textbox &menu &issuewindow &msg_yn &borrower_dialog);
+&textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -133,21 +133,23 @@ sub issuewindow {
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
   my $l3  = Newt::Label("Borrower Info");
-  my $li  = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-  my $li2 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-  my $li3 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-  $li->Add($items1->[0],$items1->[1]);
+  my $li1 = Newt::Listbox(5,
+    NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
+  my $li2 = Newt::Listbox(5,
+    NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
+  my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  $li1->Add($items1->[0],$items1->[1]);
   $li2->Add($items2->{'title'});
   $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
   "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
- $panel->AddHotKey(NEWT_KEY_F10);
+  $panel->AddHotKey(NEWT_KEY_F10);
   $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,45);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
   $panel->Add(0,2,$li3,NEWT_ANCHOR_LEFT);  
   $panel->Add(0,3,$l1,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,4,$li,NEWT_ANCHOR_LEFT);  
+  $panel->Add(0,4,$li1,NEWT_ANCHOR_LEFT);  
   $panel->Add(1,3,$l2,NEWT_ANCHOR_RIGHT);
   $panel->Add(1,4,$li2,NEWT_ANCHOR_RIGHT);  
  
@@ -247,6 +249,18 @@ sub msg_yn {
   $panel1->Add(0,2,$bpanel,NEWT_ANCHOR_TOP);
   my ($reason,$data) =$panel1->Run();
   return($reason);
+}
+
+
+sub debug_msg {
+  my ($env,$text)=@_;
+  my $panel1=Newt::Panel(4,4,"");
+  my $label1=Newt::Label($text);
+  my $butt=Newt::Button("Okay");
+  $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
+  $panel1->Add(0,1,$butt,NEWT_ANCHOR_TOP);
+  my ($reason,$data) =$panel1->Run();
+  return();
 }
 
 sub endint {

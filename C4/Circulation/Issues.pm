@@ -62,7 +62,7 @@ sub Issue  {
     #clear help
     helptext('');
     clearscreen();
-    my ($bornum,$issuesallowed,$borrower) = &findborrower($env,$dbh);
+    my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
     #deal with alternative loans
     #now check items 
     clearscreen();
@@ -100,37 +100,11 @@ sub processitems {
     $row++;
   }
   my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
-  $itemnum=uc $itemnum;
-#  my ($itemnum,$reason)=&scanbook();
-  my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
-  my $sth=$dbh->prepare($query);  
-  $sth->execute;
-  my $item=$sth->fetchrow_hashref;  
-  $items2=$item;
-  $sth->finish;
-  #check if item is restricted
-  if ($item->{'restricted'} == 1 ){
-    output(20,1,"whoop whoop restricted");
-    #check borrowers status to take out restricted items
-    # if borrower allowed {
-    #  book issued
-    # } else {
-    #  next item
-    # }
-  } else {
-    #check if item is on issue already
-    my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
-    #check reserve
-    my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});
-    
-    #if charge deal with it
-    #now mark as issued
-    &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
-    my $branch;
-    &UpdateStats($env,$branch,'issue');
+  if ($itemnum ne ""){ 
+    my ($item,$items2) = &issueitem($env,$dbh,$itemnum,$bornum,$items,$items2);
     output(40,$row2,$item->{'title'});
-    $row2++;
-  }
+    $row2++;	      
+  }  
   $dbh->disconnect;
   #check to see if more books to process for this user
   if ($reason eq 'Finished user'){
@@ -143,6 +117,45 @@ sub processitems {
       return('Circ');
     }
   }
+}
+
+sub issueitem{
+   my ($env,$dbh,$itemnum,$bornum,$items,$items2)=@_;
+   $itemnum=uc $itemnum;
+   my $canissue = 1;
+ #  my ($itemnum,$reason)=&scanbook();
+   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
+   my $sth=$dbh->prepare($query);  
+   $sth->execute;
+   my $item=$sth->fetchrow_hashref;  
+   $items2=$item;
+   $sth->finish;
+   #check if item is restricted
+   if ($item->{'restricted'} == 1 ){
+      output(20,1,"whoop whoop restricted");
+      #check borrowers status to take out restricted items
+      # if borrower allowed {
+      #  $canissue = 1
+      # } else {
+      #  $canissue = 0
+      # }
+   } else {
+     #check if item is on issue already
+     my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
+     #check reserve
+     my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});    
+     #if charge deal with it
+   }   
+   if ($canissue == 1) {
+     #now mark as issued
+     &debug_msg($env,"Issue $item->{'itemnumber'}
+$item->{'biblioitemnumber'} $bornum");
+     &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
+     &debug_msg($env,"stats");
+     &UpdateStats($env,$env->{'branchcode'},'issue');
+     &debug_msg($env,"Done");
+   }
+   return($item,$items2);
 }
 
 sub updateissues{
@@ -162,11 +175,11 @@ sub updateissues{
    # this ought to also insert the branch, but doen't do so yet.
    $query = "Insert into issues (borrowernumber,itemnumber,date_due,branchcode)
    values
-($bornum,$itemno,datetime('now'::abstime)+$loanlength,$env->{'branchcode'})";
+   ($bornum,$itemno,datetime('now'::abstime)+$loanlength,$env->{'branchcode'})";
    my $sth=$dbh->prepare($query);
 #   print "\n$query\n";
-   $sth->execute;
-   $sth->finish;
+  $sth->execute;
+  $sth->finish;
 }
 
 END { }       # module clean-up code here (global destructor)
