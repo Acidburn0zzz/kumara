@@ -13,182 +13,29 @@ use C4::Reserves2;
 my $input = new CGI;
 print $input->header;
 
+my @bibitems=$input->param('biblioitem');
+my $biblio=$input->param('biblio');
+my $borrower=$input->param('member');
+my $branch=$input->param('pickup');
 
-#setup colours
-print startpage();
-print startmenu();
-my $blah;
-my $bib=$input->param('bib');
-my $dat=bibdata($bib);
-my ($count,$reserves)=FindReserves($bib);
-#print $count;
-#print $input->dump;
-
-
-print <<printend
-
-<FONT SIZE=6><em>Requesting: <a href=biblio.html>$dat->{'title'}</a> ($dat->{'author'})</em></FONT><P>
-<p>
-<form action="placerequest.pl" method=post>
-<INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=187 BORDER=0 src="/images/place-request.gif" align=right >
-
-<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left >
-
-<!----------------BIBLIO RESERVE TABLE-------------->
-
-<p align=right>
-
-<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
-<TR VALIGN=TOP>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Rank</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Member</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Date</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pickup</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Request</b></TD>
-</TR>
-<tr VALIGN=TOP  >
-<TD><select name=rank-request>
-printend
-;
-$count++;
-my $i;
-for ($i=1;$i<$count;$i++){
-  print "<option value=$i>$i\n";
+my $count=@bibitems;
+@bibitems=sort @bibitems;
+my $i2=1;
+my @realbi;
+$realbi[0]=$bibitems[0];
+for (my $i=1;$i<$count;$i++){
+  my $i3=$i2-1;
+  if ($realbi[$i3] ne $bibitems[$i]){
+    $realbi[$i2]=$bibitems[$i];
+    $i2++;
+  }
 }
-print "<option value=$i selected>$i\n";
-my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =localtime(time);
-$year=$year+1900;
-$mon++;
-my $date="$mday/$mon/$year";
-print <<printend
-</select>
-</td>
-<TD><input type=text size=20 name=member></td>
-<TD>$date</td>
-<TD><select name=pickup>
-<option value=levin>Levin
-<option value=foxton>Foxton
-<option value=Shannon>Shannon
-</select>
-</td>
-<td><input type=checkbox name=request value=any>Next Available, <br>(or choose from list below)</td>
-</tr>
-
-
-</table>
-</p>
-
-
-<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
-<TR VALIGN=TOP>
-
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Request</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Item Type</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Classification</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Volume</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Number</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Copyright</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pubdate</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Copies</b></TD>
-</TR>
-printend
-;
-my $blah;
-my @data=ItemInfo(\$blah,$bib);
-my $count2=@data;
-for ($i=0;$i<$count2;$i++){
-  my @stuff=split('\t',$data[$i]);
-  print "<tr VALIGN=TOP  >
-  <TD><input type=checkbox name=request value=$bib>
-  </td>
-  <TD>$stuff[7]</td>
-  <TD>$stuff[4]
-  </td>																								
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td>$stuff[1], $stuff[2] </td>
-  </tr>";
+print $input->dump;
+my $env;
+my $bornum=borrdata($borrower);
+my $const;
+if ($input->param('request') eq 'any'){
+  $const='a';
 }
-print <<printend
-</table>
-</p>
-<form>
-<p>&nbsp; </p>
-<!-----------MODIFY EXISTING REQUESTS----------------->
-
-<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
-
-<TR VALIGN=TOP>
-
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=6><B>MODIFY EXISTING REQUESTS </b></TD>
-</TR>
-<form action=placerequest.pl method=post>
-<TR VALIGN=TOP>
-
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Rank</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Member</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Date</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pickup</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Request</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Change To</b></TD>
-</TR>
-printend
-;
-$count--;
-for ($i=0;$i<$count;$i++){
-print "<tr VALIGN=TOP  >
-<TD><select name=rank-request>
-<option value=1>1
-<option value=2>2
-<option value=3>3
-<option value=\"\">Del
-</select>
-</td>
-<TD><a href=/members/rachey-record.html>Rachey Hamilton-Williams</a></td>
-<TD>1/2/00</td>
-<TD><select name=pickup>
-<option value=levin>Levin
-<option value=foxton>Foxton
-<option value=Shannon>Shannon
-</select>
-</td>
-<TD>Next Available</td>
-<TD><select name=itemtype>
-<option value=next>Next Available
-<option value=change>Change Selection
-<option value=nc >No Change
-</select>
-</td>
-</tr>
-";
-}
-print <<printend
-
-
-<tr VALIGN=TOP  >
-
-<TD colspan=6 align=right>
-Delete a request by selcting "del" from the rank list.
-
-<INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=64 BORDER=0 src="/images/ok.gif"></td>
-
-
-</tr>
-
-
-</table>
-<P>
-
-<br>
-
-
-
-
-</form>
-printend
-;
-
-print endmenu();
-print endpage();
+CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi);
+#print @realbi;

@@ -31,7 +31,7 @@ print <<printend
 <p>
 <form action="placerequest.pl" method=post>
 <INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=187 BORDER=0 src="/images/place-request.gif" align=right >
-
+<input type=hidden name=biblio value=$bib>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left >
 
 <!----------------BIBLIO RESERVE TABLE-------------->
@@ -99,9 +99,10 @@ my $count2=@data;
 for ($i=0;$i<$count2;$i++){
   my @stuff=split('\t',$data[$i]);
   print "<tr VALIGN=TOP  >
-  <TD><input type=checkbox name=request value=$bib>
+  <TD><input type=checkbox name=reqbib value=$stuff[8]>
+  <input type=hidden name=biblioitem value=$stuff[8]>
   </td>
-  <TD>$stuff[7]</td>
+  <TD>$stuff[6]</td>
   <TD>$stuff[4]
   </td>																								
   <td></td>
