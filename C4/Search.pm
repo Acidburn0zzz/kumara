@@ -334,9 +334,9 @@ sub CatSearch  {
 	    for ($i=1;$i<$count;$i++){
 	      $query.=" and (subtitle like '$key[$i]%' or subtitle like '% $key[$i] %' or subtitle like '% $key[$i]')";
 	    }
-	    $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0]%')";
+	    $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0] %' or seriestitle '% $key[0]')";
 	    for ($i=1;$i<$count;$i++){
-	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
+	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i] %' or seriestitle like '% $key[$i]')";
 	    }
 	    $query=$query."))";
 #	    if ($search->{'class'} ne ''){
