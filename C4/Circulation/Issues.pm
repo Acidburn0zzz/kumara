@@ -203,7 +203,7 @@ sub issueitem{
        $canissue = 0;
        # }
      } elsif ($item->{'itemtype'} eq 'REF'){
-       error_msg($env,"Restricted Item");
+       error_msg($env,"Item Not for Loan");
        $canissue=0;
      }
      #check if item is on issue already
