@@ -66,6 +66,28 @@ sub startint {
     );
     my $num_colors = scalar @colors;		    
     init_colors($sl,$num_colors,@colors);
+#    $sl->smg_set_color(0);
+#
+#    $sl->smg_write_string($colors[11]);
+#    $sl->smg_set_color(12);                                     
+#    $sl->smg_erase_eol;
+
+   my $msg = 'Circulation';                     
+   my $color;            
+   my $dr = 5;                    
+   my $dc = 16;         
+   my $r  = 0; 
+   my $c  = 20;                                           
+   
+   $sl->smg_set_color(4);  
+   $sl->SLsmg_set_char_set(1);          
+   $sl->SLsmg_fill_region($r + 1, $c + 1, $dr - 2, $dc - 2, 'a');          
+   $sl->SLsmg_set_char_set(0); 
+   $sl->smg_set_color(0);         
+   $sl->smg_gotorc($r + $dr/2, $c + 2);                 
+   $sl->smg_write_string($msg);      
+   $sl->smg_draw_box($r, $c, $dr, $dc);
+   $sl->smg_refresh; 
     if ($sl ne ''){
     menu_loop($sl,$menu,$functions);
     quit($sl);
@@ -87,7 +109,7 @@ sub print_menu {
 	if ($sl ne ''){
 	$sl->SLsig_block_signals;
 	#$sl->smg_cls;	
-	my $row = 2;
+	my $row = 6;
 	my $i   = 1;   	
         for my $name (@$names) {
 	   $sl->smg_gotorc($row, 3);
@@ -95,8 +117,8 @@ sub print_menu {
 	   $row++;
 	   $i++;
         }
-	$row = 0;
-	$sl->smg_gotorc($row, 1);
+	$row = 5;
+	$sl->smg_gotorc($row,1);
 	$sl->smg_write_string('Choose number:');
 	
 	$sl->smg_refresh;
@@ -107,10 +129,10 @@ sub print_menu {
 }
 
 sub output {
-  my ($type,$string,$interface)=@_;
+  my ($type,$string,$interface,$row)=@_;
   if ($type eq 'console'){
     #print "here";
-    $interface->smg_gotorc(10, 1);
+    $interface->smg_gotorc($row, 1);
     $interface->smg_write_string("$string");
     $interface->smg_refresh;
     
@@ -150,11 +172,13 @@ sub getinput {
   my ($sl,$row)=@_;
   $sl->smg_gotorc($row, 1);
   my $input;
-  while (my $ch = chr $sl->SLkp_getkey ne '\n'){
+  my $ch = chr $sl->SLang_getkey;
+  while ($ch !~ /\r/){
      $sl->smg_write_string("$ch");  
      $sl->smg_refresh;                
      $sl->SLsig_unblock_signals;
      $input=$input.$ch;
+     $ch = chr $sl->SLang_getkey;
   }
   return($input);
 }

@@ -73,7 +73,7 @@ sub Issue  {
 
   if ($bornum eq ''){
     #borrower not found
-    &out('console',"Borrower not found",$interface);
+    &output('console',"Borrower not found",$interface);
 #    print "notfound";
   }
   $sth->finish;
@@ -189,8 +189,10 @@ sub scanbook {
 sub scanborrower {
   my ($interface)=@_;
   #scan barcode
-  my $number='V00126643';  
-#  my $number=&userdialog('console','Please enter a borrower barcode',$interface);
+#  my $number='V00126643';  
+  output('console','Please enter the Borrower number',$interface,8);
+    output('console','',$interface,9);
+  my $number=&getinput($interface,9);
   return ($number);
 }
 
