@@ -23,7 +23,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&pastitems &checkoverdues &previousissue 
-&checkreserve &checkwaiting &scanbook &scanborrower &getbranch);
+&checkreserve &checkwaiting &scanbook &scanborrower &getbranch &getprinter);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,

@@ -53,6 +53,7 @@ sub trapscreen {
   my ($env,$bornum,$borrower,$amount,$traps_set)=@_;
   my $titlepanel = titlepanel($env,$env->{'sysarea'},"Borrower Flags");
   my @borinfo;
+  debug_msg($env,"owwing = $amount");
   my $borpanel = borrowerbox($env,$borrower,$amount);
   $borpanel->draw();
   my $hght = @$traps_set+4;

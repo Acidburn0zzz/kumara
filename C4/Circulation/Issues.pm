@@ -127,10 +127,12 @@ sub processitems {
    my @done;
    if ($env->{'newborrower'} ne "") {$reason = "Finished user";} 
    if ($reason eq 'Finished user'){
-     remoteprint($env,$items2,$borrower);
-     if ($amountdue > 0) {
-       &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
-     } 	 
+     if ($items2 ne "") {
+       remoteprint($env,$items2,$borrower);
+       if ($amountdue > 0) {
+         &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
+       }
+     }  
      @done = ("Issues");
    } elsif ($reason eq "Print"){
      remoteprint($env,$items2,$borrower);

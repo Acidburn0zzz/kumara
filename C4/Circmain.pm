@@ -73,8 +73,8 @@ sub Start_circ{
       #
       #($reason,$data) = menu($env,'console','Circulation', 
       #  ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-      ($reason,$data) = menu($env,'console','Circulation', 
-        ('Issues','Returns','Select Branch','Select Printer)); 
+      ($reason,$data) = menu($env,'console','Circulation',
+        ('Issues','Returns','Select Branch','Select Printer')); 
     } else {
       $data = $donext;
     }

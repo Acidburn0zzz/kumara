@@ -236,7 +236,7 @@ sub prmenu {
   my $x = 0;
   while (@$prrecs[$x] ne "") {
     my $prrec =@$prrecs[$x]; 
-    $mitems[$x]=fmtstr($env,$prrec->{'printernam'},"L20");
+    $mitems[$x]=fmtstr($env,$prrec->{'printername'},"L20");
     $x++;
   }  
   my $menu = new Cdk::Scroll ('Title'=>"  ",
@@ -433,8 +433,9 @@ sub prebook {
 sub borrowerbox {
   my ($env,$borrower,$amountowing,$odues) = @_;
   my @borrinfo;
-  my $amountowing = fmtdec($amountowing,"42");
+  my $amountowing = fmtdec($env,$amountowing,"42");
   #debug_msg($env,"borrbox");
+  debug_msg($env,"$amountowing");
   my $line = "$borrower->{'cardnumber'} ";
   $line = $line."$borrower->{'surname'}, ";
   $line = $line."$borrower->{'title'} $borrower->{'firstname'}";
@@ -455,7 +456,6 @@ sub borrowerbox {
     $line = $line." </R>NOTES<!R>";
   }
   if ($amountowing > 0) {
-    #$amountowing=fmtdec($env,$amountowing);
     $line = $line." </B>\$$amountowing";
   }
   $borrinfo[2]=$line;
@@ -494,6 +494,9 @@ sub returnwindow {
   if (!defined $barcode) {
     $barcode="";
     $reason="Circ";
+    $bookentry->erase();
+    $funcmenu->erase();
+    if ($borrbox ne "") {$borrbox->erase();}
   } else {
     $reason="";
   }
