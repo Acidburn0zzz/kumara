@@ -107,7 +107,7 @@ sub CatSearch  {
     last SWITCH;
   }
 
-  print "$query\n";
+#  print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count=$sth->fetchrow_hashref;
