@@ -135,6 +135,7 @@ sub renewbook {
 
 sub bulkrenew {
   my ($env,$dbh,$bornum,$amount,$borrower,$odues) = @_;
+  debug_msg($env,"got here");
   my $query = "select * from issues 
     where borrowernumber = '$bornum' and returndate is null order by date_due";
   my $sth = $dbh->prepare($query);

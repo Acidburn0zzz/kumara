@@ -5,6 +5,8 @@ use C4::Format;
 use strict;
 use Cdk;
 use Date::Manip;
+use C4::Accounts;
+use C4::Circulation::Renewals;
 #use C4::Circulation;
 
 require Exporter;
@@ -242,12 +244,15 @@ sub selborrower {
 }
 
 sub issuewindow {
-  my ($env,$title,$items1,$items2,$borrower,$amountowing,$odues)=@_;
+  my ($env,$title,$dbh,$items1,$items2,$borrower,$amountowing,$odues)=@_;
+  my @functs=("Due Date","Renewals","Payments","Current","Previous");
   my $titlepanel = titlepanel($env,"Issues","Issue a book");
   my $scroll2 = new Cdk::Scroll ('Title'=>"Previous Issues",
     'List'=>\@$items1,'Height'=> 8,'Width'=>78,'Ypos'=>18);
   my $scroll1 = new Cdk::Scroll ('Title'=>"Current Issues",
     'List'=>\@$items2,'Height'=> 8,'Width'=>78,'Ypos'=>9);
+  my $funcmenu = new Cdk::Scroll ('Title'=>"Function",
+    'List'=>\@functs,'Height'=>5,'Width'=>12,'Ypos'=>3,'Xpos'=>28);
   my $loanlength = new Cdk::Entry('Label'=>"Due Date:      ",
     'Max'=>"30",'Width'=>"11",
     'Xpos'=>0,'Ypos'=>5,'Type'=>"UMIXED");
@@ -261,7 +266,8 @@ sub issuewindow {
      'Max'=>"11",'Width'=>"11",
      'Xpos'=>"0",'Ypos'=>3,'Type'=>"UMIXED");
   $scroll2->draw();
-  $scroll1->draw(); 
+  $scroll1->draw();
+  $funcmenu->draw();
   $loanlength->draw(); 
   $borrbox->draw();   
   #$env->{'loanlength'} = "";
@@ -269,7 +275,8 @@ sub issuewindow {
   my $x;
   my $barcode;
   $entryBox->preProcess ('Function' => 
-    sub{prebook(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+    sub{prebook(@_,$env,$dbh,$funcmenu,$entryBox,$loanlength,
+    $scroll1,$scroll2,$borrower,$amountowing,$odues);});
   $barcode = $entryBox->activate();
   my $reason;
   if (!defined $barcode) {
@@ -279,28 +286,60 @@ sub issuewindow {
   $entryBox->erase();
   $scroll2->erase();
   $scroll1->erase();
+  $funcmenu->erase();
   $loanlength->erase(); 
   #debug_msg($env,"exiting");    
   return $barcode,$reason;
 }  
+sub actfmenu {
+  my ($env,$dbh,$funcmenu,$entryBox,$loanlength,$scroll1,
+    $scroll2,$borrower,$amountowing,$odues) = @_;
+  my $funct =  $funcmenu->activate();
+  if (!defined $funct) {
+  } elsif ($funct == 0 ) {
+    actloanlength ($env,$entryBox,$loanlength,$scroll1,$scroll2);
+  } elsif ($funct == 1 ) {
+    $entryBox->erase();
+    $scroll1->erase();
+    $scroll2->erase();
+    $loanlength->erase();
+    debug_msg($env,"");
+    C4::Circulation::Renewals::bulkrenew($env,$dbh,$borrower->{'borrowernumber'},
+      $amountowing,$borrower,$odues);
+    debug_msg($env,"");
+    Cdk::refreshCdkScreen();
+  } elsif ($funct == 2 ) {
+    $entryBox->erase();
+    $scroll1->erase();
+    $scroll2->erase();
+    $loanlength->erase();
+    C4::Accounts::reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},
+    $amountowing,$borrower,$odues);
+    Cdk::refreshCdkScreen();
+  } elsif ($funct == 3 ) {
+    actscroll1 ($env,$entryBox,$loanlength,$scroll1,$scroll2);
+  } elsif ($funct == 4 ) {
+    actscroll2 ($env,$entryBox,$loanlength,$scroll1,$scroll2);
+  }
+}  
 sub actscroll1 {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  $scroll1->preProcess ('Function' =>
-    sub{prescroll1(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+  #$scroll1->preProcess ('Function' =>
+  #  sub{prescroll1(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   $scroll1->activate();
   return 1;
 }
 sub actscroll2 {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  $scroll2->preProcess ('Function' =>
-    sub{prescroll2(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+  #$scroll2->preProcess ('Function' =>
+  #  sub{prescroll2(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   $scroll2->activate();
   return 1;
 }
 sub actloanlength {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  $loanlength->preProcess ('Function' =>
-    sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+  #$loanlength->preProcess ('Function' =>
+  #  sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   my $validdate = "N";
   while ($validdate eq "N") {
     my $loanlength = $loanlength->activate();
@@ -326,10 +365,13 @@ sub actloanlength {
 }
 
 sub prebook {
-  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  my ($input,$env,$dbh,$funcmenu,$entryBox,$loanlength,
+    $scroll1,$scroll2,$borrower,$amountowing,$odues)= @_;
   if ($input eq $key_tab) {    
-    actloanlength($env,$entryBox,$loanlength,$scroll1,$scroll2);
-    return 0;
+#    actloanlength($env,$entryBox,$loanlength,$scroll1,$scroll2);
+     actfmenu ($env,$dbh,$funcmenu,$entryBox,$loanlength,$scroll1,
+       $scroll2,$borrower,$amountowing,$odues);
+  return 0;
   }
   return 1;
 }

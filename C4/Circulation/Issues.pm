@@ -108,7 +108,7 @@ sub processitems {
    my $dbh=&C4Connect;  
 #  my $amountdue = 0;  
    my ($itemnum,$reason) = 
-     issuewindow($env,'Issues',$items,$items2,$borrower,fmtdec($env,$amountdue,"32"));
+     issuewindow($env,'Issues',$dbh,$items,$items2,$borrower,fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
       my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($datedue ne "") {
