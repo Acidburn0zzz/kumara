@@ -679,7 +679,7 @@ sub needsmod{
 sub delitem{
   my ($itemnum)=@_;
   my $dbh=C4Connect;
-  my $query="Delete from items where itemnumber=$itemnum";
+  my $query="update items set wthdrawn=1 where itemnumber=$itemnum";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
