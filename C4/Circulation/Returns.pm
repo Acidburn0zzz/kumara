@@ -145,7 +145,7 @@ sub checkissue {
           where borrowernumber = '$resrec->{'borrowernumber'}'";
        my $btsh = $dbh->prepare($bquery);
        $btsh->execute;                   
-       my $resborrower = $bsth->fetchrow_hashref;
+       my $resborrower = $btsh->fetchrow_hashref;
        printreserve($env,$resrec,$resborrower,$itemrec);
        my $mess = "Reserved for collection at branch $resrec->{'branchcode'}"; 
        error_msg($env,$mess);

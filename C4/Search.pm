@@ -16,7 +16,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
-&OpacSearch &borrdata2 &NewBorrowerNumber); 
+&OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -105,6 +105,7 @@ sub OpacSearch {
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
+  $search->{'keyword'}=~ s/ +$//;
   my @key=split(' ',$search->{'keyword'});
   my $count=@key;
   my $i=1;
@@ -120,8 +121,7 @@ sub KeywordSearch {
   $sth->execute;
   $i=0;
   while (my $data=$sth->fetchrow_hashref){
-
-$results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+    $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
 #      print $results[$i];
 $i++;
   }
@@ -197,16 +197,18 @@ sub CatSearch  {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
-            $query="select count(*) from biblio,biblioitems
-	    where biblioitems.biblionumber=biblio.biblionumber and (title like '%$key[0]%'";
+            $query="select count(*) from biblio,bibliosubtitle
+	    where
+(biblio.biblionumber=bibliosubtitle.biblionumber) and
+	    ((title like '%$key[0]%' or subtitle like '%$key[0]%')";
 	    while ($i<$count){
-	      $query=$query." and title like '%$key[$i]%'";
+	      $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
 	      $i++;
 	    }
 	    $query=$query.")";
-	    if ($search->{'class'} ne ''){
-	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
-	    }
+#	    if ($search->{'class'} ne ''){
+#	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
+#	    }
 	  } elsif ($search->{'class'} ne ''){
 	     $query="select count(*) from biblioitems,biblio where itemtype =
 '$search->{'class'}' and biblio.biblionumber=biblioitems.biblionumber";
@@ -442,6 +444,20 @@ sub bibdata {
   and biblioitems.biblionumber=$bibnum and
 (bibliosubject.biblionumber=$bibnum or bibliosubject.biblionumber=1) and
 (bibliosubtitle.biblionumber=$bibnum or bibliosubtitle.biblionumber=1)";
+#  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
+}
+
+sub bibitemdata {
+  my ($bibitem)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from biblio,biblioitems where biblio.biblionumber=
+  biblioitems.biblionumber and biblioitemnumber=$bibitem";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;

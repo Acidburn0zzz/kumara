@@ -132,12 +132,13 @@ while ($i < $count2){
       if ($scount > 0){
         $stuff[5]=$stuff[5]." S$scount";
       }
+        $stuff[6]=mklink("/cgi-bin/koha/request.pl?bib=$stuff[2]","Request");
     } else {
       my $word=$stuff[1];
       $word=~ s/ /%20/g;
       $stuff[1]=mklink("/cgi-bin/koha/subjectsearch.pl?subject=$word",$stuff[1]);
     }
-    $stuff[6]=mklink("/cgi-bin/koha/request.pl?bib=$stuff[2]","Request");
+
     if ($colour == 1){
       print mktablerow(6,$secondary,$stuff[1],$stuff[0],$stuff[3],$stuff[4],$stuff[5],$stuff[6]);
       $colour=0;

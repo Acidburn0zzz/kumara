@@ -17,7 +17,7 @@ my $blah;
 my $env;
 my $subject=$input->param('subject');
 #my $title=$input->param('title');
-
+my $type=$input->param('type');
 my @items=subsearch(\$blah,$subject);
 #print @items;
 my $count=@items;
@@ -47,11 +47,12 @@ while ($i < $count){
   if ($scount > 0){                                                                                                                           
     $results[4]=$results[4]." S$scount";                                                                                                          
   }             
+  $results[6]=mklink("/cgi-bin/koha/request.pl?bib=$results[2]","Request");
   if ($colour == 1){                                                                          
-    print mktablerow(4,'#ffffcc',$results[0],$results[1],$results[3],$results[4]);                                        
+    print mktablerow(5,'#ffffcc',$results[0],$results[1],$results[3],$results[4],$results[6]);                                        
     $colour=0;                                                                   
   } else{                                                                        
-    print mktablerow(4,'white',$results[0],$results[1],$results[3],$results[4]);                                     
+    print mktablerow(5,'white',$results[0],$results[1],$results[3],$results[4],$results[6]);                                     
     $colour=1;                                                                                
   }
    $i++;

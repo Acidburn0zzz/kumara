@@ -91,7 +91,7 @@ my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
   if ($type ne 'opac'){
-    $results[1]=mklink("/cgi-bin/koha/moredetail.pl?item=$results[5]",$results[1]);
+    $results[1]=mklink("/cgi-bin/koha/moredetail.pl?item=$results[5]&bib=$bib&bi=$results[8]",$results[1]);
   }
   if ($results[2] eq ''){
     $results[2]='Available';
