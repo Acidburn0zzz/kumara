@@ -473,19 +473,19 @@ sub borrdata2 {
   my ($env,$bornum)=@_;
   my $dbh=C4Connect;
   my $query="Select count(*) from issues where borrowernumber='$bornum' and
-returndate is NULL";
-#  print $query;
+    returndate is NULL";
+    # print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;
   $sth->finish;
   $sth=$dbh->prepare("Select count(*) from issues where
-borrowernumber='$bornum' and date_due < now() and returndate is NULL");
+    borrowernumber='$bornum' and date_due < now() and returndate is NULL");
   $sth->execute;
   my $data2=$sth->fetchrow_hashref;
   $sth->finish;
   $sth=$dbh->prepare("Select sum(amountoutstanding) from accountlines where
-borrowernumber='$bornum'");
+    borrowernumber='$bornum'");
   $sth->execute;
   my $data3=$sth->fetchrow_hashref;
   $sth->finish;

@@ -8,6 +8,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Format;
+use C4::Accounts;
 use C4::InterfaceCDK;
 use C4::Interface::ReserveentCDK;
 use C4::Circulation::Main;
@@ -256,7 +257,7 @@ sub CalcReserveFee {
 }
 
 sub CreateReserve {
-  my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
+  my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems,$fee) = @_;
   my $dbh = &C4Connect;
   #$dbh->{RaiseError} = 1;
   #$dbh->{AutoCommit} = 0;
@@ -266,6 +267,16 @@ sub CreateReserve {
   my $resdate = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   #eval {     
     # updates take place here
+    if ($fee > 0) {
+      my $nextacctno = &getnextacctno($env,$borrnum,$dbh);
+      my $updquery = "insert into accountlines
+         (borrowernumber,accountno,date,amount,description,accounttype,amountoutstanding)
+          values ($borrnum,$nextacctno,now(),$fee,'Reserve Charge',
+          'Res',$fee";
+      my $usth = $dbh->prepare($updquery);
+      $usth->execute;
+      $usth->finish;
+    }
     my $query="insert into reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype) values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
     my $sth = $dbh->prepare($query);
     $sth->execute();
