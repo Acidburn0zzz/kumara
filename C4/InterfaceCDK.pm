@@ -371,7 +371,7 @@ sub returnwindow {
   #debug_msg($env,$borrower);
   my $titlepanel = titlepanel($env,"Returns","Scan book");
   my $returnlist = new Cdk::Scroll ('Title'=>"Items Returned",
-     'List'=>\@$items,'Height'=> 12,'Width'=>60,'Ypos'=>10,'Xpos'=>1);
+     'List'=>\@$items,'Height'=> 12,'Width'=>74,'Ypos'=>10,'Xpos'=>1);
   $returnlist->draw();
   my $borrbox;
   if ($borrower-{'cardnumber'} ne "") {    

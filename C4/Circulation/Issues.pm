@@ -177,8 +177,8 @@ sub issueitem{
      } 
      #check if item is on issue already
      if ($canissue == 1) {
-       my $currbor = &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
-       if ($currbor ne "") {$canissue = 0;};
+       my ($currbor,$issuestat) = &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
+       if ($issuestat ) {$canissue = 0;};
      } 
      if ($canissue == 1) {
        #check reserve

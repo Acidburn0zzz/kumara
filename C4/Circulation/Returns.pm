@@ -13,6 +13,7 @@ use C4::Circulation::Main;
 use C4::Format;
 use C4::Scan;
 use C4::Stats;
+use C4::Search;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -80,8 +81,10 @@ sub Returns {
       ($resp,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
       if ($resp ne "") {
         if ($resp eq "Returned") {
-	  my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
-      	  unshift @items,$fmtitem;     	  
+	  my $item = itemnodata($env,$dbh,$itemno);
+	  #my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
+      	  my $fmtitem = C4::Circulation::Issues::formatitem($env,$item,"",$amt_owing);
+	  unshift @items,$fmtitem;     	  
   	} elsif ($resp ne "") {
 	  error_msg($env,"$resp");
 	}
