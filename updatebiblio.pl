@@ -70,7 +70,7 @@ if ($error ne ''){
   print startpage();
   print startmenu();
   print $error;
-  my @subs=split(' ',$error);
+  my @subs=split('\n',$error);
   print "<p> Click submit to force the subject";
   my @names=$input->param;
   my %data;

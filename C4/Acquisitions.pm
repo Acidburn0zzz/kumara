@@ -345,12 +345,13 @@ sub modsubject {
          #subject not in aut, chosen to force anway
 	 #so insert into cataloguentry so its in auth file
 	 $query="Insert into catalogueentry (entrytype,catalogueentry)
-	 values ('s','$force')";
+	 values ('s','$subject[$i]')";
 	 my $sth2=$dbh->prepare($query);
+#	 print $query;
 	 $sth2->execute;
 	 $sth2->finish;
       } else {      
-        $error="$subject[$i] does not exist in the subject authority file";
+        $error="$subject[$i]\n does not exist in the subject authority file";
         $query= "Select * from catalogueentry where
         entrytype='s' and (catalogueentry like '$subject[$i] %' or 
         catalogueentry like '% $subject[$i] %' or catalogueentry like
