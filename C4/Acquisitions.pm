@@ -215,7 +215,7 @@ sub breakdown {
 sub basket {
   my ($basketno)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from aqorders,biblio,biblioitems where basketno='$basketno'
+  my $query="Select *,biblio.title from aqorders,biblio,biblioitems where basketno='$basketno'
   and biblio.biblionumber=aqorders.biblionumber and biblioitems.biblioitemnumber
   =aqorders.biblioitemnumber group by aqorders.ordernumber";
   my $sth=$dbh->prepare($query);
