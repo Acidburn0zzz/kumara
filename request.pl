@@ -42,7 +42,7 @@ print <<printend
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 <TR VALIGN=TOP>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Rank</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Member</b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Member Number</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Date</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pickup</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Request</b></TD>
