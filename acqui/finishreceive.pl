@@ -56,9 +56,14 @@ if ($barcode =~ /\,/){
 } else {
   $barcodes[0]=$barcode;
 }
-makeitems($quantrec,$bibitemno,$biblio,$replacement,$cost,$bookseller,$branch,@barcodes);
-if ($itemtype ne 'PER'){
-  print $input->redirect("/cgi-bin/koha/acqui/receive.pl?invoice=$invoiceno&id=$id&freight=$freight&gst=$gst");
+my ($error)=makeitems($quantrec,$bibitemno,$biblio,$replacement,$cost,$bookseller,$branch,@barcodes);
+if ($error eq ''){
+  if ($itemtype ne 'PER'){
+    print $input->redirect("/cgi-bin/koha/acqui/receive.pl?invoice=$invoiceno&id=$id&freight=$freight&gst=$gst");
+  } else {
+    print $input->redirect("/acquisitions/");
+  }
 } else {
-  print $input->redirect("/acquisitions/");
+  print $input->header;
+  print $error;
 }

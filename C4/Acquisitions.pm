@@ -292,7 +292,7 @@ sub modbiblio {
   where
   biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
-    print $query;
+#    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
@@ -608,6 +608,7 @@ sub makeitems {
   my $item=$data->{'max(itemnumber)'};
   $sth->finish;
   $item++;
+  my $error;
   for (my $i=0;$i<$count;$i++){
     $barcodes[$i]=uc $barcodes[$i];
     my $query="Insert into items (biblionumber,biblioitemnumber,itemnumber,barcode,
@@ -617,11 +618,13 @@ sub makeitems {
     '$branch','$price','$replacement',now())";
     my $sth=$dbh->prepare($query);
     $sth->execute;
+    $error.=$sth->errstr;
     $sth->finish;
     $item++;
 #    print $query;
   }
   $dbh->disconnect;
+  return($error);
 }
 
 sub moditem {
