@@ -103,21 +103,10 @@ sub CatSearch  {
       }
   } 
   if ($type eq 'subject'){
-      $query="Select distinct(subject) from catalogueentry,bibliosubject"; 
-      if ($search->{'subject'} ne ''){
-         if ($query =~ /where/){
-	    $query=$query." and ";
-	 } else {
-   	    $query=$query." where ";
-	 }
-	 $search->{'subject'}=uc $search->{'subject'};
-	 $query=$query." ((lower(catalogueentry.catalogueentry) = lower(bibliosubject.subject))        
-	 and (lower(catalogueentry.catalogueentry) like
-            lower('$search->{'subject'}%')) 
-	 and (entrytype = 's'))"; 
-      }
-   }
-   if ($type eq 'precise'){
+    $query="select distinct(subject) from bibliosubject where subject like
+    '$search->{'subject'}%'";
+  }
+  if ($type eq 'precise'){
       $query="select count(*) from items,biblio ";
       if ($search->{'item'} ne ''){
         my $search2=uc $search->{'item'};
@@ -126,13 +115,7 @@ sub CatSearch  {
       }
       if ($search->{'isbn'} ne ''){
         my $search2=uc $search->{'isbn'};
-	#
-	# Commented code does not work properly, but would be much faster 
-	# if it did
-	# Can't make it returne the biblionumber properly
-	#
         my $query1 = "select * from biblioitems where isbn='$search2'";
-        #debug_msg($env,$query1);
 	my $sth1=$dbh->prepare($query1);
 	$sth1->execute;
         my $i2=0;
