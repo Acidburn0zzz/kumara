@@ -112,7 +112,7 @@ sub CatSearch  {
   while (my $data=$sth->fetchrow_hashref){
 #   print "$data->{'catalogueentry'}
 #   $data->{'biblionumber'} \n";
-    ItemInfo(\%env,$data->{'biblionumber'}); 
+    ItemInfo($env,$data->{'biblionumber'}); 
   }
   $sth->execute;
   $sth->finish;
@@ -120,7 +120,7 @@ sub CatSearch  {
 }    
 
 sub ItemInfo {
-  my (%env,$biblionumber)=@_;
+  my ($env,$biblionumber)=@_;
   my $dbh = &C4Connect;
   my $query="Select * from items 
   where (biblionumber = '$biblionumber')";
@@ -146,7 +146,7 @@ sub ItemInfo {
 }
 
 sub BornameSearch  {
-  my (%env,searchstring,$type)=@_;
+  my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
   my $query="Select * from borrowers where surname like
   '%$searchstring%' or firstname like '%$searchstring%' or othernames like 
