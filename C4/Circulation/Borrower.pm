@@ -341,7 +341,9 @@ sub reserveslist {
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
     my $itemdata = itemnodata($env,$dbh,$data->{'itemnumber'});
-    push @items,$itemdata;
+    if ($itemdata){
+      push @items,$itemdata;
+    }
   }
   $sth->finish;
   reservesdisplay($env,$borrower,$amount,$odues,\@items);
