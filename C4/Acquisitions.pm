@@ -135,14 +135,14 @@ sub getallorders {
 sub ordersearch {
   my ($search,$biblio)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from aqorders,biblioitems
+  my $query="Select * from aqorders,biblioitems,biblio
   where aqorders.biblioitemnumber=
-  biblioitems.biblioitemnumber 
+  biblioitems.biblioitemnumber and biblio.biblionumber=aqorders.biblionumber 
   and ((";
   my @data=split(' ',$search);
   my $count=@data;
   for (my $i=0;$i<$count;$i++){
-    $query.= "(aqorders.title like '$data[$i]%' or aqorders.title like '% $data[$i]%') and ";
+    $query.= "(biblio.title like '$data[$i]%' or biblio.title like '% $data[$i]%') and ";
   }
   $query=~ s/ and $//;
   $query.=" ) or biblioitems.isbn='$search' 
