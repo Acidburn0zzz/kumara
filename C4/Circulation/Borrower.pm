@@ -13,6 +13,7 @@ use C4::Circulation;
 use C4::Circulation::Issues;
 use C4::Scan;
 use C4::Stats;
+use C4::Format;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking

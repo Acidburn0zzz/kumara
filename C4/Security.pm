@@ -8,6 +8,7 @@ require Exporter;
 use DBI;
 use C4::Interface;
 use C4::Database;
+use C4::Format;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 # set the version for version checking

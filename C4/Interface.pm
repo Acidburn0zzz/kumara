@@ -1,7 +1,7 @@
 package C4::Interface; #asummes C4/Interface
 
 #uses Newt
-
+use C4::Format;
 use strict;
 #use Newt qw(:keys :exits :anchors :flags :colorsets :entry :fd :grid :macros
 #:textbox);
