@@ -134,7 +134,7 @@ sub checkreserve{
   where (items.itemnumber = '$itemnum')
   and (items.biblionumber = reserves.biblionumber)
   and (reserves.found is null) order by priority";
-  print $query;
+#  print $query;
   my $sth = $dbh->prepare($query);
   $sth->execute();
   if (my $data=$sth->fetchrow_hashref) {

@@ -135,19 +135,20 @@ sub issuewindow {
   my $li2 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $li3 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   $li->Add($items1->[0],$items1->[1]);
-  $li2->Add($items2->[0],$items2->[1]);
+  $li2->Add($items2->{'title'});
   $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
   "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
-  $panel->AddHotKey(NEWT_KEY_F10);
-  $panel->Add(0,0,$l3,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,1,$li3,NEWT_ANCHOR_LEFT);  
-  $panel->Add(0,2,$l1,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,3,$li,NEWT_ANCHOR_LEFT);  
-  $panel->Add(1,2,$l2,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,3,$li2,NEWT_ANCHOR_LEFT);  
-  $panel->Add(0,4,$label,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,4,$entry,NEWT_ANCHOR_LEFT);
+ $panel->AddHotKey(NEWT_KEY_F10);
+# $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,2,$li3,NEWT_ANCHOR_LEFT);  
+  $panel->Add(0,3,$l1,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,4,$li,NEWT_ANCHOR_LEFT);  
+  $panel->Add(1,3,$l2,NEWT_ANCHOR_LEFT);
+  $panel->Add(1,4,$li2,NEWT_ANCHOR_LEFT);  
+ 
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
