@@ -177,7 +177,7 @@ sub returnrecord {
   my $query = "select * from accountlines
     where (borrowernumber = '$bornum')
     and (itemnumber = '$itemno')
-    and (accounttype = 'FU')";
+    and (accounttype = 'FU' or accounttype='O')";
   my $sth = $dbh->prepare($query);
     $sth->execute;
     if (my $data = $sth->fetchrow_hashref) {
