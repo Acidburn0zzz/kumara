@@ -129,7 +129,7 @@ sub ordersearch {
      $sth2->finish;
      $data->{'author'}=$data2->{'author'};
      $sth2=$dbh->prepare("Select * from aqorderbreakdown where
-    ordernumber='$data->{'ordernumber'}");
+    ordernumber=$data->{'ordernumber'}");
     $sth2->execute;
     $data2=$sth2->fetchrow_hashref;
     $sth2->finish;

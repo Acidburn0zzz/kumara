@@ -136,9 +136,7 @@ for (my $i=0;$i<$count2;$i++){
   print ">$bookfund[$i]->{'bookfundname'}";
 }      
 
-#do fancy retail price calculation stuff
-#first check if the replacement price exists
-my $rrp=$results[0]->{'listprice'};
+my $rrp=$results[0]->{'rrp'};
 
 print <<EOP
 </select>
@@ -161,7 +159,7 @@ print <<EOP
 <TR VALIGN=TOP>
 <TD>
 Budgeted Cost </td>
-<td><input type=text size=20 name=ecost value=>
+<td><input type=text size=20 name=ecost value=$results[0]->{'ecost'}>
 </td>
 </tr>
 <TR VALIGN=TOP bgcolor=#ffffcc>
