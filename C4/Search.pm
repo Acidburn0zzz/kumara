@@ -325,7 +325,7 @@ sub CatSearch  {
             $query="select count(*) from biblio,bibliosubtitle
 	    where
             (biblio.biblionumber=bibliosubtitle.biblionumber) and 
-	    (((title like '$key[0] %' or title like '% $key[0] %' or title like '% $key[0]')";
+	    (((title like '$key[0]%' or title like '% $key[0] %' or title like '% $key[0]')";
 	    while ($i<$count){
 	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i] %' or title '% $key[$i]')";
 	      $i++;
@@ -334,7 +334,7 @@ sub CatSearch  {
 	    for ($i=1;$i<$count;$i++){
 	      $query.=" and (subtitle like '$key[$i]%' or subtitle like '% $key[$i] %' or subtitle like '% $key[$i]')";
 	    }
-	    $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0] %' or seriestitle '% $key[0]')";
+	    $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0] %' or seriestitle like '% $key[0]')";
 	    for ($i=1;$i<$count;$i++){
 	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i] %')";
 	    }
@@ -984,8 +984,7 @@ sub itemcount {
     $sth2->finish;     
   } 
 #  if ($count == 0){
-    my $query2="Select * from aqorders where biblionumber=$bibnum and
-quantity > quantityreceived";
+    my $query2="Select * from aqorders where biblionumber=$bibnum";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;
     if (my $data=$sth2->fetchrow_hashref){
