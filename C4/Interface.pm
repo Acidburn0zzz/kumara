@@ -64,7 +64,7 @@ sub suspend_cb {
 }
       
 sub startint {
-  Newt::SetSuspendCallback(\&suspend_cb,'t');
+  Newt::SetSuspendCallback(\&suspend_cb);
   my ($env,$msg)=@_;
   Newt::Init();
   Newt::Cls();
