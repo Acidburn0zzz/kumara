@@ -203,6 +203,7 @@ sub scanbook {
   #scan barcode
 #  my $number='L01781778';  
   my ($number,$reason)=dialog("Book Barcode:");
+  $number=uc $number;
   return ($number,$reason);
 }
 
@@ -212,7 +213,7 @@ sub scanborrower {
 #  my $number='V00126643';  
   my ($number,$reason)=&dialog("Borrower Barcode:");
   $number=uc $number;
-  return ($number);
+  return ($number,$reason);
 }
 
 
