@@ -50,7 +50,7 @@ my $offset2=$num+$offset;
 print "<br> Results $offset to $offset2 displayed";
 print mktablehdr;
 
-  print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
+print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
 
 my $count2=@results;
 my $i=0;

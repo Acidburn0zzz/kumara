@@ -2,9 +2,9 @@
 #script to provide intranet (librarian) advanced search facility
 #modified 9/11/1999 by chris@katipo.co.nz
 #adding an extra comment to play with CVS (Si, 19/11/99)
+#modified 29/12/99 by chris@katipo.co.nz to be usavle by opac as well
 
 use strict;
-#use DBI;
 use C4::Search;
 use CGI;
 use C4::Output;
@@ -12,6 +12,19 @@ use C4::Output;
 my $env;
 my $input = new CGI;
 print $input->header;
+#whether it is called from the opac of the intranet                                                            
+my $type=$input->param('type');                                                                                
+#setup colours                                                                                                 
+my $main;                                                                                                      
+my $secondary;                                                                                                 
+if ($type eq 'opac'){                                                                                          
+  $main='#99cccc';                                                                                             
+  $secondary='#efe5ef';                                                                                        
+} else {                                                                                                       
+  $main='#cccc99';                                                                                             
+  $secondary='#ffffcc';                                                                                        
+}       
+
 #print $input->dump;
 my $blah;
 my %search;
@@ -42,7 +55,7 @@ if ($num eq ''){
   $num=10;
 }
 print startpage();
-print startmenu();
+print startmenu($type);
 print mkheadr(1,'Catalogue Search Results');
 print center();
 my $count;
@@ -73,9 +86,9 @@ my $offset2=$num+$offset;
 print "<br> Results $offset to $offset2 displayed";
 print mktablehdr;
 if ($subject ne ''){
-  print mktablerow(1,'#cccc99','<b>SUBJECT</b>');
+  print mktablerow(1,$main,'<b>SUBJECT</b>');
 } else {
-  print mktablerow(4,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
+  print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
 }
 my $count2=@results;
 my $i=0;
@@ -87,12 +100,12 @@ while ($i < $count2){
     $title2=~ s/ /%20/g;
     if ($subject eq ''){
 #      print $stuff[0];
-      $stuff[1]=mklink("/cgi-bin/kumara/detail.pl?bib=$stuff[2]&title=$title2",$stuff[1]);
+      $stuff[1]=mklink("/cgi-bin/koha/detail.pl?type=$type&bib=$stuff[2]&title=$title2",$stuff[1]);
       my $word=$stuff[0];
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
-      my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
+      my $url="/cgi-bin/koha/search.pl?author=$word&type=a";
       $stuff[0]=mklink($url,$stuff[0]);
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
@@ -111,10 +124,10 @@ while ($i < $count2){
     } else {
       my $word=$stuff[1];
       $word=~ s/ /%20/g;
-      $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
+      $stuff[1]=mklink("/cgi-bin/koha/subjectsearch.pl?subject=$word",$stuff[1]);
     }
     if ($colour == 1){
-      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
+      print mktablerow(4,$secondary,$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
       $colour=0;
     } else{
       print mktablerow(4,'white',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
@@ -123,10 +136,10 @@ while ($i < $count2){
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(4,'#cccc99',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
+print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
 print mktableft();
 if ($offset < $count){
-    my $search="num=$num&offset=$offset";
+    my $search="num=$num&offset=$offset&type=$type";
     if ($subject ne ''){
       $subject=~ s/ /%20/g;
       $search=$search."&subject=$subject";
@@ -144,10 +157,10 @@ if ($offset < $count){
       $search=$search."&keyword=$keyword";
     }
     
-    my $stuff=mklink("/cgi-bin/kumara/search.pl?$search",'More');
+    my $stuff=mklink("/cgi-bin/koha/search.pl?$search",'Next');
     print $stuff;
 }
 
 print endcenter();
-print endmenu();
+print endmenu($type);
 print endpage();
