@@ -12,10 +12,18 @@ use C4::Output;
 use C4::Acquisitions;
 
 my $input = new CGI;
-print $input->header;
-my $bibitemnum=$input->param('bibitem');
-my $data=bibitemdata($bibitemnum);
+my $submit=$input->param('delete.x');
 my $itemnum=$input->param('item');
+my $bibitemnum=$input->param('bibitem');
+if ($submit ne ''){
+  print $input->redirect("/cgi-bin/koha/delitem.pl?itemnum=$itemnum&bibitemnum=$bibitemnum");
+}
+
+print $input->header;
+#print $input->dump;
+
+my $data=bibitemdata($bibitemnum);
+
 my $item=itemnodata('blah','',$itemnum);
 #my ($analytictitle)=analytic($biblionumber,'t');
 #my ($analyticauthor)=analytic($biblionumber,'a');

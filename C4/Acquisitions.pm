@@ -15,7 +15,7 @@ $VERSION = 0.01;
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
 &getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
-&findall &needsmod);
+&findall &needsmod &delitem);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -674,6 +674,16 @@ sub needsmod{
   $sth->finish;
   $dbh->disconnect;
   return($result);
+}
+
+sub delitem{
+  my ($itemnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Delete from items where itemnumber=$itemnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
 }
 
 END { }       # module clean-up code here (global destructor)
