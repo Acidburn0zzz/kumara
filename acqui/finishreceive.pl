@@ -38,6 +38,10 @@ if ($quantrec != 0){
 my $gst=$input->param('gst');
 my $freight=$input->param('freight');
 my $volinf=$input->param('volinf');
+my $loan=0;
+if ($itemtype =~ /REF/){
+  $loan=1;
+}
 if ($volinf ne ''){
 #  print "$bibitemno";
   $class="Periodical";
@@ -59,7 +63,7 @@ if ($barcode =~ /\,/){
 #  print @barcodes;
 #  print $barcode;
 }
-my ($error)=makeitems($quantrec,$bibitemno,$biblio,$replacement,$cost,$bookseller,$branch,@barcodes);
+my ($error)=makeitems($quantrec,$bibitemno,$biblio,$replacement,$cost,$bookseller,$branch,$loan,@barcodes);
 if ($error eq ''){
   if ($itemtype ne 'PER'){
     print $input->redirect("/cgi-bin/koha/acqui/receive.pl?invoice=$invoiceno&id=$id&freight=$freight&gst=$gst");

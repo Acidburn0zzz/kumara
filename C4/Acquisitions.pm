@@ -600,7 +600,8 @@ sub insertsup {
 }
 
 sub makeitems {
-  my ($count,$bibitemno,$biblio,$replacement,$price,$booksellerid,$branch,@barcodes)=@_;
+  my
+($count,$bibitemno,$biblio,$replacement,$price,$booksellerid,$branch,$loan,@barcodes)=@_;
   my $dbh=C4Connect;
   my $sth=$dbh->prepare("Select max(itemnumber) from items");
   $sth->execute;
@@ -613,9 +614,9 @@ sub makeitems {
     $barcodes[$i]=uc $barcodes[$i];
     my $query="Insert into items (biblionumber,biblioitemnumber,itemnumber,barcode,
     booksellerid,dateaccessioned,homebranch,holdingbranch,price,replacementprice,
-    replacementpricedate) values
+    replacementpricedate,notforloan) values
     ($biblio,$bibitemno,$item,'$barcodes[$i]','$booksellerid',now(),'$branch',
-    '$branch','$price','$replacement',now())";
+    '$branch','$price','$replacement',now(),$loan)";
     my $sth=$dbh->prepare($query);
     $sth->execute;
     $error.=$sth->errstr;
