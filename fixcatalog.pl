@@ -15,7 +15,7 @@ $sth->finish;
 while (my $da=<STDIN>){
   chomp $da;
   my @temp=split('\t',$da);
-  if ($temp[1] =~ /t/){
+#  if ($temp[1] =~ /t/){
     my $dat=$temp[0];
 #    print "hey";
     while ( my ($key, $value) = each %stop) {
@@ -25,10 +25,10 @@ while (my $da=<STDIN>){
     }
     $dat=~ s/\'//g;
     print "$temp[0]\t$temp[1]\t \t \t \t$dat\n";
-  } else {
-    print $da,"\n";
+#  } else {
+#    print $da,"\n";
 #    print $temp[1],"\n";
-  }
+#  }
 }
 
 $dbh->disconnect;

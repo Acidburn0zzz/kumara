@@ -5,8 +5,13 @@
 #called as an include by the acquisitions index page
 
 use C4::Acquisitions;
+#use CGI;
+#my $inp=new CGI;
+#print $inp->header;
+my ($count,@results)=bookfunds;
 
-print <<printend
+open (FILE,'>/usr/local/www/hdl/htdocs/includes/budgets.inc') || die "Cant open file";
+print FILE <<printend
 
 <TABLE  width="40%"  cellspacing=0 cellpadding=5 border=1 >
 <FORM ACTION="/cgi-bin/koha/search.pl">
@@ -18,32 +23,48 @@ print <<printend
 
 <tr><td>
 <b>Budgets</B></TD> <TD><b>Total</B></TD> <TD><b>Spent</B></TD><TD><b>Comtd</B></TD><TD><b>Avail</B></TD></TR>
-
-
-
+printend
+;
+my $total=0;
+my $totspent=0;
+my $totcomtd=0;
+my $totavail=0;
+for (my $i=0;$i<$count;$i++){
+  my ($spent,$comtd)=bookfundbreakdown($results[$i]->{'bookfundid'});
+  my $avail=$results[$i]->{'budgetamount'}-($spent+$comtd);
+  print FILE <<EOP
 <tr><td>
-<A HREF="total-budget-1.html">Fund Name</a> </TD> <TD>$10 000</TD> <TD>$6000</TD><TD>$3000</TD><TD>$1000</TD></TR>
+<A HREF="total-budget-1.html">$results[$i]->{'bookfundname'}</a> </TD> 
+<TD>$results[$i]->{'budgetamount'}</TD> <TD>
+EOP
+;
+printf FILE ("%.2f", $spent);
+print FILE "</TD><TD>";
+printf FILE ("%.2f",$comtd);
+print FILE "</TD><TD>";
+printf FILE ("%.2f",$avail);
+print FILE "</TD></TR>";
+  $total+=$results[$i]->{'budgetamount'};
+  $totspent+=$spent;
+  $totcomtd+=$comtd;
+  $totavail+=$avail;
+}
 
-<tr><td>
-<A HREF="total-budget-2.html">Children</a> </TD> <TD>$10 000</TD> <TD>$6000</TD><TD>$3000</TD><TD>$1000</TD></TR>
-
-<tr><td>
-<A HREF="total-budget-3.html">Maori</a> </TD> <TD>$10 000</TD> <TD>$6000</TD><TD>$3000</TD><TD>$1000</TD></TR>
-
-<tr><td>
-<A HREF="total-budget-4.html">Talking Books</a> </TD> <TD>$10 000</TD> <TD>$6000</TD><TD>$3000</TD><TD>$1000</TD></TR>
-
-<tr><td>
-<A HREF="total-budget-5.html">etc</a> </TD> <TD>$10 000</TD> <TD>$6000</TD><TD>$3000</TD><TD>$1000</TD></TR>
-
-<tr><td>
-<A HREF="total-budget-6.html">fund name</a> </TD> <TD>$10 000</TD> <TD>$6000</TD><TD>$3000</TD><TD>$1000</TD></TR>
+print FILE <<printend
 <tr><td colspan=5>
 <hr size=1 noshade></TD></TR>
 
 <tr><td>
-<A HREF="total.html">Total</a> </TD> <TD>$60 000</TD> <TD>$36000</TD><TD>$18000</TD><TD>$6000</TD></TR>
-
+<A HREF="total.html">Total</a> </TD> <TD>$total</TD> <TD>
+printend
+;
+printf FILE ("%.2f",$totspent);
+print FILE "</TD><TD>";
+printf FILE ("%.2f",$totcomtd);
+print FILE "</TD><TD>";
+printf FILE ("%.2f",$totavail);
+print FILE "</TD></TR>";
+print FILE <<printend
 </table><br>
 Use your reload button [ctrl + r] to get the most recent figures.
 Committed figures are approximate only, as exchange rates will affect the amount actually paid.
@@ -54,3 +75,5 @@ Committed figures are approximate only, as exchange rates will affect the amount
 
 printend
 ;
+
+close FILE;

@@ -10,7 +10,10 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&getorders &bookseller &breakdown &basket);
+@EXPORT = qw(&getorders &bookseller &breakdown &basket &newbasket &bookfunds
+&ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
+ &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
+ &bookfundbreakdown &curconvert &updatesup);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -50,7 +53,9 @@ my $priv_func = sub {
 sub getorders {
   my ($supplierid)=@_;
   my $dbh=C4Connect;
-  my $query = "Select count(*),authorisedby,entrydate,basketno from aqorders where booksellerid='$supplierid'";
+  my $query = "Select count(*),authorisedby,entrydate,basketno from aqorders where 
+  booksellerid='$supplierid' and (datereceived = '0000-00-00' or
+datereceived is NULL)";
   $query.=" group by basketno order by entrydate";
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -65,11 +70,82 @@ sub getorders {
   return ($i,\@results);
 }
 
+sub getsingleorder {
+  my ($ordnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from biblio,biblioitems,aqorders where ordernumber=$ordnum 
+  and biblio.biblionumber=aqorders.biblionumber and
+  biblioitems.biblioitemnumber=aqorders.biblioitemnumber";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
+}
+
+sub invoice {
+  my ($invoice)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from aqorders,biblio,biblioitems where
+  booksellerinvoicenumber='$invoice' 
+  and biblio.biblionumber=aqorders.biblionumber and biblioitems.biblioitemnumber=
+  aqorders.biblioitemnumber";
+  my $i=0;
+  my @results;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+}
+
+sub ordersearch {
+  my ($search)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from aqorders,biblioitems
+  where aqorders.biblioitemnumber=
+  biblioitems.biblioitemnumber 
+  and (aqorders.title like '%$search%' or biblioitems.isbn='$search' 
+  or aqorders.ordernumber='$search') 
+  group by aqorders.ordernumber";
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  my $i=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+     my $sth2=$dbh->prepare("Select * from biblio where
+     biblionumber='$data->{'biblionumber'}'");
+     $sth2->execute;
+     my $data2=$sth2->fetchrow_hashref;
+     $sth2->finish;
+     $data->{'author'}=$data2->{'author'};
+     $sth2=$dbh->prepare("Select * from aqorderbreakdown where
+ordernumber='$data->{'ordernumber'}");
+    $sth2->execute;
+    $data2=$sth2->fetchrow_hashref;
+    $sth2->finish;
+    $data->{'branchcode'}=$data2->{'branchcode'};
+    $data->{'bookfundid'}=$data2->{'bookfundid'};
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+}
+
+
 sub bookseller {
   my ($searchstring)=@_;
   my $dbh=C4Connect;
   my $query="Select * from aqbooksellers where name like '$searchstring%' or
-  id like '$searchstring%'";
+  id = '$searchstring'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -103,7 +179,40 @@ sub breakdown {
 sub basket {
   my ($basketno)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from aqorders where basketno='$basketno'";
+  my $query="Select * from aqorders,biblio,biblioitems where basketno='$basketno'
+  and biblio.biblionumber=aqorders.biblionumber and biblioitems.biblioitemnumber
+  =aqorders.biblioitemnumber group by aqorders.ordernumber";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+#  print $query;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+}
+
+sub newbasket {
+  my $dbh=C4Connect;
+  my $query="Select max(basketno) from aqorders";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_arrayref;
+  my $basket=$$data[0];
+  $basket++;
+  $sth->finish;
+  $dbh->disconnect;
+  return($basket);
+}
+
+sub bookfunds {
+  my $dbh=C4Connect;
+  my $query="Select * from aqbookfund,aqbudget where aqbookfund.bookfundid
+  =aqbudget.bookfundid group by aqbookfund.bookfundid";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -117,6 +226,210 @@ sub basket {
   return($i,@results);
 }
 
+sub bookfundbreakdown {
+  my ($id)=@_;
+  my $dbh=C4Connect;
+  my $query="Select quantity,datereceived,freight,unitprice,listprice
+  from aqorders,aqorderbreakdown where bookfundid='$id' and 
+  aqorders.ordernumber=aqorderbreakdown.ordernumber and entrydate >=
+  '1999-06-01'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $comtd=0;
+  my $spent=0;
+  while (my $data=$sth->fetchrow_hashref){
+    if ($data->{'datereceived'} =~ /0000/){
+       $comtd+=($data->{'listprice'}+$data->{'freight'})*$data->{'quantity'};
+    } else {
+       $spent+=($data->{'unitprice'}+$data->{'freight'})*$data->{'quantity'};
+    }
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($spent,$comtd);
+}
+      
+
+sub newbiblio {
+  my ($title,$author,$copyright)=@_;
+  my $dbh=C4Connect;
+  my $query="Select max(biblionumber) from biblio";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_arrayref;
+  my $bibnum=$$data[0];
+  $bibnum++;
+  $sth->finish;
+  $query="insert into biblio (biblionumber,title,author,copyrightdate) values
+  ($bibnum,'$title','$author','$copyright')";
+  $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+  return($bibnum);
+}
+
+sub modbiblio {
+  my ($bibnum,$title,$author,$copyright)=@_;
+  my $dbh=C4Connect;
+  my $query="update biblio set title='$title',
+  author='$author',copyrightdate='$copyright' where
+  biblionumber=$bibnum";
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+  return($bibnum);
+}
+
+sub newbiblioitem {
+  my ($bibnum,$itemtype,$isbn)=@_;
+  my $dbh=C4Connect;
+  my $query="Select max(biblioitemnumber) from biblioitems";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_arrayref;
+  my $bibitemnum=$$data[0];
+  $bibitemnum++;
+  $sth->finish;
+  $query="insert into biblioitems (biblionumber,biblioitemnumber,
+  itemtype,isbn) 
+  values
+  ($bibnum,$bibitemnum,'$itemtype','$isbn')";
+  $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+  return($bibitemnum);
+}
+
+sub newsubject {
+  my ($bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="insert into bibliosubject (biblionumber) values
+  ($bibnum)";
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub newsubtitle {
+  my ($bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="insert into bibliosubtitle (biblionumber) values
+  ($bibnum)";
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub neworder {
+  my ($bibnum,$title,$ordnum,$basket,$quantity,$listprice,$supplier,$who,
+  $notes,$bookfund,$bibitemnum)=@_;
+  my $dbh=C4Connect;
+  my $query="insert into aqorders (biblionumber,title,ordernumber,basketno,
+  quantity,listprice,booksellerid,entrydate,requisitionedby,authorisedby,notes,
+  biblioitemnumber) 
+  values
+  ($bibnum,'$title',$ordnum,$basket,$quantity,$listprice,'$supplier',now(),
+  '$who','$who','$notes',$bibitemnum)";
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $query="insert into aqorderbreakdown (ordernumber,bookfundid) values
+  ($ordnum,'$bookfund')";
+  $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub modorder {
+  my ($title,$ordnum,$quantity,$listprice)=@_;
+  my $dbh=C4Connect;
+  my $query="update aqorders set title='$title',
+  quantity='$quantity',listprice='$listprice' where
+  ordernum=$ordnum";
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub newordernum {
+  my $dbh=C4Connect;
+  my $query="Select max(ordernumber) from aqorders";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_arrayref;
+  my $ordnum=$$data[0];
+  $ordnum++;
+  $sth->finish;
+  $dbh->disconnect;
+  return($ordnum);
+}
+
+sub receiveorder {
+  my ($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno)=@_;
+  my $dbh=C4Connect;
+  my $query="update aqorders set quantityreceived='$quantrec',
+  datereceived=now(),booksellerinvoicenumber='$invoiceno',
+  biblioitemnumber=$bibitemno,unitprice=$cost
+  where biblionumber=$biblio and ordernumber=$ordnum
+  ";
+#  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub curconvert {
+  my ($currency,$price)=@_;
+  my $dbh=C4Connect;
+  my $query="Select rate from currency where currency='$currency'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  my $cur=$data->{'rate'};
+  my $price=$price / $cur;
+  return($price);
+}
+
+sub updatesup {
+   my ($data)=@_;
+   my $dbh=C4Connect;
+   my $query="Update aqbooksellers set
+   name='$data->{'name'}',address1='$data->{'address1'}',address2='$data->{'address2'}',
+   address3='$data->{'address3'}',address4='$data->{'address4'}',postal='$data->{'postal'}',
+   phone='$data->{'phone'}',fax='$data->{'fax'}',url='$data->{'url'}',
+   contact='$data->{'contact'}',contpos='$data->{'contpos'}',
+   contphone='$data->{'contphone'}', contfax='$data->{'contfax'}', contaltphone=
+   '$data->{'contaltphone'}', contemail='$data->{'contemail'}', contnotes=
+   '$data->{'contnotes'}', active=$data->{'active'},
+   listprice='$data->{'listprice'}', invoiceprice='$data->{'invoiceprice'}',
+   gstreg=$data->{'gstreg'}, listincgst=$data->{'listincgst'},
+   invoiceincgst=$data->{'invoiceincgst'}, specialty='$data->{'specialty'}',
+   discount='$data->{'discount'}'
+   where id='$data->{'id'}'";
+   my $sth=$dbh->prepare($query);
+   $sth->execute;
+   $sth->finish;
+   $dbh->disconnect;
+#   print $query;
+}
 END { }       # module clean-up code here (global destructor)
   
     

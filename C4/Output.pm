@@ -66,13 +66,15 @@ sub gotopage{
 sub startmenu{
   my ($type)=@_;
   if ($type eq 'issue') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/issues-top.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc') || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/opac-top.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-top.inc') || die;
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/members-top.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-top.inc') || die;
+  } elsif ($type eq 'acquisitions'){
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-top.inc') || die;
   } else {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/cat-top.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc') || die;
   }
   my @string=<FILE>;
   close FILE;
@@ -85,13 +87,15 @@ sub startmenu{
 sub endmenu{
   my ($type)=@_;
   if ($type eq 'issue'){
-    open (FILE,'/usr/local/www/koha/htdocs/includes/issues-bottom.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc') || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/opac-bottom.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-bottom.inc') || die;
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/members-bottom.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-bottom.inc') || die;
+  } elsif ($type eq 'acquisitions') {
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-bottom.inc') || die;
   } else {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/cat-bottom.inc');
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc') || die;
   }
   my @string=<FILE>;
   close FILE;
@@ -137,26 +141,30 @@ sub mkform{
   my $string="<form action=$action method=post>\n";
   $string=$string.mktablehdr();
   my $key;
-  my @order;
-  while ( my ($key, $value) = each %inputs) {
+  my @keys=sort keys %inputs;
+  
+  my $count=@keys;
+  my $i2=0;
+  while ( $i2<$count) {
+    my $value=$inputs{$keys[$i2]};
     my @data=split('\t',$value);
     #my $posn = shift(@data);
     if ($data[0] eq 'hidden'){
-      $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
+      $string=$string."<input type=hidden name=$keys[$i2] value=\"$data[1]\">\n";
     } else {
       my $text;
       if ($data[0] eq 'radio') {
-        $text="<input type=radio name=$key value=$data[1]>$data[1]
-	<input type=radio name=$key value=$data[2]>$data[2]";
+        $text="<input type=radio name=$keys[$i2] value=$data[1]>$data[1]
+	<input type=radio name=$keys[$i2] value=$data[2]>$data[2]";
       } 
       if ($data[0] eq 'text') {
-        $text="<input type=$data[0] name=$key value=\"$data[1]\">";
+        $text="<input type=$data[0] name=$keys[$i2] value=\"$data[1]\">";
       }
       if ($data[0] eq 'textarea') {
-        $text="<textarea name=$key wrap=physical cols=40 rows=4>$data[1]</textarea>";
+        $text="<textarea name=$keys[$i2] wrap=physical cols=40 rows=4>$data[1]</textarea>";
       }
       if ($data[0] eq 'select') {
-        $text="<select name=$key>";
+        $text="<select name=$keys[$i2]>";
 	my $i=1;
        	while ($data[$i] ne "") {
 	  my $val = $data[$i+1];
@@ -165,9 +173,10 @@ sub mkform{
 	}
 	$text=$text."</select>";
       }	
-      $string=$string.mktablerow(2,'white',$key,$text);
-      #@order[$posn] =mktablerow(2,'white',$key,$text);
+      $string=$string.mktablerow(2,'white',$keys[$i2],$text);
+      #@order[$posn] =mktablerow(2,'white',$keys[$i2],$text);
     }
+    $i2++;
   }
   #$string=$string.join("\n",@order);
   $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');

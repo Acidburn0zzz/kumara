@@ -352,18 +352,19 @@ sub CatSearch  {
         my $search2=uc $search->{'isbn'};
         my $query1 = "select * from biblioitems where isbn='$search2'";
 	my $sth1=$dbh->prepare($query1);
+	print $query1;
 	$sth1->execute;
         my $i2=0;
 	while (my $data=$sth1->fetchrow_hashref) {
-	   $query="select * from items,biblio where
+	   $query="select * from biblioitems,biblio where
            biblio.biblionumber = $data->{'biblionumber'}
-           and items.biblionumber = biblio.biblionumber";
+           and biblioitems.biblionumber = biblio.biblionumber";
 	   my $sth=$dbh->prepare($query);
-#	   $sth->execute;
-#	   my $data=$sth->fetchrow_hashref;
-	   $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
+	   $sth->execute;
+	   my $data=$sth->fetchrow_hashref;
+           $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}\t$data->{'isbn'}\t$data->{'itemtype'}";
            $i2++; 
-#	   $sth->finish;
+	   $sth->finish;
 	}
 	$sth1->finish;
       }
@@ -404,22 +405,11 @@ sub CatSearch  {
   my $i=0;
   my $i2=0;
   my $limit=$num+$offset;
-
-#  if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
-#    while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
-#      if ($i >= $offset){
-#
-#        $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
-#        $i2++;
-#      }
-#      $i++;
-#    }
-#  } else {
-    while (my $data=$sth->fetchrow_hashref){
-     if ($type ne 'subject'){
-$results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
-     } elsif ($search->{'isbn'} ne ''){
-     } else {  
+  while (my $data=$sth->fetchrow_hashref){
+  if ($type ne 'subject' && $type ne 'precise'){
+     $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+  } elsif ($search->{'isbn'} ne ''){
+  } else {  
 $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
      }
      $i++;

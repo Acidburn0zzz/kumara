@@ -40,8 +40,9 @@ $inputs{'Publication Year'}="text\t$data->{'publicationyear'}";
 $inputs{'Volume'}="text\t$data->{'volumedesc'}";
 $inputs{'Illustrations'}="text\t$data->{'illustration'}";
 $inputs{'Pages'}="text\t$data->{'pages'}";
-
-print mkform('wah',%inputs);
+$inputs{'bibnum'}="hidden\t$data->{'biblionumber'}";
+$inputs{'bibitemnum'}="hidden\t$data->{'biblioitemnumber'}";
+print mkform('updatebiblio.pl',%inputs);
 #print mktablehdr();
 #print mktableft();
 print endmenu();
