@@ -101,6 +101,7 @@ if ($biblio eq ''){
   print "<input type=hidden name=existing value=no>";
 }
 print <<printend
+<!--$title-->
 <input type=hidden name=ordnum value=$ordnum>
 <input type=hidden name=basket value=$basket>
 <input type=hidden name=supplier value=$id>
