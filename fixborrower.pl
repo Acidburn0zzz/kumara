@@ -4,9 +4,9 @@ use C4::Database;
 use strict;
 
 my $dbh=C4Connect;
-my $query = "Select * from categories where categorycode like 'L%' or categorycode like 'F%'
-or categorycode like 'S%' or categorycode like 'O%' or categorycode like 'H%' and categorycode <>'HR' 
-and categorycode <> 'ST'";
+my $query = "Select * from categories where (categorycode like 'L%' or categorycode like 'F%'
+or categorycode like 'S%' or categorycode like 'O%' or categorycode like 'H%') and (categorycode <>'HR' 
+and categorycode <> 'ST')";
 my $sth=$dbh->prepare($query);
 $sth->execute;
 while (my $data=$sth->fetchrow_hashref){

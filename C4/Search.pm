@@ -467,10 +467,15 @@ sub BornameSearch  {
 }
 
 sub borrdata {
-  my ($cardnumber)=@_;
+  my ($cardnumber,$bornum)=@_;
   $cardnumber = uc $cardnumber;
   my $dbh=C4Connect;
-  my $query="Select * from borrowers where cardnumber='$cardnumber'";
+  my $query;
+  if ($bornum eq ''){
+    $query="Select * from borrowers where cardnumber='$cardnumber'";
+  } else {
+      $query="Select * from borrowers where borrowernumber='$bornum'";
+  }
   #print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -479,6 +484,8 @@ sub borrdata {
   $dbh->disconnect;
   return($data);
 }
+
+
 
 sub borrdata2 {
   my ($env,$bornum)=@_;
