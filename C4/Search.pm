@@ -73,7 +73,7 @@ sub KeywordSearch {
     $count++;
   }
   $sth->finish;
-  $query=$query." limit $num,$offset";
+#  $query=$query." limit $num,$offset";
   $sth=$dbh->prepare($query);
   $sth->execute;
 #  print $query;
@@ -94,24 +94,32 @@ sub CatSearch  {
   my $dbh = &C4Connect;
   my $query = '';
   if ($type eq 'loose') {
-      $query="Select count(*) from biblio,catalogueentry"; 
+#      $query="Select count(*) from biblio,catalogueentry"; 
       if ($search->{'author'} ne ''){
-        $query=$query." where ((catalogueentry.catalogueentry = biblio.author)
+        $query="select biblio.biblionumber,title,author from
+         biblio,catalogueentry
+         where ((catalogueentry.catalogueentry = biblio.author)
          and (catalogueentry.catalogueentry like '$search->{'author'}%') 
-         and (entrytype = 'a'))";
-         if ($search->{'title'} ne ''){
-	   $query= "Select biblionumber,title from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.author)
-            and (catalogueentry.catalogueentry like '$search->{'author'}%') 
-            and (entrytype = 'a')) intersect select biblionumber,title from
-            biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
-           and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
-           and (entrytype = 't'))";
-	 }
+         and (entrytype = 'a')) union
+	 select biblio.biblionumber,title,author from biblio,biblioanalysis
+         where
+
+	 biblioanalysis.analyticalauthor like '$search->{'author'}%'
+	 and biblioanalysis.biblionumber=
+	 biblio.biblionumber";
+#         if ($search->{'title'} ne ''){
+#	 }
       } else {
           if ($search->{'title'} ne ''){
-    	   $query=$query." where ((catalogueentry.catalogueentry = biblio.title)
+    	   $query="select biblio.biblionumber,title,author from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
            and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
-           and (entrytype = 't'))";
+           and (entrytype = 't')) union select
+           biblio.biblionumber,title,author from
+	   biblioanalysis,biblio where analyticaltitle like
+           '%$search->{'title'}%' and biblio.biblionumber=biblioanalysis.biblionumber
+           union select biblio.biblionumber,title,author from
+           biblio,bibliosubtitle where subtitle like '%$search->{'title'}%' and
+           biblio.biblionumber=bibliosubtitle.biblionumber";
 	 }
       }
   } 
@@ -148,7 +156,7 @@ sub CatSearch  {
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count2=0;
-  if ($type ne 'subject'){
+  if ($type eq 'precise'){
     my $count=$sth->fetchrow_hashref;
     $count2=$count->{'count'};
   } else {
@@ -159,7 +167,7 @@ sub CatSearch  {
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
   if ($type ne 'precise' && $type ne 'subject'){
-    $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
+    $query=$query." order by title limit $num,$offset";
   } else {
     if ($type eq 'subject'){
       $query=$query." order by subject limit $num,$offset";
@@ -168,16 +176,28 @@ sub CatSearch  {
   $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
+  my $i2=0;
+  my $limit=$num+$offset;
   my @results;
-  while (my $data=$sth->fetchrow_hashref){
-   if ($type ne 'subject'){
-    $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
-    $data->{'author'}";
-   } else {
-    $results[$i]="$data->{'biblionumber'}\t$data->{'subject'}\t
-    $data->{'author'}";
-   }
-    $i++;
+  if ($search->{'title'} ne '' || $search->{'author'} ne ''){
+    while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
+      if ($i >= $offset){
+        $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
+        $i2++;
+      }
+      $i++;
+    }
+  } else {
+    while (my $data=$sth->fetchrow_hashref){
+     if ($type ne 'subject'){
+      $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
+      $data->{'author'}";
+     } else {
+      $results[$i]="$data->{'biblionumber'}\t$data->{'subject'}\t
+      $data->{'author'}";
+     }
+     $i++;
+    }
   }
   $sth->finish;
 #    print "$query\n";
@@ -195,11 +215,13 @@ sub updatesearchstats{
 sub subsearch {
   my ($env,$subject)=@_;
   my $dbh=C4Connect();
-  my $query="Select * from bibliosubject,biblio where subject='$subject'
-  and bibliosubject.biblionumber=biblio.biblionumber";
+  my $query="Select * from biblio,bibliosubject where
+biblio.biblionumber=bibliosubject.biblionumber and
+bibliosubject.subject='$subject'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
+#  print $query;
   my @results;
   while (my $data=$sth->fetchrow_hashref){
     $results[$i]="$data->{'title'}\t$data->{'author'}\t$data->{'biblionumber'}";
@@ -235,7 +257,7 @@ sub ItemInfo {
     }
     $isth->finish;
 
-$results[$i]="$data->{'title'}\t$data->{'itemnumber'}\t$datedue\t$data->{'branchname'}";
+$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
      $i++;
   }
   $sth->finish;

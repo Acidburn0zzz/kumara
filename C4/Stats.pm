@@ -63,6 +63,8 @@ sub UpdateStats {
 
 sub statsreport {
   #module to return a list of stats for a given day,time,branch type
+  #or to return search stats
+  
 }
 
 END { }       # module clean-up code here (global destructor)

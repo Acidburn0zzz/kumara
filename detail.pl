@@ -24,7 +24,7 @@ my $count=@items;
 my $i=0;
 print center();
 print mktablehdr;
-print mktablerow(4,'#cccc99','Title','Item Number','DateDue','Location'); 
+print mktablerow(5,'#cccc99','Title','Barcode','DateDue','Location','Dewey'); 
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
@@ -32,10 +32,10 @@ while ($i < $count){
     $results[2]='Available';
   }
   if ($colour == 1){                                                                          
-    print mktablerow(4,'#ffffcc',@results);                                        
+    print mktablerow(5,'#ffffcc',@results);                                        
     $colour=0;                                                                                
   } else{                                                                                     
-    print mktablerow(4,'white',@results);                                          
+    print mktablerow(5,'white',@results);                                          
     $colour=1;                                                                                
   }
    $i++;

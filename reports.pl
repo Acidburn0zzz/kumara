@@ -1,46 +1,23 @@
 #!/usr/bin/perl
 
-#script to display detailed information
+#script to display reports
 #written 8/11/99
 
 use strict;
-#use DBI;
-use C4::Search;
 use CGI;
 use C4::Output;
+use C4::Stats;
 
 my $input = new CGI;
 print $input->header;
+my $type=$input->param('type');
 print startpage();
 print startmenu();
-my $blah;
-
-my $bib=$input->param('bib');
-my $title=$input->param('title');
-
-my @items=ItemInfo(\$blah,$bib,$title);
-#print @items;
-my $count=@items;
-my $i=0;
-print center();
-print mktablehdr;
-print mktablerow(4,'#cccc99','Title','Item Number','DateDue','Location'); 
-my $colour=1;
-while ($i < $count){
-  my @results=split('\t',$items[$i]);
-  if ($results[2] eq ''){
-    $results[2]='Available';
-  }
-  if ($colour == 1){                                                                          
-    print mktablerow(4,'#ffffcc',@results);                                        
-    $colour=0;                                                                                
-  } else{                                                                                     
-    print mktablerow(4,'white',@results);                                          
-    $colour=1;                                                                                
-  }
-   $i++;
+if ($type eq 'search'){
+ my $data=updatestats('search','something');  
 }
-print endcenter();
-print mktableft();
+if ($type eq
+
+
 print endmenu();
 print endpage();

@@ -88,7 +88,7 @@ while ($i < $count2){
       $stuff[2]=mklink($url,$stuff[2]);
     } else {
       my $word=$stuff[1];
-      $word=~ s/ /%20/;
+      $word=~ s/ /%20/g;
       $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
     }
     if ($colour == 1){
