@@ -11,28 +11,43 @@ use C4::Output;
 
 my $input = new CGI;
 print $input->header;
+my $type=$input->param('type');
 print startpage();
-print startmenu();
+print startmenu($type);
 my $blah;
 my $env;
 my $subject=$input->param('subject');
 #my $title=$input->param('title');
-my $type=$input->param('type');
+
+my $main;                                                                                                                                 
+my $secondary;                                                                                                                            
+if ($type eq 'opac'){                                                                                                                     
+  $main='#99cccc';                                                                                                                        
+  $secondary='#efe5ef';                                                                                                                   
+} else {                                                                                                                                  
+  $main='#99cc33';                                                                                                                        
+  $secondary='#ffffcc';                                                                                                                   
+}      
+
 my @items=subsearch(\$blah,$subject);
 #print @items;
 my $count=@items;
 my $i=0;
 print center();
 print mktablehdr;
-print mktablerow(4,'#99cc33',bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION'),"/images/background-mem.gif"); 
+if ($type ne 'opac'){
+  print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION'),"/images/background-mem.gif"); 
+} else {
+  print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION')); 
+}
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
-  $results[0]=mklink("/cgi-bin/kumara/detail.pl?bib=$results[2]",$results[0]);
+  $results[0]=mklink("/cgi-bin/kumara/detail.pl?bib=$results[2]&type=$type",$results[0]);
   my $word=$results[1];
   $word=~ s/ //g;
   $word=~ s/\,/\,%20/;
-  $results[1]=mklink("/cgi-bin/kumara/search.pl?author=$word",$results[1]);
+  $results[1]=mklink("/cgi-bin/kumara/search.pl?author=$word&type=$type",$results[1]);
   my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$results[2]);                                                                     
   $results[3]=$count;                                                                                                                           
   if ($nacount > 0){                                                                                                                          
@@ -47,7 +62,9 @@ while ($i < $count){
   if ($scount > 0){                                                                                                                           
     $results[4]=$results[4]." S$scount";                                                                                                          
   }             
-  $results[6]=mklink("/cgi-bin/koha/request.pl?bib=$results[2]","Request");
+  if ($type ne 'opac'){
+    $results[6]=mklink("/cgi-bin/koha/request.pl?bib=$results[2]","Request");
+  }
   if ($colour == 1){                                                                          
     print mktablerow(5,'#ffffcc',$results[0],$results[1],$results[3],$results[4],$results[6]);                                        
     $colour=0;                                                                   
@@ -59,5 +76,5 @@ while ($i < $count){
 }
 print endcenter();
 print mktableft();
-print endmenu();
+print endmenu($type);
 print endpage();

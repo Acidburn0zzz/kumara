@@ -132,11 +132,15 @@ while ($i < $count2){
       if ($scount > 0){
         $stuff[5]=$stuff[5]." S$scount";
       }
+      if ($type ne 'opac'){
         $stuff[6]=mklink("/cgi-bin/koha/request.pl?bib=$stuff[2]","Request");
+      }
     } else {
       my $word=$stuff[1];
       $word=~ s/ /%20/g;
-      $stuff[1]=mklink("/cgi-bin/koha/subjectsearch.pl?subject=$word",$stuff[1]);
+      
+        $stuff[1]=mklink("/cgi-bin/koha/subjectsearch.pl?subject=$word&type=$type",$stuff[1]);
+
     }
 
     if ($colour == 1){
