@@ -11,7 +11,7 @@ use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
 use C4::Circulation::Borrower;
 use C4::Reserves;
-use C4::Interface;
+#use C4::Interface;
 use C4::Security;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
