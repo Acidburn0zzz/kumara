@@ -327,11 +327,17 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio,biblioitems
-         where biblioitems.biblionumber=biblio.biblionumber and
-         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%')";    
+         biblio,biblioitems,additionalauthors
+         where biblioitems.biblionumber=biblio.biblionumber 
+	 and biblio.biblionumber=additionalauthors.biblionumber and
+         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%' or
+	 additionalauthors.author like '$key[0]%' or
+	 additionalauthors.author like '% $key[0]%' 
+	 )";    
 	 while ($i < $count){ 
-           $query=$query." and (author like '$key[$i]%' or author like '% $key[$i]%')";   
+           $query=$query." and (biblio.author like '$key[$i]%' or biblio.author like '% $key[$i]%'
+	   or additionalauthors.author like '$key[$i]%' or
+	   additionalauthors.author like '% $key[$i]%')";   
            $i++;       
 	 }   
 	 $query=$query.")";
@@ -344,10 +350,13 @@ sub CatSearch  {
 	   $query.= "and ( itemtype='$temp[0]'";
 	   for (my $i=1;$i<$count;$i++){
 	     $query.=" or itemtype='$temp[$i]'";
-	 }
+  	   }
 	   $query.=") ";
-           
 	 }
+	 if ($search->{'dewey'} ne ''){
+	      $query.=" and dewey='$search->{'dewey'}' ";
+         }           
+	 
 	 $query.=" group by biblio.biblionumber";
       } else {
           if ($search->{'title'} ne ''){
@@ -398,6 +407,9 @@ sub CatSearch  {
 	      }
 	      $query.=")";
 	    }
+	    if ($search->{'dewey'} ne ''){
+	      $query.=" and dewey='$search->{'dewey'}' ";
+	    }
 	   }
 	  } elsif ($search->{'class'} ne ''){
 	     $query="select count(*) from biblioitems,biblio where biblio.biblionumber=biblioitems.biblionumber";
@@ -408,6 +420,10 @@ sub CatSearch  {
 	       $query.=" or itemtype='$temp[$i]'";
 	      }
 	      $query.=")";
+	  } elsif ($search->{'dewey'} ne ''){
+	     $query="select count(*) from biblioitems,biblio 
+	     where biblio.biblionumber=biblioitems.biblionumber
+	     and biblioitems.dewey like '$search->{'dewey'}%'";
 	  }
           $query .=" group by biblio.biblionumber";	 
       }
@@ -489,7 +505,7 @@ sub CatSearch  {
   $query=~ s/count\(\*\)/\*/g;
   if ($type ne 'precise' && $type ne 'subject'){
     if ($search->{'author'} ne ''){
-      $query=$query." order by author,title limit $offset,$num";
+      $query=$query." order by biblio.author,title limit $offset,$num";
     } else {
       $query=$query." order by title limit $offset,$num";
      }
