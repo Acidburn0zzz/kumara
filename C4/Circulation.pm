@@ -103,7 +103,7 @@ sub checkoverdues{
 }
 
 sub previousissue {
-  my (%env,$itemnum,$dbh,$bornum)=@_;
+  my $env,$itemnum,$dbh,$bornum)=@_;
   my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
@@ -130,7 +130,7 @@ sub checkwaiting{
 }
 
 sub scanbook {
-  my (%env,$interface)=@_;
+  my ($env,$interface)=@_;
   #scan barcode
 #  my $number='L01781778';  
   my ($number,$reason)=dialog("Book Barcode:");
@@ -139,7 +139,7 @@ sub scanbook {
 }
 
 sub scanborrower {
-  my (%env,$interface)=@_;
+  my ($env,$interface)=@_;
   #scan barcode
 #  my $number='V00126643';  
   my ($number,$reason)=&dialog("Borrower Barcode:");
