@@ -202,7 +202,7 @@ sub borrower_dialog {
   my $result;
   my $borrower;
   my $book;
-  my @coltitles = ("Borrower","Book");
+  my @coltitles = ("Borrower","Item");
   my @rowtitles = (" ");
   my @coltypes  = ("UMIXED","UMIXED");
   my @colwidths = (12,12);
@@ -246,7 +246,7 @@ sub selborrower {
 sub issuewindow {
   my ($env,$title,$dbh,$items1,$items2,$borrower,$amountowing,$odues)=@_;
   my @functs=("Due Date","Renewals","Payments","Current","Previous");
-  my $titlepanel = titlepanel($env,"Issues","Issue a book");
+  my $titlepanel = titlepanel($env,"Issues","Issue an Item");
   my $scroll2 = new Cdk::Scroll ('Title'=>"Previous Issues",
     'List'=>\@$items1,'Height'=> 8,'Width'=>78,'Ypos'=>18);
   my $scroll1 = new Cdk::Scroll ('Title'=>"Current Issues",
@@ -262,7 +262,7 @@ sub issuewindow {
      $x++;
   }
   my $borrbox = borrowerbox($env,$borrower,$amountowing);
-  my $entryBox = new Cdk::Entry('Label'=>"Book Barcode:  ",
+  my $entryBox = new Cdk::Entry('Label'=>"Item Barcode:  ",
      'Max'=>"11",'Width'=>"11",
      'Xpos'=>"0",'Ypos'=>3,'Type'=>"UMIXED");
   $scroll2->draw();
@@ -409,7 +409,7 @@ sub borrowerbox {
 sub returnwindow {
   my ($env,$title,$item,$items,$borrower,$amountowing,$odues,$dbh)=@_;
   #debug_msg($env,$borrower);
-  my $titlepanel = titlepanel($env,"Returns","Scan book");
+  my $titlepanel = titlepanel($env,"Returns","Scan Item");
   my @functs=("Payments","Issues","Renewal");
   my $funcmenu = new Cdk::Scroll ('Title'=>"Function",
      'List'=>\@functs,'Height'=>5,'Width'=>12,'Ypos'=>3,'Xpos'=>16);
@@ -424,7 +424,7 @@ sub returnwindow {
   }
   my $bookentry  =  new Cdk::Entry('Label'=>" ",
      'Max'=>"11",'Width'=>"11",
-     'Xpos'=>"2",'Ypos'=>"3",'Title'=>"Book Barcode",
+     'Xpos'=>"2",'Ypos'=>"3",'Title'=>"Item Barcode",
      'Type'=>"UMIXED");
   $bookentry->preProcess ('Function' =>sub{preretbook(@_,$env,$dbh,
      $funcmenu,$bookentry,$borrower,$amountowing,$odues);});

@@ -6,6 +6,7 @@ package C4::Accounts; #asummes C4/Accounts
 use strict;
 require Exporter;
 use DBI;
+use C4::Database;
 use C4::Format;
 use C4::Search;
 use C4::InterfaceCDK;
@@ -81,8 +82,8 @@ sub checkaccount  {
 
 sub reconcileaccount {
   #print put money owing give person opportunity to pay it off
-  my ($env,$dbh,$bornumber,$total)=@_;
-  debug_msg($env,$dbh);
+  my ($env,$dummy,$bornumber,$total)=@_;
+  my $dbh = &C4Connect;
   #get borrower record
   my $sth=$dbh->prepare("select * from borrowers
     where borrowernumber=$bornumber");
@@ -123,6 +124,7 @@ sub reconcileaccount {
     #Check if the borrower still owes
     $total=&checkaccount($env,$bornumber,$dbh);
   }
+  $dbh->disconnect;
   return($total);
 
 }

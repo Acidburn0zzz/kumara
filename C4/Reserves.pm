@@ -129,9 +129,9 @@ sub EnterReserves{
       if ($biblionumber eq "") {
         error_msg($env,"No items found");   
       } else {
-        #debug_msg($env,"getting items $biblionumber");	
+        debug_msg($env,"getting items $biblionumber");	
         my @items = GetItems($env,$biblionumber);
-        #debug_msg($env,"got items ");
+        debug_msg($env,"got items ");
 	 
 	my $cnt_it = @items;
 	my $dbh = &C4Connect;
@@ -145,7 +145,7 @@ sub EnterReserves{
         my @branches;
 	#debug_msg($env,"select branches ");
 	    
-        my $query = "select * from branches order by branchname";
+        my $query = "select * from branches where issuing=1 order by branchname";
         my $sth=$dbh->prepare($query);
         $sth->execute;
         while (my $branchrec=$sth->fetchrow_hashref) {
@@ -160,15 +160,18 @@ sub EnterReserves{
        	  #debug_msg($env,"make reserves");
 	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
             MakeReserveScreen($env, $data, \@items, \@branches);
-      	  my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
-       	  if ($reason eq "") { 
-       	    if ($borrnum ne "") {
-              CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
-              $donext = "Circ"
-            }
-          } else {
-       	    $donext = $reason;
-	  }  
+      	  if ($borcode ne "") { 
+   	    my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
+       	    if ($reason eq "") { 
+       	      if ($borrnum ne "") {
+                CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
+                $donext = "Circ"
+              }
+	      
+            } else {
+       	      $donext = $reason;
+	    }
+	  } else { $donext = "Circ" }  
 	} 
 	$dbh->disconnect;
       }
