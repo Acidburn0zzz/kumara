@@ -156,9 +156,8 @@ sub MakeReserveScreen {
   my ($env,$bibliorec,$bitems,$branches) = @_;
   debug_msg($env,"make reserv");
   my $panel    = Newt::Panel(1,4);
-  my $itemlist = Newt::Listbox(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-  my $brlist   = Newt::Listbox(6,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT |
-NEWT_FLAG_MULTIPLE);
+  my $itemlist = Newt::Listbox(10, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  my $brlist   = Newt::Listbox(6,  NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $book = fmtstr($env,$bibliorec->{'title'},"L60");
   my $auth = substr($bibliorec->{'author'},0,20);
   substr($book,(60-length($auth)-2),length($auth)+2) = "  ".$auth;
@@ -232,12 +231,21 @@ NEWT_FLAG_MULTIPLE);
     $reason = $stuff;
   } else {
     $reason = "";
+    my @constarr = ("a", "o", "e");
     @answers[0] = $bentry->Get();
     my @brline = split(" ",$brlist->Get());
     @answers[1] = @brline[0];
-    @answers[2] = $constraint->Get();
-    @answers[3] = $bitx{$itemlist->Get()};
-    debug_msg($env,"$answers[0] $answers[1] $answers[2] $answers[3]");
+    @answers[2] = $constarr[$constraint->Get()];
+    my @items;
+    my @itarr = $itemlist->Get();
+    my $cnt = @itarr;
+    my $i = 0;
+    while ($i < $cnt) {
+      @items[$i] = $bitx{$itarr[$i]};
+      $i++;
+    }
+    @answers[3] = \@items;
+#    debug_msg($env,"$answers[0] $answers[1] $answers[2] $answers[3]");
   }
   return ($stuff,@answers);
 }

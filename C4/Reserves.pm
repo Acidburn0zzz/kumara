@@ -10,6 +10,7 @@ use C4::Database;
 use C4::Format;
 use C4::Interface;
 use C4::Interface::Reserveentry;
+use C4::Circulation;
 use C4::Circulation::Borrower;
 use C4::Search;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -95,7 +96,10 @@ sub EnterReserves{
     my $no_ents = @results;
     my $biblionumber;
     if ($no_ents > 0) {
-      if ($no_ents > 1) {
+      if ($no_ents == 1) {
+        my @ents = split("\t",@results[0]);
+        $biblionumber  = @ents[0];       
+      } else {  
         my %biblio_xref;
         my @bibtitles;
         my $i = 0;
@@ -110,20 +114,19 @@ sub EnterReserves{
           $i++;
         }
         titlepanel($env,"Reserves","Select Title");
-        my ($results,$bibres)  =  SelectBiblio($env,$count,\@bibtitles);
-        if ($results ne 1) {
-  	  $biblionumber = $biblio_xref{$bibres};
-          if ($biblionumber eq "")  {
+        my ($results,$bibres) = SelectBiblio($env,$count,\@bibtitles);
+        if ($results == 1) {
+       	  $biblionumber = $biblio_xref{$bibres};
+          if ($biblionumber eq "") {
             error_msg($env,"No item selected");
           } else {
 	    $donext = $results;
 	  }  
-	}  
-      } else  {
-        my @ents = split("\t",@results[0]);
-        $biblionumber  = @ents[0];
+	}
       }
-      if ($biblionumber ne "") {
+      if ($biblionumber eq "") {
+        error_msg($env,"No items found");   
+      } else {
         my @items = GetItems($env,$biblionumber);
         my $cnt_it = @items;
 	my $dbh = &C4Connect;
@@ -149,20 +152,16 @@ sub EnterReserves{
        	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
             MakeReserveScreen($env, $data, \@items, \@branches);
       	  my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
-          $dbh->disconnect;
-	  debug_msg ($env,$reason);
-      	  if ($reason eq "") { 
+       	  if ($reason eq "") { 
        	    if ($borrnum ne "") {
               CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
-            $donext = "Circ"
+              $donext = "Circ"
             }
           } else {
-            $dbh->disconnect;
-      	    $donext = $reason;
+       	    $donext = $reason;
 	  }  
 	} 
-      } else {
-        error_msg($env,"No items found"); 
+	$dbh->disconnect;
       }
     }
   }
@@ -175,9 +174,8 @@ sub CreateReserve {
   my $dbh = &C4Connect;
   $dbh->{RaiseError} = 1;
   $dbh->{AutoCommit} = 0;
-  debug_msg($env,"making reserve");
   my $const = lc substr($constraint,0,1);
-  debug_msg($env,"constraint $const");
+  debug_msg($env,"constraint $constraint $const");
   my @datearr = localtime(time);
   my $resdate = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   eval {     
@@ -185,26 +183,27 @@ sub CreateReserve {
     my $query="insert into reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype) values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
     my $sth = $dbh->prepare($query);
     $sth->execute();
-    #if (($const eq "o") || ($const eq "e")) {
-    #  my $numitems = @$bibitems;
-    #  my $i = 0;
-    #  while ($i < $numitems) {
-    #    my $biblioitem = @$bibitems[$i];
-    #	my $query = "insert into reserveconstraints
-    #	   (borrowernumber,reservedate,biblionumber,biblioitemnumber)
-    #	   values ('$borrnum','$biblionumber','$resdate','$biblioitem')";
-    #	my $sth = $dbh->prepare($query);
-    #	$sth->execute();
-    #  }
-    #}
+    debug_msg($env,"const = $const"); 
+    if (($const eq "o") || ($const eq "e")) {
+      my $numitems = @$bibitems;
+      my $i = 0;
+      while ($i < $numitems) {
+        my $biblioitem = @$bibitems[$i];
+    	my $query = "insert into reserveconstraints
+    	   (borrowernumber,biblionumber,reservedate,biblioitemnumber)
+    	   values ('$borrnum','$biblionumber','$resdate','$biblioitem')";
+        my $sth = $dbh->prepare($query);
+    	$sth->execute();
+	$i++;
+      }
+    }
     $dbh->commit();
   };
   if (@_) {
     # update failed
     my $temp = @_;
-    error_msg($env,"error trap @_");
-    
-    $dbh->rollback();
+    #  error_msg($env,"Update failed");    
+    $dbh->rollback(); 
   }
   $dbh->disconnect();
   return();
