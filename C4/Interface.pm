@@ -107,9 +107,9 @@ sub menu2 {
     #debug_msg("","hot ");
     if ($data eq NEWT_KEY_F11) {
        $stuff="Quit";
-    } elsif ($data eq NEWT_KEY_F2) {
-       $stuff="Returns";
     } elsif ($data eq NEWT_KEY_F3) {
+       $stuff="Returns";
+    } elsif ($data eq NEWT_KEY_F2) {
        $stuff="Issues";	      
     } elsif ($data eq NEWT_KEY_F4) {
        $stuff="Reserves";
