@@ -79,10 +79,12 @@ my $count2=@results;
 my $i=0;
 my $colour=1;
 while ($i < $count2){
+#    print $results[$i]."\n";
     my @stuff=split('\t',$results[$i]);
     my $title2=$stuff[1];
     $title2=~ s/ /%20/g;
     if ($subject eq ''){
+#      print $stuff[0];
       $stuff[1]=mklink("/cgi-bin/kumara/detail.pl?bib=$stuff[2]&title=$title2",$stuff[1]);
       my $word=$stuff[0];
       $word=~ s/ //g;

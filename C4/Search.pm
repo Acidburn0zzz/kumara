@@ -15,7 +15,8 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
-&itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount); 
+&itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
+&OpacSearch); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -51,6 +52,46 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
+sub OpacSearch {
+  my ($env,$type,$search,$num,$offset)=@_;
+  my $dbh = &C4Connect;
+  my @key=split(' ',$search->{'keyword'});
+  my $count=@key;
+  my $i=1;
+  my @results;
+  my $query ="Select count(*) from biblio where 
+  (title like '%$key[0]%'";
+  while ($i < $count){
+    $query=$query." and title like '%$key[$i]%'";
+    $i++;
+  }
+  $query=$query.") or (author like '%$key[0]%'";
+  $i=1;
+  while ($i < $count){
+    $query=$query." and author like '%$key[$i]%'";
+    $i++;
+  }
+  $query=$query.") order by title";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  my $count=$data->{'count(*)'};
+  $sth->finish;
+  $query=~ s/count\(\*\)/\*/;
+  $query= $query." limit $offset,$num";
+  $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($count,@results);
+}
+
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
@@ -70,7 +111,8 @@ sub KeywordSearch {
   $i=0;
   while (my $data=$sth->fetchrow_hashref){
     $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
-        $i++;
+#      print $results[$i];
+$i++;
   }
   $sth->finish;
   $sth=$dbh->prepare("Select biblionumber from bibliosubject where subject
@@ -82,7 +124,10 @@ sub KeywordSearch {
     $sth2->execute;
     while (my $data2=$sth2->fetchrow_hashref){
       $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}";
+#      print $results[$i];
       $i++;   
+
+
     }
     $sth2->finish;
   }    
@@ -103,6 +148,7 @@ sub KeywordSearch {
   my @res2;
   while ($i2 < $num){
     $res2[$i2]=$res[$i2+$offset];
+#    print $res2[$i2];
     $i2++;
   }
   $sth->finish;
@@ -167,15 +213,14 @@ sub CatSearch  {
 	   my $sth=$dbh->prepare($query);
 	   $sth->execute;
 	   my $data=$sth->fetchrow_hashref;
-
-$results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
+	   $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
            $i2++; 
 	   $sth->finish;
 	}
 	$sth1->finish;
       }
     }
-#print $query;
+print $query;
   my $sth=$dbh->prepare($query);
     $sth->execute;
   my $data=$sth->fetchrow_arrayref;

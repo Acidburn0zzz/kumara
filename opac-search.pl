@@ -16,20 +16,11 @@ print $input->header;
 my $blah;
 my %search;
 #build hash of users input
-my $title=$input->param('title');
-$search{'title'}=$title;
+
+
 my $keyword=$input->param('keyword');
 $search{'keyword'}=$keyword;
-my $author=$input->param('author');
-$search{'author'}=$author;
-my $subject=$input->param('subject');
-$search{'subject'}=$subject;
-my $itemnumber=$input->param('item');
-$search{'item'}=$itemnumber;
-my $isbn=$input->param('isbn');
-$search{'isbn'}=$isbn;
-my $datebefore=$input->param('date-before');
-$search{'date-before'};
+
 my @results;
 my $offset=$input->param('offset');
 if ($offset eq ''){
@@ -41,25 +32,13 @@ if ($num eq ''){
 }
 print startpage();
 print startmenu();
-print mkheadr(1,'Catalogue Search Results');
+print mkheadr(1,'Opac Search Results');
 print center();
 my $count;
 my @results;
-if ($itemnumber ne '' || $isbn ne ''){
-    ($count,@results)=&CatSearch(\$blah,'precise',\%search,$num,$offset);
-} else {
-  if ($subject ne ''){
-    ($count,@results)=&CatSearch(\$blah,'subject',\%search,$num,$offset);
-  } else {
-    if ($keyword ne ''){
-#      print "hey";
-      ($count,@results)=&KeywordSearch(\$blah,'opac',\%search,$num,$offset);
-    } else {
-      ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
-#            print "hey";
-    }
-  }
-}
+
+($count,@results)=&OpacSearch(\$blah,'loose',\%search,$num,$offset);
+
 print "You searched on ";
 while ( my ($key, $value) = each %search) {                                 
   if ($value ne ''){
@@ -70,11 +49,9 @@ print " $count results found";
 my $offset2=$num+$offset;
 print "<br> Results $offset to $offset2 displayed";
 print mktablehdr;
-if ($subject ne ''){
-  print mktablerow(1,'#cccc99','<b>SUBJECT</b>');
-} else {
+
   print mktablerow(4,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
-}
+
 my $count2=@results;
 my $i=0;
 my $colour=1;
@@ -82,15 +59,15 @@ while ($i < $count2){
     my @stuff=split('\t',$results[$i]);
     my $title2=$stuff[1];
     $title2=~ s/ /%20/g;
-    if ($subject eq ''){
-      $stuff[1]=mklink("/cgi-bin/kumara/detail.pl?bib=$stuff[0]&title=$title2",$stuff[1]);
-      my $word=$stuff[2];
+
+      $stuff[1]=mklink("/cgi-bin/koha/detail.pl?bib=$stuff[2]&title=$title2",$stuff[1]);
+      my $word=$stuff[0];
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
-      my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
-      $stuff[2]=mklink($url,$stuff[2]);
-      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[0]);
+      my $url="/cgi-bin/koha/search.pl?author=$word&type=a";
+      $stuff[0]=mklink($url,$stuff[0]);
+      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
       if ($nacount > 0){
         $stuff[4]=$stuff[4]."N/A=$nacount";
@@ -104,16 +81,11 @@ while ($i < $count2){
       if ($scount > 0){
         $stuff[4]=$stuff[4]."S=$scount";
       }
-    } else {
-      my $word=$stuff[1];
-      $word=~ s/ /%20/g;
-      $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
-    }
     if ($colour == 1){
-      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[2],$stuff[3],$stuff[4]);
+      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
       $colour=0;
     } else{
-      print mktablerow(4,'white',$stuff[1],$stuff[2],$stuff[3],$stuff[4]);
+      print mktablerow(4,'white',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
       $colour=1;
     }
     $i++;
@@ -122,25 +94,8 @@ $offset=$num+$offset;
 print mktablerow(4,'#cccc99',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
 print mktableft();
 if ($offset < $count){
-    my $search="num=$num&offset=$offset";
-    if ($subject ne ''){
-      $subject=~ s/ /%20/g;
-      $search=$search."&subject=$subject";
-    }
-    if ($title ne ''){
-      $title=~ s/ /%20/g;
-      $search=$search."&title=$title";
-    }
-    if ($author ne ''){
-      $author=~ s/ /%20/g;
-      $search=$search."&author=$author";
-    }
-    if ($keyword ne ''){
-      $keyword=~ s/ /%20/g;
-      $search=$search."&keyword=$keyword";
-    }
-    
-    my $stuff=mklink("/cgi-bin/kumara/search.pl?$search",'More');
+    my $search="num=$num&offset=$offset&keyword=$keyword";
+    my $stuff=mklink("/cgi-bin/koha/opac-search.pl?$search",'More');
     print $stuff;
 }
 
