@@ -401,9 +401,9 @@ sub CatSearch  {
 	      }
 	      $query.=")";
 	  }
-	 
+          $query .=" group by biblio.biblionumber";	 
       }
-      $query .=" group by biblio.biblionumber";
+
   } 
   if ($type eq 'subject'){
     my @key=split(' ',$search->{'subject'});
@@ -464,10 +464,10 @@ sub CatSearch  {
     $sth->execute;
 #  } else {
   my $count=0;
-  if ($search->{'title'} || $search->{'author'}){
-    $query=$query." group by biblio.biblionumber";
+#  if ($search->{'title'} || $search->{'author'}){
+#    $query=$query." group by biblio.biblionumber";
 #    $query=~ s/count\(\*\)/count\(biblio.biblionumber\)/;
-  } 
+#  } 
 #  if ($type eq 'subject'){ 
     while (my $data=$sth->fetchrow_arrayref){
       $count++;
@@ -492,6 +492,7 @@ sub CatSearch  {
   }
   $sth=$dbh->prepare($query);
   $sth->execute;
+#  print $query;
   my $i=0;
   my $i2=0;
   my $limit=$num+$offset;
@@ -501,7 +502,7 @@ sub CatSearch  {
   } elsif ($search->{'isbn'} ne '' || $search->{'item'} ne ''){
      $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
   } else {  
-$results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+   $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
      }
      $i++;
     }
