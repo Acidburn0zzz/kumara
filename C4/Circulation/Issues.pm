@@ -169,6 +169,7 @@ sub updateissues{
   # issue the book
   my ($env,$itemno,$bitno,$dbh,$bornum)=@_;
   my $loanlength=21;
+  debug_msg($env,"loan length");
   my $query="Select loanlength from biblioitems,itemtypes
   where (biblioitems.biblioitemnumber='$bitno') 
   and (biblioitems.itemtype = itemtypes.itemtype)";
@@ -178,6 +179,7 @@ sub updateissues{
     $loanlength = $data->{'loanlength'}
   }
   $sth->finish;
+  debug_msg($env,"issue");
   my $datedue = time + $loanlength;
   my @datearr = localtime($datedue);
   my $dateduef = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];

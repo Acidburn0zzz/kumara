@@ -74,10 +74,11 @@ sub renewstatus {
   if (my $data1 = $sth1->fetchrow_hashref) {
     my $q2 = "select renewalsallowed from items,biblioitems,itemtypes
        where (items.itemnumber = '$itemno')
-       and (items.biblioitemnuber = biblioitem.biblioitemnumber) 
+       and (items.biblioitemnuber = biblioitems.biblioitemnumber) 
        and (biblioitems.itemtype = itemtype.itemtype)";
      my $sth2 = $dbh->prepare($q2);
-     print $q2
+     print $q2;
+     
      $sth2->execute;
      if (my $data2=$sth2->fetchrow_hashref) {
        $renews = $data2->{'renewalsallowed'};

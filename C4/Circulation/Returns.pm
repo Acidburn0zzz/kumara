@@ -61,12 +61,15 @@ sub returnrecord {
   my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   my @datearr = localtime(time);
   my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
+  debug_msg($env,"before return");
   my $query = "update issues 
   set returndate = '$dateret', branchcode = '$env->{'branchcode'}'
   where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
   and (returndate is null)";  
+  print $query;
   my $sth = $dbh->prepare($query);
   $sth->execute;
+
   return($amt_owing);
 }
 
