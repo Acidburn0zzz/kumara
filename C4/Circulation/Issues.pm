@@ -71,7 +71,6 @@ sub Issue  {
     my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
       #C4::Circulation::Borrowers
     if ($reason ne "") {
-      $dbh->disconnect;
       clearscreen();
       $done = $reason;
     } else {
@@ -85,9 +84,9 @@ sub Issue  {
       while ($done eq 'No'){
         ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
       }    
-      $dbh->disconnect;  
       debug_msg("","after processitems done = $done");
     }
+    $dbh->disconnect;
    # if ($done ne 'Circ'){
    #    debug_msg("","calling issue again with $done");
    #    $done=Issue($env);      
@@ -185,7 +184,8 @@ sub issueitem{
      }
    } else {
      error_msg($env,"$itemnum not found - rescan");
-   }  
+   }
+   $sth->finish;
 #   debug_msg("","date $datedue");
    return($item,$charge,$datedue);
 }
@@ -245,7 +245,7 @@ sub calc_charges {
      }
      $sth2->{'finish'};
   }   
-  $sth1->{'finish'};
+  $sth1->finish;
   return ($charge);
 }
 

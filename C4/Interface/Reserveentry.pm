@@ -85,6 +85,7 @@ sub FindBiblioScreen {
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F12);
   my ($reason,$data)=$panel->Run();
+  Newt::PopHelpLine();
   my @responses;
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {    
@@ -149,6 +150,7 @@ sub SelectBiblio {
   } else {
     $result = $biblist->Get();
   }  
+  Newt::PopHelpLine();
   return($reason,$result);
 }
 
@@ -215,6 +217,7 @@ sub MakeReserveScreen {
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F12);
   my ($reason, $data) = $panel->Run();
+  Newt::PopHelpLine();
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
       $stuff="Circ";
