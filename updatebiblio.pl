@@ -9,23 +9,24 @@ my $input= new CGI;
 #print $input->header;
 #print $input->dump;
 
-my $title=$input->param('Title');
-my $author=$input->param('Author');
-my $bibnum=$input->param('bibnum');
-my $copyright=$input->param('Copyright');
-my $seriestitle=$input->param('Series');
-my $serial=$input->param('Serial');
-my $unititle=$input->param('Unititle');
-my $notes=$input->param('Notes');
+
+my $title=checkinp($input->param('Title'));
+my $author=checkinp($input->param('Author'));
+my $bibnum=checkinp($input->param('bibnum'));
+my $copyright=checkinp($input->param('Copyright'));
+my $seriestitle=checkinp($input->param('Series'));
+my $serial=checkinp($input->param('Serial'));
+my $unititle=checkinp($input->param('Unititle'));
+my $notes=checkinp($input->param('Notes'));
 
 modbiblio($bibnum,$title,$author,$copyright,$seriestitle,$serial,$unititle,$notes);
 
-my $bibitemnum=$input->param('bibitemnum');
-my $itemtype=$input->param('Item');
-my $isbn=$input->param('ISBN');
-my $publishercode=$input->param('Publisher');
-my $publicationdate=$input->param('Publication');
-my $class=$input->param('Class');
+my $bibitemnum=checkinp($input->param('bibitemnum'));
+my $itemtype=checkinp($input->param('Item'));
+my $isbn=checkinp($input->param('ISBN'));
+my $publishercode=checkinp($input->param('Publisher'));
+my $publicationdate=checkinp($input->param('Publication'));
+my $class=checkinp($input->param('Class'));
 my $classification;
 my $dewey;
 my $subclass;
@@ -42,15 +43,15 @@ if ($class =~/[0-9]+/){
 }else{
   $dewey='';
 }
-my $illus=$input->param('Illustrations');
-my $pages=$input->param('Pages');
-my $volumeddesc=$input->param('Volume');
+my $illus=checkinp($input->param('Illustrations'));
+my $pages=checkinp($input->param('Pages'));
+my $volumeddesc=checkinp($input->param('Volume'));
 modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
 
-my $subtitle=$input->param('Subtitle');
+my $subtitle=checkinp($input->param('Subtitle'));
 modsubtitle($bibnum,$subtitle);
 
-my $subject=$input->param('Subject');
+my $subject=checkinp($input->param('Subject'));
 $subject=uc $subject;
 my @sub=split(/\|/,$subject);
 #print @sub;
@@ -63,4 +64,11 @@ if ($error ne ''){
   print $error;
 } else {
   print $input->redirect("detail.pl?type=intra&bib=$bibnum");
+}
+
+sub checkinp{
+  my ($inp)=@_;
+  $inp=~ s/\'/\\\'/g;
+  $inp=~ s/\"/\\\"/g;
+  return($inp);
 }
