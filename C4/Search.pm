@@ -598,7 +598,7 @@ sub getacctlist {
       and items.biblionumber = biblio.biblionumber
       and accountlines.amountoutstanding<>0 order by date";
    my $sth=$dbh->prepare($query);
-   print $query;
+#   print $query;
    $sth->execute;
    my $total=0;
    while (my $data=$sth->fetchrow_hashref){
@@ -617,9 +617,10 @@ sub getboracctrecord {
    my @acctlines;
    my $numlines;
    my $query = "Select * from accountlines
-   where borrowernumber = $params->{'borrowernumber'} ";
+   where borrowernumber = $params->{'borrowernumber'} and amountoutstanding
+<>0";
    my $sth=$dbh->prepare($query);
-   print $query;
+#   print $query;
    $sth->execute;
    my $total=0;
    while (my $data=$sth->fetchrow_hashref){

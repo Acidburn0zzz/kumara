@@ -52,10 +52,18 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub FindReserves {
-  my ($bib)=@_;
+  my ($bib,$bor)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from reserves,borrowers where biblionumber=$bib and
-reserves.borrowernumber=borrowers.borrowernumber";
+  my $query="Select * from reserves,borrowers,biblio ";
+  if ($bib ne ''){
+    $query=$query." where reserves.biblionumber=$bib and
+    reserves.borrowernumber=borrowers.borrowernumber and
+biblio.biblionumber=$bib";
+  } else {
+    $query=$query." where borrowers.borrowernumber=$bor and
+    reserves.borrowernumber=borrowers.borrowernumber and reserves.biblionumber
+    =biblio.biblionumber";
+  }
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
@@ -64,6 +72,7 @@ reserves.borrowernumber=borrowers.borrowernumber";
     $results[$i]=$data;
     $i++;
   }
+#  print $query;
   $sth->finish;
   $dbh->disconnect;
   return($i,\@results);
