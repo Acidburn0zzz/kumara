@@ -166,7 +166,7 @@ sub bulkrenew {
        $rstatuses[$x] = "Y";
      }  
      $line = $line.fmtdec($env,$issrec->{'renewals'},"20")." ";
-     $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
+     $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'itemtype'}." ".$itemdata->{'title'};
      $items[$x] = $line;
      #debug_msg($env,$line);
      $issues[$x] = $issrec;
