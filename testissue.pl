@@ -27,7 +27,7 @@ my %env = (
   );
 
 $env{'branchcode'} = "C";
-$env{'usercode'} = "chris";
+$env{'usercode'} = `whoami`;
 $env{'telnet'} = "Y";
 
 
@@ -46,7 +46,7 @@ while ($donext ne 'Quit') {
     $data = $donext;                                                              
   }                                                                               
   if ($data eq 'Issues') {                                                        
-   my @args=('./issuewrapper.pl');
+   my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}");
    system(@args);
   } elsif ($data eq 'Returns') {                                                  
     $donext=Returns(\%env); #C4::Circulation::Returns                              

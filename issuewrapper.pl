@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-my ($env) = @_;                                                                  
+#my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}");
+
 $done = "Issues";                                                                
 my $i=0;
 while ($done eq "Issues") {                                                      
-  my @args='./borrwraper.pl';
+  my @args=('borrwraper.pl',@ARGV);
   eval{system(@args)};
   $exit_value  = $? >> 8;
   if ($exit_value){

@@ -10,7 +10,7 @@ use C4::Acquisitions;
 #print $inp->header;
 my ($count,@results)=bookfunds;
 
-open (FILE,'>/usr/local/www/hdl/htdocs/includes/budgets.inc') || die "Cant open file";
+open (FILE,'>/usr/local/www/koha/htdocs/includes/budgets.inc') || die "Cant open file";
 print FILE <<printend
 
 <TABLE  width="40%"  cellspacing=0 cellpadding=5 border=1 >

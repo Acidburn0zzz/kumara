@@ -147,24 +147,24 @@ sub previousissue {
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
-      my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
+      my ($renewstatus) = C4::Circulation::Renewals::renewstatus($env,$dbh,$bornum,$itemnum);
       my ($resbor,$resrec) = checkreserve($env,$dbh,$itemnum);
       if ($renewstatus == "0") {
         info_msg($env,"</S>Issued to this borrower - No renewals<!S>");
 	$canissue = "N";
       } elsif ($resbor ne "") {
-        my $resp = msg_ny($env,"Book is issued to this borrower",
+        my $resp = C4::InterfaceCDK::msg_ny($env,"Book is issued to this borrower",
 	  "and is reserved - Renew?");
         if ($resp eq "Y") {
-	  $newdate = &renewbook($env,$dbh,$bornum,$itemnum);
+	  $newdate = C4::Circulation::Renewals::renewbook($env,$dbh,$bornum,$itemnum);
 	  $canissue = "R";
 	} else {
 	  $canissue = "N";
 	}
       } else {
-        my $resp = &msg_yn($env,"Book is issued to this borrower", "Renew?");
+        my $resp = C4::InterfaceCDK::msg_yn($env,"Book is issued to this borrower", "Renew?");
         if ($resp eq "Y") {
-          $newdate = &renewbook($env,$dbh,$bornum,$itemnum);
+          $newdate = C4::Circulation::Renewals::renewbook($env,$dbh,$bornum,$itemnum);
      	  $canissue = "R";
         } else {
           $canissue = "N";

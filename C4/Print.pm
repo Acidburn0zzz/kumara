@@ -66,7 +66,7 @@ sub remoteprint {
   my $i=0;
   my $brdata = $env->{'brdata'};
   print PRINTER "Horowhenua Library Trust\r\n";
-  print PRINTER "$brdata->{'branchname'}\r\n";
+#  print PRINTER "$brdata->{'branchname'}\r\n";
   print PRINTER "Phone: 368-1953\r\n";   
   print PRINTER "Fax:    367-9218\r\n";   
   print PRINTER "Email:  renewals\@library.org.nz\r\n\r\n\r\n";

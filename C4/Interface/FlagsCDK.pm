@@ -74,8 +74,8 @@ sub trapscreen {
 
 sub trapsnotes {
   my ($env,$bornum,$borrower,$amount) = @_;
-  my $titlepanel = titlepanel($env,$env->{'sysarea'},"Borrower Notes");
-  my $borpanel = borrowerbox($env,$borrower,$amount);
+  my $titlepanel = C4::InterfaceCDK::titlepanel($env,$env->{'sysarea'},"Borrower Notes");
+  my $borpanel = C4::InterfaceCDK::borrowerbox($env,$borrower,$amount);
   $borpanel->draw();
   my $notesbox = new Cdk::Mentry ('Label'=>"Notes:  ",
     'Width'=>40,'Prows'=>10,'Lrows'=>30,
@@ -109,8 +109,8 @@ sub trapsnotes {
 
 sub reservesdisplay {
   my ($env,$borrower,$amount,$odues,$items) = @_;
-  my $titlepanel = titlepanel($env,$env->{'sysarea'},"Reserves Waiting");
-  my $borpanel = borrowerbox($env,$borrower,$amount);
+  my $titlepanel = C4::InterfaceCDK::titlepanel($env,$env->{'sysarea'},"Reserves Waiting");
+  my $borpanel = C4::InterfaceCDK::borrowerbox($env,$borrower,$amount);
   $borpanel->draw();
   my $x = 0;
   my @itemslist;

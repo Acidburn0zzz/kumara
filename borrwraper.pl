@@ -7,8 +7,13 @@ use C4::Circulation::Main;
 use C4::InterfaceCDK;
 use C4::Circulation::Borrower;
 
-
-my ($env) = @_;                                                                  
+# my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}");
+my %env = (
+  branchcode => $ARGV[0], usercode => $ARGV[1], proccode => "lgon", borrowernumber => "",
+  logintime  => "", lasttime => "", tempuser => "", debug => "9",
+  telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5]
+      );
+my ($env) = \%env;                                                                  
   startint();
   helptext('');                                                                    
 my $done;                                                                        

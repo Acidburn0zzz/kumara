@@ -601,7 +601,7 @@ sub makeitems {
     booksellerid,dateaccessioned,homebranch,holdingbranch,price,replacementprice,
     replacementpricedate) values
     ($biblio,$bibitemno,$item,'$barcodes[$i]','$booksellerid',now(),'$branch',
-    '$branch',$price,$replacement,now())";
+    '$branch','$price','$replacement',now())";
     my $sth=$dbh->prepare($query);
     $sth->execute;
     $sth->finish;
