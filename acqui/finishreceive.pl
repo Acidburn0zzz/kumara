@@ -66,9 +66,9 @@ modbibitem($bibitemno,$itemtype,$isbn,$publisher,$pubdate,$class,$dewey,$subclas
 my $barcode=$input->param('barcode');
 my @barcodes;
 if ($barcode =~ /\,/){
-  @barcodes=split(',',$barcode);
+  @barcodes=split(/\,/,$barcode);
 }elsif ($barcode =~ /\|/){
-  @barcodes=split('|',$barcode);
+  @barcodes=split(/\|/,$barcode);
 } else {
   $barcodes[0]=$barcode;
 #  print $input->header;
