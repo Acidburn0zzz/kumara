@@ -284,7 +284,7 @@ sub bookfundbreakdown {
   my $query="Select quantity,datereceived,freight,unitprice,listprice
   from aqorders,aqorderbreakdown where bookfundid='$id' and 
   aqorders.ordernumber=aqorderbreakdown.ordernumber and entrydate >=
-  '1999-06-01'";
+  '2000-07-01' ";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $comtd=0;
