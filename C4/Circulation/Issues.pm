@@ -170,7 +170,8 @@ sub processitems {
     #check if item is on issue already
     my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
     #check reserve
-    &checkreserve;
+    my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});
+    
     #if charge deal with it
     #now mark as issued
     &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);

@@ -4,7 +4,7 @@ package C4::Interface; #asummes C4/Interface
 
 use strict;
 use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
-NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F12
+NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F12
 NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE);
 #use C4::Circulation;
 
@@ -17,7 +17,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&textbox &menu &issuewindow);
+&textbox &menu &issuewindow &msg_yn);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -190,6 +190,24 @@ sub dialog {
 #  Newt::Finished();
   my $stuff=$entry->Get();
   return($stuff,$reason);
+}
+
+sub msg_yn {
+  my ($text)=@_;
+  my $panel1=Newt::Panel(2,4,"");
+  $panel1->Add(0,0,$text,NEWT_ANCHOR_LEFT);
+  $panel1->AddHotKey(NEWT_KEY_F4);
+  $panel1->AddHotKey(NEWT_KEY_F5);
+  my ($reason,$data) =$panel1->Run();
+  if ($reason eq NEWT_EXIT_HOTKEY) {
+    if ($data eq NEWT_KEY_F4) {
+      $reason="Y";
+    }
+    if ($data eq NEWT_KEY_F5) {
+      $reason="N";
+    }
+  }  
+  return($reason);
 }
 
 sub endint {

@@ -91,7 +91,7 @@ sub checkoverdues{
   my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio where
   borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
-   items.biblionumber=biblio.biblionumber");
+  items.biblionumber=biblio.biblionumber");
   $sth->execute;
   my $row=1;
   my $col=40;
@@ -104,7 +104,7 @@ sub checkoverdues{
 
 sub previousissue {
   my ($env,$itemnum,$dbh,$bornum)=@_;
-  my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
+  my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber,cardnumber
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
   issues.borrowernumber=borrowers.borrowernumber");
@@ -113,18 +113,36 @@ sub previousissue {
   $sth->finish;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
-      output(1,24,"Book is marked as issue to current borrower");
+      output(1,24,"Book is marked as issue to current borrower");       
+      #  my $resp = &msg_yn("Book is marked as issue to current borrower");
   
     } else {
-      my $text="book is issued to borrower $borrower->{'firstname'} $borrower->{'surname'} borrowernumber $borrower->{'borrowernumber'}";    
+      my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
       output(1,24,$text);
+      # my $resp = &msg_yn($text);
     }
   } 
   return($borrower->{'borrowernumber'});
 }
 
 sub checkreserve{
+  # Check for reserves for biblio 
+  # does not look at constraints yet
+  my ($env,$dbh,$itemnum)=@_;
+  my $resbor = "";
+  my $query = "select * from reserves,items 
+  where (items.itemnumber = '$itemnum')
+  and (items.biblionumber = reserves.biblionumber)
+  and (reserves.found is null) order by priority";
+  print $query;
+  my $sth = $dbh->prepare($query);
+  $sth->execute();
+  if (my $data=$sth->fetchrow_hashref) {
+    $resbor = $data->{'borrowernumber'}; 
+  }
+  return ($resbor);
 }
+
 sub checkwaiting{
 
 }
