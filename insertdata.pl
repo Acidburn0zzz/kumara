@@ -25,9 +25,10 @@ if ($data{'type'} eq 'biblio'){
   my $num=$bibnum->{'max'};
   $num++;
   $data{'biblionumber'}=$num;
-} end if ($data{'type'} eq 'borrowers') {
+} elsif ($data{'type'} eq 'borrowers') {
   my $bornum=getmax('borrowers','borrowernumber');
   my $num=$bornum->{'max'};
   $num++;
-  $data{
+  $data{'borrowernumber'}=$num;
+}  
 &sqlinsert($data{'type'},%data);
