@@ -144,12 +144,13 @@ print <<printend
 
 <TR VALIGN=TOP>
 
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=5><B>ITEMS CURRENTLY ON ISSUE</b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=6><B>ITEMS CURRENTLY ON ISSUE</b></TD>
 </TR>
 
 <TR VALIGN=TOP>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Title</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Due</b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Itemtype</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Charge</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Status</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Renew</b></TD>
@@ -171,7 +172,8 @@ for (my $i=0;$i<$count;$i++){
   <TD>$issue->[$i]{'date_due'}</td>";
   #find the charge for an item
   my ($charge,$itemtype)=calc_charges(\%env,$issue->[$i]{'itemnumber'},$bornum);
-  print "<TD>$charge $itemtype</td>";
+  print "<TD>$itemtype</td>";
+  print "<TD>$charge</td>";
 
   if ($datedue < $today){
     print "<td>Overdue</td>";
