@@ -158,6 +158,7 @@ if ($type eq 'opac'){
 }
 my $colour=1;
 while ($i < $count){
+#  print $items[$i],"<br>";
   my @results=split('\t',$items[$i]);
   if ($type ne 'opac'){
     $results[1]=mklink("/cgi-bin/koha/moredetail.pl?item=$results[5]&bib=$bib&bi=$results[8]",$results[1]);
@@ -167,11 +168,11 @@ while ($i < $count){
   }
   if ($colour == 1){
     if ($type ne 'opac'){
-      if ($results[6] eq 'PER'){
+#      if ($results[6] eq 'PER'){
         print mktablerow(7,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1],$results[9]);
-      } else {
-            print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);
-      }
+#      } else {
+#            print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);
+#      }
     } else {
        $results[6]=ItemType($results[6]);
        if ($results[6] =~ /Periodical/){
@@ -183,11 +184,11 @@ while ($i < $count){
     $colour=0;                                                                                
   } else{                                                                                     
     if ($type ne 'opac'){
-      if ($results[6] eq 'PER'){
+#      if ($results[6] eq 'PER'){
       print mktablerow(7,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1],$results[9]);                                          
-      }else{
-            print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
-      }
+#      }else{
+#           print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
+#      }
     } else {
       $results[6]=ItemType($results[6]);
        if ($results[6] =~ /Periodical/){
