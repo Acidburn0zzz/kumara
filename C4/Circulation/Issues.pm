@@ -202,6 +202,9 @@ sub issueitem{
        # } else {
        $canissue = 0;
        # }
+     } elsif ($item->{'itemtype'} eq 'REF'){
+       error_msg($env,"Restricted Item");
+       $canissue=0;
      }
      #check if item is on issue already
      if ($canissue == 1) {
