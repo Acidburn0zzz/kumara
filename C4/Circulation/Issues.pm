@@ -67,7 +67,7 @@ sub Issue  {
     #deal with alternative loans
     #now check items 
     clearscreen();
-    my ($items,$items2)=pastitems($env,$bornum,$dbh);
+    my ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
     my $done = "No";
     my $row2=5;
     my $it2p=0;
