@@ -174,7 +174,7 @@ sub returnwindow {
   my $la1      = Newt::Label("Total Amount");
   my $fee      = Newt::Label(fmtdec($env,$amountowing,"$32"));
   my $l1       = Newt::Label("Returned"); 
-  my $li1      = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER);
+  my $li1      = Newt::Listbox(13,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER);
   my $i = 0;
   while ($items->[$i]) {
     $li1->Add($items->[$i]);

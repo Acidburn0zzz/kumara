@@ -73,15 +73,16 @@ sub Returns {
       ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
       if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
         if ($reason eq "Returned") {
-	my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
-           unshift @items,$fmtitem;
+	  my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
+       	  unshift @items,$fmtitem;
 	  
-	} else {
-          error_msg($env,$reason);
+  	} else {
+            error_msg($env,$reason);
 	}
       }
     }
   }
+  clearscreen;
   $dbh->disconnect;
   return($reason);
   }
@@ -95,31 +96,34 @@ sub checkissue {
   my $itemrec;
   my $amt_owing;
   $item = uc $item;
-  my $query = "select * from items where barcode = '$item'";
+  my $query = "select * from items,biblio 
+    where barcode = '$item'
+    and (biblio.biblionumber=items.biblionumber)";
   my $sth=$dbh->prepare($query); 
   $sth->execute;
   if ($itemrec=$sth->fetchrow_hashref) {
      $sth->finish;
-     $query = "select * from issues where
-       (itemnumber='$itemrec->{'itemnumber'}') and (returndate is null)";
+     $query = "select * from issues
+       where (itemnumber='$itemrec->{'itemnumber'}')
+       and (returndate is null)";
      my $sth=$dbh->prepare($query);
      $sth->execute;
      if (my $issuerec=$sth->fetchrow_hashref) {
-     $sth->finish;
-     $query = "select * from borrowers where
-     (borrowernumber = '$issuerec->{'borrowernumber'}')";
-     my $sth= $dbh->prepare($query);
-     $sth->execute;
-     $borrower = $sth->fetchrow_hashref;
-     $bornum = $issuerec->{'borrowernumber'};
-     $itemno = $issuerec->{'itemnumber'};
-     $amt_owing = returnrecord($env,$dbh,$bornum,$itemno);     
-     $reason = "Returned";    
+       $sth->finish;
+       $query = "select * from borrowers where
+       (borrowernumber = '$issuerec->{'borrowernumber'}')";
+       my $sth= $dbh->prepare($query);
+       $sth->execute;
+       $borrower = $sth->fetchrow_hashref;
+       $bornum = $issuerec->{'borrowernumber'};
+       $itemno = $issuerec->{'itemnumber'};
+       $amt_owing = returnrecord($env,$dbh,$bornum,$itemno);     
+       $reason = "Returned";    
      } else {
        $sth->finish;
        $reason = "Item not issued";
      }       
-  } else {
+   } else {
      $sth->finish;
      $reason = "Item not found";
   }   
