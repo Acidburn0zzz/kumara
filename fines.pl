@@ -29,18 +29,18 @@ for (my $i=0;$i<$count;$i++){
         $borrower=BorType($bornum);
       }
 
-#      if ($borrower->{'description'} !~ /Staff/ && $borrower->{'description'} !~ /Branch/){
-          my ($amount)=CalcFine($data->[$i]->{'itemnumber'},$borrower->{'categorycode'},$difference);      
+
+          my ($amount,$type)=CalcFine($data->[$i]->{'itemnumber'},$borrower->{'categorycode'},$difference);      
 	  if ($amount > $max){
   	    $amount=$max;
 	  }
 	  if ($amount > 0){
-            UpdateFine($data->[$i]->{'itemnumber'},$bornum,$amount);
-              print "$borrower->{'firstname'} $borrower->{'surname'} $data->[$i]->{'date_due'}\n";
+            UpdateFine($data->[$i]->{'itemnumber'},$bornum,$amount,$type);
+              print "$borrower->{'firstname'} $borrower->{'surname'} $data->[$i]->{'date_due'} $type $difference\n";
 	  } else {
 #	    print "0 fine\n";
 	  }
-#      }
+
     }
 }
 print "\n $count2\n";
