@@ -292,7 +292,7 @@ sub modbiblio {
   where
   biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
-#    print $query;
+    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
@@ -613,7 +613,7 @@ sub makeitems {
 }
 
 sub moditem {
-  my ($itemnum,$bibitemnum,$barcode,$notes)=@_;
+  my ($itemnum,$bibitemnum,$barcode,$notes,$homebranch,$lost,$wthdrawn)=@_;
   my $dbh=C4Connect;
   my $query="update items set biblioitemnumber=$bibitemnum,
   barcode='$barcode',itemnotes='$notes'
@@ -621,6 +621,12 @@ sub moditem {
   if ($barcode eq ''){
     $query="update items set biblioitemnumber=$bibitemnum where itemnumber=$itemnum";
   }
+  if ($lost ne ''){
+    $query="update items set biblioitemnumber=$bibitemnum,
+      barcode='$barcode',itemnotes='$notes',homebranch='$homebranch',
+      itemlost='$lost',wthdrawn='$wthdrawn' where itemnumber=$itemnum";
+  }
+
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;

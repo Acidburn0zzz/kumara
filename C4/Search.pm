@@ -372,7 +372,7 @@ sub CatSearch  {
 	$sth1->finish;
       }
   }
-#print $query;
+print $query;
   my $sth=$dbh->prepare($query);
 #  if ($search->{'isbn'} eq ''){
     $sth->execute;

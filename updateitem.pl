@@ -32,6 +32,9 @@ my $isbn=checkinp($input->param('ISBN'));
 my $publishercode=checkinp($input->param('Publisher'));
 my $publicationdate=checkinp($input->param('Publication'));
 my $class=checkinp($input->param('Class'));
+my $homebranch=checkinp($input->param('Home'));
+my $lost=$input->param('Lost');
+my $wthdrawn=$input->param('withdrawn');
 my $classification;
 my $dewey;
 my $subclass;
@@ -70,7 +73,7 @@ my $volumeddesc=checkinp($input->param('Volume'));
 #  }
 #} 
 #modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
-moditem($itemnum,$bibitemnum,$barcode,$notes);
+moditem($itemnum,$bibitemnum,$barcode,$notes,$homebranch,$lost,$wthdrawn);
 
 print $input->redirect("moredetail.pl?type=intra&bib=$bibnum&bi=$bibitemnum");
 #print $bibitemnum;

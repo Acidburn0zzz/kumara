@@ -7,7 +7,7 @@ use C4::Acquisitions;
 use C4::Output;
 
 my $input= new CGI;
-#print $input->header;
+print $input->header;
 #print $input->dump;
 
 

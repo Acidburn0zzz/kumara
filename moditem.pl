@@ -63,6 +63,8 @@ $inputs{'Illustrations'}="hidden\t$data->{'illustration'}\t10";
 $inputs{'ItemNotes'}="textarea\t$item->{'itemnotes'}\t15";
 #$inputs{'Serial'}="text\t$data->{'serial'}\t16";
 $inputs{'Volume'}="hidden\t$data->{'volumeddesc'}\t17";
+$inputs{'Home Branch'}="text\t$item->{'homebranch'}\t18";
+$inputs{'Lost'}="radio\t$item->{'itemlost'}\t19";
 #$inputs{'Analytic author'}="text\t\t18";
 #$inputs{'Analytic title'}="text\t\t19";
 
@@ -74,47 +76,65 @@ $inputs{'itemnumber'}="hidden\t$itemnum\t22";
 
 print <<printend
 <FONT SIZE=6><em>$data->{'title'} ($data->{'author'})</em></FONT><br>
+<table border=0 cellspacing=0 cellpadding=5>
+<tr valign=top bgcolor=white><td><form action=updateitem.pl method=post>
+<table border=0 cellspacing=0 cellpadding=5>
+<tr valign=top bgcolor=white><td>Barcode</td><td><input type=text name=Barcode value="$item->{'barcode'}" size=40></td></tr>
+<input type=hidden name=Class value="$data->{'classification'}$dewey$data->{'subclass'}">
+<input type=hidden name=Publisher value="$data->{'publisher'}">
+<input type=hidden name=ISBN value="$data->{'isbn'}">
+<input type=hidden name=Publication Year value="$data->{'publicationyear'}">
+<input type=hidden name=Pages value="$data->{'pages'}">
+<input type=hidden name=Illustrations value="$data->{'illustration'}">
+<tr valign=top bgcolor=white><td>ItemNotes</td><td><textarea name=ItemNotes cols=40 rows=4>$item->{'itemnotes'}</textarea></td></tr>
+<input type=hidden name=Volume value="$data->{'volumeddesc'}">
+<tr valign=top bgcolor=white><td>Home Branch</td><td><input type=text name=Home Branch value="$item->{'homebranch'}" size=40></td></tr>
+<tr valign=top bgcolor=white><td>Lost</td><td><input type=radio name=Lost value=1
 printend
 ;
-my @formats=findall($data->{'biblionumber'});
-my $count=@formats;
-my $format="<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=\"220\">
-";
-my $i=0;
-while ($i<$count){
-  $format.="<TR VALIGN=TOP>
-  <td  bgcolor=\"#cccc99\" background=\"/images/background-mem.gif\">
-  <B>FORMAT - $formats[$i]->{'description'}</TD></TR>
-  <tr VALIGN=TOP  >
-  <TD>
-  <FONT SIZE=2  face=\"arial, helvetica\">
-  <b>ISBN:</b> $formats[$i]->{'isbn'}<br>
-  <b>Item type:</b> $formats[$i]->{'itemtype'}<br>
-  <b>Class:</b>  $formats[$i]->{'classification'}
-  ";
-  my $bibitemnumber=$formats[$i]->{'biblioitemnumber'};
-  while ($bibitemnumber == $formats[$i]->{'biblioitemnumber'}){
-    $format.="<hr>
-    <b>Item:</b> <a href=\"/cgi-bin/koha/moredetail.pl?item=36358&bib=12073&bi=61386\">$formats[$i]->{'barcode'}</a><br>
-    <b>Location:</b> $formats[$i]->{'holdingbranch'}<br>
-    <b>Last Seen:</b> $formats[$i]->{'datelastseen'}
-    </font>";
-    $bibitemnumber=$formats[$i]->{'biblioitemnumber'};
-    $i++;
-  }
-#  $i++;
-  $format.="</td></TR>";
+if ($item->{'itemlost'} ==1){
+  print " checked ";
 }
-					     
+print <<printend
+>Yes
+<input type=radio name=Lost value=0
+printend
+;
+if ($item->{'itemlost'} ==0){
+  print " checked ";
+}
+print <<printend
+>No</td></tr>
+<tr valign=top bgcolor=white><td>Cancelled</td><td><input type=radio name=withdrawn value=1
+printend
+;
+if ($item->{'wthdrawn'} ==1){
+  print " checked ";
+}
+print <<printend
+>Yes
+<input type=radio name=withdrawn value=0
+printend
+;
+if ($item->{'wthdrawn'} ==0){
+  print " checked ";
+}
+print <<printend
+>No</td></tr>
+<input type=hidden name=bibnum value="$data->{'biblionumber'}">	
+<input type=hidden name=bibitemnum value="$data->{'biblioitemnumber'}">
+<input type=hidden name=itemnumber value="$itemnum">
+<tr valign=top bgcolor=white><td><input type=submit></td></tr>
+</table>
+</form></td></tr>
+</table>
+	
+printend
+;
 
-$format.="</table>";
-my $rightside=mkform3('updateitem.pl',%inputs);
 
 
-print mktablehdr();
-print mktablerow(1,'white',$rightside);
 
-print mktableft();
 
 print endmenu();
 print endpage();
