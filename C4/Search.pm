@@ -106,17 +106,21 @@ sub CatSearch  {
     '%$searchstring%' and entrytype like '%$type%'";
     last SWITCH;
   }
-  print "$query\n";
+#  print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
+  my $i=0;
+  my @results;
   while (my $data=$sth->fetchrow_hashref){
 #   print "$data->{'catalogueentry'}
 #   $data->{'biblionumber'} \n";
-    ItemInfo($env,$data->{'biblionumber'}); 
+    $results[$i]=ItemInfo($env,$data->{'biblionumber'}); 
+    $i++;
   }
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
+  return(@results);
 }    
 
 sub ItemInfo {
@@ -126,6 +130,8 @@ sub ItemInfo {
   where (biblionumber = '$biblionumber')";
   my $sth=$dbh->prepare($query);
   $sth->execute;
+  my $i=0;
+  my @results;
   while (my $data=$sth->fetchrow_hashref){
     my $iquery = "Select * from issues
     where itemnumber = '$data->{'itemnumber'}'
@@ -138,11 +144,14 @@ sub ItemInfo {
     }
     $isth->execute;
     $isth->finish;
-    print "$data->{'itemnumber'} $datedue\n";
+#    print "$data->{'itemnumber'} $datedue\n";
+     $results[$i]="$data->{'itemnumber'}\t$datadue";
+     $i++;
   }
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
+  return(@results);
 }
 
 sub BornameSearch  {
