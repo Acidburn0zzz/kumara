@@ -193,7 +193,7 @@ printend
 my ($rescount,$reserves)=FindReserves('',$bornum); #From C4::Reserves2
 for (my $i=0;$i<$rescount;$i++){
   print "<tr VALIGN=TOP  >
-  <TD><a href=\"link to biblio record with all requests\">$reserves->[$i]{'title'}</a></td>
+  <TD><a href=\"/cgi-bin/koha/request.pl?bib=$reserves->[$i]{'biblionumber'}\">$reserves->[$i]{'title'}</a></td>
   <TD>$reserves->[$i]{'reservedate'}</td>
 
   <TD>$2</td>

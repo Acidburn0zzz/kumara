@@ -113,9 +113,29 @@ sub KeywordSearch {
   my $count=@key;
   my $i=1;
   my @results;
+  my $query ="Select * from catalogueentry where entrytype is not NULL and
+  entrytype<>'a' and entrytype <>'ad' and entrytype<>'aa' and ((catalogueentry
+  like '$key[0]%' or catalogueentry like '% $key[0]%')
+  while ($i < $count){
+    $query=$query." and (catalogueentry like '$key[$i]%' or catalogueentry like '% $key[$i]%')";
+    $i++;
+  }
+  my $sth=$dbh->execute;
+  
+  
+  
+sub KeywordSearch {
+  my ($env,$type,$search,$num,$offset)=@_;
+  my $dbh = &C4Connect;
+  $search->{'keyword'}=~ s/ +$//;
+  $search->{'keyword'}=~ s/'/\\'/;
+  my @key=split(' ',$search->{'keyword'});
+  my $count=@key;
+  my $i=1;
+  my @results;
   my $query ="Select * from biblio,bibliosubtitle where
   biblio.biblionumber=bibliosubtitle.biblionumber and
-  ((title like '%$key[0]%' or subtitle like '%$key[0]%')";
+  ((title like '%$key[0]%' or subtitle like '%$key[0]%' or seriestitle)";
   while ($i < $count){
     $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
     $i++;

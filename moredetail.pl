@@ -41,7 +41,7 @@ print center();
 
 print <<printend
 <br>
-<a href=request.html><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>
+<a href=/cgi-bin/koha/request.pl?bib=$bib><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>
 <FONT SIZE=6><em>$data->{'title'} ($data->{'author'})</em></FONT><P>
 <p>
 <form >
