@@ -469,6 +469,7 @@ sub ItemInfo {
     $query.=" and (items.itemlost<>1 or items.itemlost is NULL)
     and (wthdrawn <> 1 or wthdrawn is NULL)";
   }
+  $query=$query."order by items.timestamp desc";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
