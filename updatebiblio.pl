@@ -6,8 +6,8 @@ use strict;
 use C4::Acquisitions;
 
 my $input= new CGI;
-print $input->header;
-print $input->dump;
+#print $input->header;
+#print $input->dump;
 
 my $title=$input->param('Title');
 my $author=$input->param('Author');

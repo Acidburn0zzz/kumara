@@ -291,7 +291,7 @@ sub modbiblio {
   where
   biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
-    print $query;
+#    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
@@ -304,7 +304,7 @@ sub modsubtitle {
   my $query="update bibliosubtitle set subtitle='$subtitle' where biblionumber=$bibnum";
   print $query;
   my $sth=$dbh->prepare($query);
-  print $query;
+#  print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
@@ -317,12 +317,12 @@ sub modsubject {
   my $query="Delete from bibliosubject where biblionumber=$bibnum";
 #  print $query;
   my $sth=$dbh->prepare($query);
-  print $query;
+#  print $query;
   $sth->execute;
   $sth->finish;
   for (my $i=0;$i<$count;$i++){
     $sth=$dbh->prepare("Insert into bibliosubject values ('$subject[$i]',$bibnum)");
-    print $subject[$i];
+#    print $subject[$i];
     $sth->execute;
     $sth->finish;
   }
@@ -339,7 +339,7 @@ sub modbibitem {
   where
   biblioitemnumber=$bibitemnum";
   my $sth=$dbh->prepare($query);
-    print $query;
+#    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
