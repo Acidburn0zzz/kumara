@@ -68,8 +68,10 @@ sub returnrecord {
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;
+    debug_msg($env,"after return before stats");
   UpdateStats($env,'branch','return','0');
   #pause();
+    debug_msg($env,"after stats");
   return($amt_owing);
 }
 

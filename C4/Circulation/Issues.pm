@@ -148,11 +148,14 @@ sub issueitem{
        #check if item is on issue already
        my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
        #check reserve
+       debug_msg($env,"before check reserve");
        my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});    
+       debug_msg($env,"after check reserve");
        #if charge deal with it
      }   
      if ($canissue == 1) {
        $charge = calc_charges($env,$dbh,$itemnum,$bornum);
+              debug_msg($env,"after charge");
      }
      if ($canissue == 1) {
        #now mark as issued
@@ -196,19 +199,21 @@ sub calc_charges {
   my ($env, $dbh, $itemno, $bornum)=@_;
   my $charge=0;
   my $item_type;
-  my $q1 = "select item_type,rentalcharge from items,biblioitems,itemtypes 
+         debug_msg($env,"before charge");
+  my $q1 = "select itemtypes.itemtype,rentalcharge from items,biblioitems,itemtypes 
     where (items.itemnumber ='$itemno')
     and (biblioitems.biblioitemnumber = items.biblioitemnumber)
-    and (biblioitems.item_type = itemtypes,item_type)";
+    and (biblioitems.itemtype = itemtypes.itemtype)";
   my $sth1= $dbh->prepare($q1);
   $sth1->execute;
+         debug_msg($env,"after first charge query");
   if (my $data1=$sth1->fetchrow_hashref) {
-     $item_type = $data1->{'item_type'};
+     $item_type = $data1->{'itemtype'};
      $charge = $data1->{'rentalcharge'};
-      my $q2 = "select discount from borrowers,categoryitems 
+      my $q2 = "select discount from borrowers,categoryitem 
         where (borrowers.borrowernumber = '$bornum') 
         and (borrower.categorycode = categories.categorycode)
-        and (categoryitems.item_item = '$item_type')";
+        and (categoryitem.itemtype = '$item_type')";
      my $sth2=$dbh->prepare($q2);
      $sth2->execute;
      if (my $data2=$sth2->fetchrow_hashref) {

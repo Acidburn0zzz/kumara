@@ -68,18 +68,18 @@ sub statsreport {
   my ($type,$time)=@_;
   my @data;
 #  print "here";
-  if ($type eq 'issue'){
-    @data=issuesrep($time);
-  }
+#  if ($type eq 'issue'){
+    @data=circrep($time,$type);
+#  }
   return(@data);
 }
 
-sub issuesrep {
-  my ($time)=@_;
+sub circrep {
+  my ($time,$type)=@_;
   my $dbh=C4Connect;
   my $query="Select * from statistics";
   if ($time eq 'today'){
-    $query=$query." where type='issue' and datetime
+    $query=$query." where type='$type' and datetime
     >=datetime('yesterday'::date)";
   }
   my $sth=$dbh->prepare($query);
