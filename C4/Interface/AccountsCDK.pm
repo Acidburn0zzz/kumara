@@ -72,11 +72,13 @@ sub accountsdialog {
   $amountentry->set('Value'=>$amountowing);
   my $amount =$amountentry->activate();
                                                                 
-  debug_msg($env,"accounts $amount");
+  #debug_msg($env,"accounts $amount");
   
   if (!defined $amount) {
-     $reason="Finished user";
+     #debug_msg($env,"escaped");
+     #$reason="Finished user";
   }
+  #debug_msg($env,"exit");
   return($amount,$reason);
 }
 

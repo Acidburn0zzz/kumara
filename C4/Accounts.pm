@@ -68,12 +68,12 @@ sub checkaccount  {
   }
   $sth->finish;
   # output(1,2,"borrower owes $total");
-  if ($total > 0){
-    # output(1,2,"borrower owes $total");
-    if ($total > 5){
-      reconcileaccount($env,$dbh,$bornumber,$total);
-    }
-  }
+  #if ($total > 0){
+  #  # output(1,2,"borrower owes $total");
+  #  if ($total > 5){
+  #    reconcileaccount($env,$dbh,$bornumber,$total);
+  #  }
+  #}
   #  pause();
   return($total);
 }    
@@ -106,21 +106,14 @@ sub reconcileaccount {
     $line= 
      $data->{'date'}." ".fmtdec($env,$amount,"52")." ".fmtstr($data->{'description'},"L15");
     push @accountlines,$line;
-#    $text="$line\t$data->{'date'}\t$amount\t$data->{'description'}";
-#    output (1,$row,$text);
-#    $row++;
     $i++;
   }
-#  $text="Borrower owes \$$total";
-#  output (1,$row,$text);
   #get amount paid and update database
-#  my ($data,$reason)=&dialog("Amount to pay");
   my ($data,$reason)=
     &accountsdialog($env,"Payment Entry",$borrower,\@accountlines,$total); 
   if ($data>0) {
     &recordpayment($env,$bornumber,$dbh,$data);
-  #Check if the borrower still owes
-#  pause();
+    #Check if the borrower still owes
     $total=&checkaccount($env,$bornumber,$dbh);
   }
   return($total);

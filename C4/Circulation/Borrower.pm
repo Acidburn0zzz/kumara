@@ -101,8 +101,11 @@ sub findborrower  {
     $env->{'bornum'} = $bornum;
     $env->{'bcard'} = $borrower->{'cardnumber'};
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
-    $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
+    my $odues;
+    ($issuesallowed,$odues) = &checktraps($env,$dbh,$bornum,$borrower);
+    debug_msg ($env,"issuesallowed1 =  $issuesallowed");
   }
+  debug_msg ($env,"issuesallowed2 =  $issuesallowed");
   return ($bornum, $issuesallowed,$borrower,$reason);
 };
 
@@ -171,6 +174,7 @@ sub checktraps {
   my $odues;
   while ($traps_done ne "DONE") {
     my @traps_set;
+    debug_msg($env,"entering traps");
     my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     if ($amount > 0) { push (@traps_set,"FINES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
@@ -187,10 +191,12 @@ sub checktraps {
     if (@traps_set[0] ne "" ) {
        $issuesallowed,$traps_done = 
          process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set); 
+       debug_msg($env,"returned issuesallowed $issuesallowed");
     } else {
        $traps_done = "DONE";
     }   
   }
+  debug_msg($env,"returning issuesallowed $issuesallowed");
   return ($issuesallowed, $odues);
 }
 
@@ -200,7 +206,8 @@ sub process_traps {
   my $x = 0;
   my %traps;
   while (@$traps_set[$x] ne "") {
-    $traps{'@$traps_set[$x]'} = 1; 
+    $traps{@$traps_set[$x]} = 1; 
+    debug_msg($env,"set @$traps_set[$x]");
     $x++;
   }
   my $traps_done;
@@ -222,14 +229,18 @@ sub process_traps {
      }
      $traps_done = "DONE";
   }
-  if ($traps{'GNA'} == 1 ) {
+  if ($traps{'GNA'} eq 1 ) {
     $issuesallowed=0;
   }
-  if (($traps{'FINES'} == 1) && ($amount > 0)) {
-    $issuesallowed=0;
+  if ($traps{'FINES'} eq 1) {
+    if ($amount > 5) {
+      debug_msg($env,"fines2 $amount");
+      $issuesallowed=0;
+    }
   }
+  debug_msg($env,"ia $issuesallowed");
   return ($issuesallowed,$traps_done);
-}
+} # end of process_traps
 
 
 sub Borenq {
