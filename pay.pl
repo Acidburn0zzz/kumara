@@ -54,8 +54,10 @@ print <<printend
 <TD><input type=radio name=payfine$i value=no checked>Unpaid
 <input type=radio name=payfine$i value=yes>Pay
 <input type=radio name=payfine$i value=wo>Writeoff
+<input type=hidden name=itemnumber$i value=$accts->[$i]{'itemnumber'}>
+<input type=hidden name=accounttype$i value=$accts->[$i]{'accounttype'}>
 <input type=hidden name=bornum value=$bornum>
-
+<input type=hidden name=accountno$i value=$accts->[$i]{'accountno'}>
 </td>
 <TD>$accts->[$i]{'description'}</td>
 <TD>$accts->[$i]{'accounttype'}</td>
@@ -103,5 +105,6 @@ print endmenu('member');
 print endpage();
 
 } else {
-  print $input->redirect("/cgi-bin/koha/sec/writeoff.pl");
+  my $quety=$input->query_string;
+  print $input->redirect("/cgi-bin/koha/sec/writeoff.pl?$quety");
 }
