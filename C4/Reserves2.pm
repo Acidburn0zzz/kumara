@@ -229,11 +229,11 @@ sub getnextacctno {
 
 sub updatereserves{
   #subroutine to update a reserve 
-  my ($rank,$biblio,$borrower,$del)=@_;
+  my ($rank,$biblio,$borrower,$del,$branch)=@_;
   my $dbh=C4Connect;
   my $query="Update reserves ";
   if ($del ==0){
-    $query.="set  priority='$rank' where
+    $query.="set  priority='$rank',branchcode='$branch' where
     biblionumber=$biblio and borrowernumber=$borrower";
   } else {
     $query="Select * from reserves where biblionumber=$biblio and

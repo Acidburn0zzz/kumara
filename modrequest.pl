@@ -19,12 +19,12 @@ my $input = new CGI;
 my @rank=$input->param('rank-request');
 my @biblio=$input->param('biblio');
 my @borrower=$input->param('borrower');
-
+my @branch=$input->param('pickup');
 my $count=@rank;
 my $del=0;
 for (my $i=0;$i<$count;$i++){
   if ($rank[$i] ne 'del' && $del == 0){
-    updatereserves($rank[$i],$biblio[$i],$borrower[$i],0); #from C4::Reserves2
+    updatereserves($rank[$i],$biblio[$i],$borrower[$i],0,$branch[$i]); #from C4::Reserves2
     
   } elsif ($rank[$i] eq 'del'){
     updatereserves($rank[$i],$biblio[$i],$borrower[$i],1); #from C4::Reserves2
