@@ -68,13 +68,11 @@ sub Issue  {
     #now check items 
     clearscreen();
     my ($items,$items2)=pastitems($env,$bornum,$dbh);
- 	 
-#    my @items2;
-#    $items2[0]=" "x30;
     my $done = "No";
     my $row2=5;
+    my $it2p=0;
     while ($done eq 'No'){
-      ($done,$items2,$row2)=&processitems($env,$bornum,$borrower,$items,$items2,$row2);
+      ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
     }    
     $dbh->disconnect;  
     if ($done ne 'Circ'){
@@ -91,7 +89,7 @@ sub processitems {
 #  clearscreen();
 #  output(1,1,"Processing Items");
    helptext("F11 Ends processing for current borrower  F10 ends issues");
-   my ($env,$bornum,$borrower,$items,$items2,$row2)=@_;
+   my ($env,$bornum,$borrower,$items,$items2,$row2,$it2p)=@_;
    my $dbh=&C4Connect;  
    my $row=5;
 #  my $count=$$items;
@@ -104,11 +102,13 @@ sub processitems {
    my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
    if ($itemnum ne ""){
       debug_msg($env,"borrower $bornum item $itemnum");
-      my ($item) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
+      my $item = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       output(40,$row2,$item->{'title'});
+      debug_msg($env,"$it2p - $item->{'title'}");
       #unshift $items2,substr(($item->{'title'}.(" "x30)),0,30);
-      #$items2[$row2-5]=substr(($item->{'title'}.(" "x30)),0,30); 
-      $row2++;	      
+      $items2->[$it2p]=substr(($item->{'title'}.(" "x30)),0,30); 
+      $row2++;	     
+      $it2p++;
    }  
           
    $dbh->disconnect;
@@ -118,7 +118,7 @@ sub processitems {
    } else {
       if ($reason ne 'Finished issues'){
          #return No to let them know that we wish to process more Items for borrower
-         return('No',$items2,$row2);
+         return('No',$items2,$row2,$it2p);
       } else  {
          return('Circ');
       }
@@ -131,13 +131,11 @@ sub issueitem{
    my $canissue = 1;
  ##  my ($itemnum,$reason)=&scanbook();
    my $query="Select * from items,biblio where (barcode='$itemnum') and
-        (items.biblionumber=biblio.biblionumber)";
-  
-  # my $query="Select * from items where barcode ='$itemnum'"; 
+       (items.biblionumber=biblio.biblionumber)";
    my $item;
    my $sth=$dbh->prepare($query);  
    $sth->execute;
-   if (my $item=$sth->fetchrow_hashref) {
+   if ($item=$sth->fetchrow_hashref) {
      debug_msg($env,$item->{'title'});
      #$items2=(substr($item.(" "x30),0,30));
      #$items2->Append(substr($item.(" "x30),0,30));
@@ -165,7 +163,7 @@ sub issueitem{
        &UpdateStats($env,$env->{'branchcode'},'issue');
      }
    } else {
-     debug_msg($env,"$itemnum not found");
+     error_msg($env,"$itemnum not found");
    }  
    return($item);
 }

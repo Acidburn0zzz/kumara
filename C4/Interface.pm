@@ -19,7 +19,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg);
+&textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -139,9 +139,17 @@ sub issuewindow {
   my $li2 = Newt::Listbox(10,
     NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
   my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-  $li1->Add($items1->[0],$items1->[1]);
+  my $i = 0;
+  while ($items1->[$i]) {
+    $li1->Add($items1->[$i]);
+    $i++;
+  }
   # $li2->Add($items2->{'title'});
-  $li2->Add($items2); 
+  $i = 0;
+  while ($items2->[$i]) {
+    $li2->Add($items2->[$i]); 
+    $i++;
+  }  
   $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
   "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
@@ -262,7 +270,18 @@ sub msg_yn {
 
 sub debug_msg {
   my ($env,$text)=@_;
-  my $panel1=Newt::Panel(4,4,"");
+  my $panel1=Newt::Panel(4,4,"*** D E B U G ***");
+  my $label1=Newt::Label($text);
+  my $butt=Newt::Button("Okay");
+  $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
+  $panel1->Add(0,1,$butt,NEWT_ANCHOR_TOP);
+  my ($reason,$data) =$panel1->Run();
+  return();
+}
+
+sub error_msg {
+  my ($env,$text)=@_;
+  my $panel1=Newt::Panel(4,4,"!!ERROR!!");
   my $label1=Newt::Label($text);
   my $butt=Newt::Button("Okay");
   $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
