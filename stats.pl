@@ -46,7 +46,15 @@ print mktableft;
 
 print "<p><b>$total</b>";
 
-my $issues=Count('issue',$date,$date2);
-print "<p>Issues: $issues";
-my $returns=Count('return',$date,$date2);
-print "<p>Returns: $returns";
+my $issues=Count('issue','C',$date,$date2);
+print "<p>Issues Levin: $issues";
+$issues=Count('issue','F',$date,$date2);
+print "<br>Issues Foxton: $issues";
+$issues=Count('issue','S',$date,$date2);
+print "<br>Issues Shannon: $issues";
+my $returns=Count('return','C',$date,$date2);
+print "<p>Returns Levin: $returns";
+$returns=Count('return','F',$date,$date2);
+print "<p>Returns Foxton: $returns";
+$returns=Count('return','S',$date,$date2);
+print "<p>Returns Shannon: $returns";

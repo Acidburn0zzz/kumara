@@ -108,6 +108,7 @@ while ($i < $count2){
 }
 $offset=$num+$offset;
 if ($offset < $count){
+    $keyword=~ s/ /%20/g;
     my $search="num=$num&offset=$offset&keyword=$keyword";
     my $stuff=mklink("/cgi-bin/koha/opac-search.pl?$search",'Next Results');
 #    print $stuff;

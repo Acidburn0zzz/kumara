@@ -102,10 +102,10 @@ sub circrep {
 }
 
 sub Count {
-  my ($type,$time,$time2)=@_;
+  my ($type,$branch,$time,$time2)=@_;
   my $dbh=C4Connect;
   my $query="Select count(*) from statistics where type='$type'";
-  $query.=" and datetime >= '$time' and datetime< '$time2'";
+  $query.=" and datetime >= '$time' and datetime< '$time2' and branch='$branch'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;

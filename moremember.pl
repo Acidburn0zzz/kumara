@@ -17,24 +17,20 @@ print $input->header;
 print startpage();
 print startmenu('member');
 my $data=borrdata('',$bornum);
+my @temp=split('-',$data->{'dateenrolled'});
+$data->{'dateenrolled'}="$temp[2]/$temp[1]/$temp[0]";
+@temp=split('-',$data->{'expiry'});
+$data->{'expiry'}="$temp[2]/$temp[1]/$temp[0]";
+@temp=split('-',$data->{'dateofbirth'});
+$data->{'dateofbirth'}="$temp[2]/$temp[1]/$temp[0]";
 print <<printend
-
-
 <FONT SIZE=6><em>$data->{'othernames'} $data->{'surname'}</em></FONT><P>
 <p>
-
-
 <form action=/cgi-bin/koha/wmemberentry.pl method=post>
-
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=270>
-
 <TR VALIGN=TOP>
-
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>MEMBERSHIP RECORD</TD></TR>
-
-
-<tr VALIGN=TOP  >
-	
+<tr VALIGN=TOP  >	
 <TD>
 <p align=right><INPUT TYPE="image" name="submit"  VALUE="add-child" height=42  WIDTH=120 BORDER=0 src="/images/add-child.gif"> 		
 <input type=hidden name=type value=Add>
@@ -95,6 +91,8 @@ for (my$i=0;$i<$numaccts;$i++){
     my $amount2= $accts->[$i]{'amountoutstanding'} + 0.00;
   print "<tr VALIGN=TOP  >";
   my $item=" &nbsp; ";
+  @temp=split('-',$accts->[$i]{'date'});
+  $accts->[$i]{'date'}="$temp[2]/$temp[1]/$temp[0]";
   if ($accts->[$i]{'accounttype'} ne 'Res'){
     #get item data
     #$item=
@@ -121,7 +119,7 @@ print <<printend
 </table>
 
 <p>
-<form action="renewscript.pl">
+<form action="renewscript.pl" method=post>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 
 <TR VALIGN=TOP>
@@ -144,6 +142,8 @@ for (my $i=0;$i<$count;$i++){
   print "<tr VALIGN=TOP  >
   <TD>";
     my $datedue=ParseDate($issue->[$i]{'date_due'});
+  @temp=split('-',$issue->[$i]{'date_due'});
+  $issue->[$i]{'date_due'}="$temp[2]/$temp[1]/$temp[0]";
   if ($datedue < $today){  
     print "<font color=red>";
   }
@@ -156,7 +156,7 @@ for (my $i=0;$i<$count;$i++){
   } else {
     print "<td> &nbsp; </td>";
   }
-  print "<TD><input type=radio name=\"renew_item_123\" value=y>Y
+  print "<TD><input type=radio name=\"renew_item->[$i]{'itemnumber'}\" value=y>Y
   <input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=n>N</td>
   </tr>
 ";
@@ -167,7 +167,7 @@ print <<printend
 <TD colspan=5 align=right>
 <INPUT TYPE="image" name="submit"  VALUE="update" height=42  WIDTH=187 BORDER=0 src="/images/update-renewals.gif">
 </td>
-
+</form>
 </tr>
 
 
@@ -197,6 +197,8 @@ printend
 ;
 my ($rescount,$reserves)=FindReserves('',$bornum); #From C4::Reserves2
 for (my $i=0;$i<$rescount;$i++){
+  @temp=split('-',$reserves->[$i]{'reservedate'});
+  $reserves->[$i]{'reservedate'}="$temp[2]/$temp[1]/$temp[0]";
   print "<tr VALIGN=TOP  >
   <TD><a href=\"/cgi-bin/koha/request.pl?bib=$reserves->[$i]{'biblionumber'}\">$reserves->[$i]{'title'}</a></td>
   <TD>$reserves->[$i]{'reservedate'}</td>

@@ -100,6 +100,8 @@ my $day=substr($items[$i]->{'timestamp0'},6,2);
 $items[$i]->{'timestamp0'}="$day/$mon/$year";
 my @temp=split('-',$items[$i]->{'dateaccessioned'});
 $items[$i]->{'dateaccessioned'}="$temp[2]/$temp[1]/$temp[0]";
+@temp=split('-',$items[$i]->{'datelastseen'});
+$items[$i]->{'datelastseen'}="$temp[2]/$temp[1]/$temp[0]";
 print <<printend
 <FONT SIZE=2  face="arial, helvetica">
 <b>Home Branch:</b> $items[$i]->{'homebranch'}<br>
