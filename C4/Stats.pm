@@ -107,7 +107,7 @@ sub Count {
   my $query="Select count(*) from statistics where type='$type'";
   if ($time eq 'today'){
     $query=$query." and datetime
-    >=datetime('yesterday'::date)";
+    =now()";
   }
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -115,18 +115,18 @@ sub Count {
   $sth->finish;
 #  print $query;
   $dbh->disconnect;
-  return($data->{'count'});
+  return($data->{'count(*)'});
 }
 
 sub Overdues{
   my $dbh=C4Connect;
-  my $query="Select count(*) from issues where datetime(date_due::date) > datetime('yesterday'::date)";
+  my $query="Select count(*) from issues where date_due >= now()";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count=$sth->fetchrow_hashref;
   $sth->finish;
   $dbh->disconnect;
-  return($count->{'count'});  
+  return($count->{'count(*)'});  
 }
 
 sub TotalOwing{
@@ -137,11 +137,12 @@ sub TotalOwing{
     $query=$query." where accounttype='F' or accounttype='FN'";
   }
   my $sth=$dbh->prepare($query);
+#  print $query;
   $sth->execute;
    my $total=$sth->fetchrow_hashref;
    $sth->finish;
   $dbh->disconnect; 
-  return($total->{'sum'});
+  return($total->{'sum(amountoutstanding)'});
 }
 
 sub TotalPaid {
@@ -149,14 +150,14 @@ sub TotalPaid {
   my $dbh=C4Connect;
   my $query="Select sum(amount) from accountlines where accounttype='Pay'";
   if ($time eq 'today'){
-    $query=$query." and datetime(date::date) >= datetime('yesterday'::date)";
+    $query=$query." and date = now()";
   }
   my $sth=$dbh->prepare($query);
   $sth->execute;
    my $total=$sth->fetchrow_hashref;
    $sth->finish;
   $dbh->disconnect; 
-  return($total->{'sum'});
+  return($total->{'sum(amount)'});
 }
 END { }       # module clean-up code here (global destructor)
   
