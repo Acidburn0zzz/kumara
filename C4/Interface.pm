@@ -7,7 +7,7 @@ use strict;
 #:textbox);
 
 use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
-NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F9 NEWT_KEY_F12
+NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F8 NEWT_KEY_F9 NEWT_KEY_F12
 NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE 
 NEWT_ANCHOR_TOP NEWT_ANCHOR_RIGHT NEWT_FLAG_BORDER);
 #use C4::Circulation;
@@ -264,6 +264,7 @@ sub issuewindow {
   }  
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
+    $panel->AddHotKey(NEWT_KEY_F8);
   $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,30);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
@@ -289,7 +290,12 @@ sub issuewindow {
     if ($data eq NEWT_KEY_F12){
       $reason="Quit"
     }
+    if ($data eq NEWT_KEY_F8){
+      $reason="Print"
+    }
+    
   }
+  debug_msg("",$reason);
 #  Newt::Finished();
   my $stuff=$entry->Get();
   return($stuff,$reason);

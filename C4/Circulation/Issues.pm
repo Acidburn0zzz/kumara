@@ -13,6 +13,8 @@ use C4::Circulation;
 use C4::Circulation::Borrower;
 use C4::Scan;
 use C4::Stats;
+use C4::Print;
+
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Newt qw();
   
@@ -63,7 +65,7 @@ sub Issue  {
     #clear help
     helptext('');
     clearscreen();
-    
+    my ($items,$items2);
     my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
       #C4::Circulation::Borrowers
     my $done;
@@ -75,7 +77,7 @@ sub Issue  {
       #deal with alternative loans
       #now check items 
       clearscreen();
-      my ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
+      ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
       $done = "No";
       my $row2=5;
       my $it2p=0;
@@ -124,6 +126,8 @@ sub processitems {
    #check to see if more books to process for this user
    if ($reason eq 'Finished user'){
       return('New borrower');
+   } elsif ($reason eq "Print"){
+      remoteprint($env,$items2,$borrower);
    } else {
       if ($reason ne 'Finished issues'){
          #return No to let them know that we wish to process more Items for borrower
