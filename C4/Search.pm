@@ -374,12 +374,18 @@ sub CatSearch  {
       }
   }
 #print $query;
+
+
   my $sth=$dbh->prepare($query);
+  
 #  if ($search->{'isbn'} eq ''){
     $sth->execute;
 #  } else {
   my $count=0;
- 
+  if ($search->{'title'} || $search->{'author'}){
+    $query=$query." group by biblio.biblionumber";
+#    $query=~ s/count\(\*\)/count\(biblio.biblionumber\)/;
+  } 
   if ($type eq 'subject'){ 
     while (my $data=$sth->fetchrow_arrayref){
       $count++;
@@ -389,10 +395,8 @@ sub CatSearch  {
     $count=$data->[0];
   }
   $sth->finish;
+#  print $query;
   $query=~ s/count\(\*\)/\*/g;
-  if ($search->{'title'} || $search->{'author'}){
-    $query=$query." group by biblio.biblionumber";
-  }
   if ($type ne 'precise' && $type ne 'subject'){
     if ($search->{'author'} ne ''){
       $query=$query." order by author,title limit $offset,$num";
@@ -920,6 +924,7 @@ sub itemcount {
   my $lostcount=0;
   my $mending=0;
   my $transit=0;
+  my $ocount=0;
   while (my $data=$sth->fetchrow_hashref){
     $count++;                     
     my $query2="select * from issues,items where issues.itemnumber=                          
@@ -951,10 +956,19 @@ sub itemcount {
       }
     }                             
     $sth2->finish;     
-  }                                 
+  } 
+#  if ($count == 0){
+    my $query2="Select * from aqorders where biblionumber=$bibnum";
+    my $sth2=$dbh->prepare($query2);
+    $sth2->execute;
+    if (my $data=$sth2->fetchrow_hashref){
+      $ocount=$data->{'quantity'};
+    }
+    $count+=$ocount;
+    $sth2->finish;
   $sth->finish; 
   $dbh->disconnect;                   
-  return ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit); 
+  return ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit,$ocount); 
 }
 
 sub ItemType {

@@ -138,7 +138,7 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/koha/search.pl?author=$word&type=$type";
       $stuff[0]=mklink($url,$stuff[0]);
-      my ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit)=itemcount($env,$stuff[2],$type);
+      my ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit,$ocount)=itemcount($env,$stuff[2],$type);
       $stuff[4]=$count;
       if ($nacount > 0){
         $stuff[5]=$stuff[5]."On Loan";
@@ -186,6 +186,13 @@ while ($i < $count2){
         $stuff[5]=$stuff[5]."In Transiit";
          if ($transit >1 ){                                                                                                         
 	  $stuff[5]=$stuff[5]." ($transit)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";	
+      }
+      if ($ocount > 0){
+        $stuff[5]=$stuff[5]."On Order";
+         if ($ocount >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($ocount)";                                                                                            
          }                                                                                                                         
 	 $stuff[5].=" ";	
       }
