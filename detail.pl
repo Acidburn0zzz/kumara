@@ -80,7 +80,8 @@ print <<printend
 printend
 ;
 if ($type ne 'opac'){
-  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
+  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\"> 
+  <INPUT TYPE=\"image\" name=\"delete\"  VALUE=\"delete\" height=42  WIDTH=93 BORDER=0 src=\"/images/delete-mem.gif\">";
 }
 print <<printend
 <br>

@@ -11,13 +11,18 @@ use CGI;
 use C4::Output;
 
 my $input = new CGI;
-print $input->header;
+
 my $bibnum=$input->param('bibnum');
 my $data=bibdata($bibnum);
 my ($count,$subject)=subject($data->{'biblionumber'});
 my ($count2,$subtitle)=subtitle($data->{'biblionumber'});
 my ($count3,$addauthor)=addauthor($data->{'biblionumber'});
+my $submit=$input->param('submit.x');                                                                                              
+if ($submit eq ''){                                                                                                                
+  print $input->redirect("/cgi-bin/koha/delbiblio.pl?biblio=$bibnum");                                     
+}  
 
+print $input->header;
 #my ($analytictitle)=analytic($biblionumber,'t');
 #my ($analyticauthor)=analytic($biblionumber,'a');
 print startpage();
