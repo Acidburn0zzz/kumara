@@ -163,7 +163,8 @@ sub selborrower {
   if ($numbors>15) {
     $numbors = 15;
   }
-  my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE );
+  #my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE );
+  my $li = Newt::Listbox($numbors );
   $li->Add(@borrows);
   my $bdata;
   my $butt = Newt::Button("Okay");
