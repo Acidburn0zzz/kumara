@@ -51,12 +51,12 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
  
 sub Login {
-  my (%env)=@_;
+  my ($env)=@_;
   $env{usercode} = "test";
   $env{branchcode} = "test";
   }
 sub CheckAccess {
-  my (%env)=@_;
+  my ($env)=@_;
   }
     
 END { }       # module clean-up code here (global destructor)

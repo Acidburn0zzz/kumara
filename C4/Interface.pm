@@ -60,7 +60,7 @@ sub suspend_cb {
       
 sub startint {
   Newt::SetSuspendCallback(\&suspend_cb);
-  my (%env,$msg)=@_;
+  my ($env,$msg)=@_;
   Newt::Init();
   Newt::Cls();
   Newt::PushHelpLine('F11 escapes');
@@ -124,7 +124,7 @@ sub list {
 }
 
 sub issuewindow {
-  my (%env,$title,$items1,$items2,$borrower,$name)=@_;
+  my ($env,$title,$items1,$items2,$borrower,$name)=@_;
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label($name);
   my $panel = Newt::Panel(4, 4, $title);
