@@ -131,9 +131,9 @@ print "<b>Total Number of Items:</b> $count
 ";
 
 }
-if ($type ne 'opac'){
-  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
-}
+#if ($type ne 'opac'){
+#  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
+#}
 print <<printend
 </font></TD>
 </TR>
