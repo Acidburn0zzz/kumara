@@ -655,7 +655,7 @@ sub itemcount {
   my ($env,$bibnum)=@_; 
   my $dbh=C4Connect;   
   my $query="Select * from items where     
-  biblionumber=$bibnum";       
+  biblionumber=$bibnum and itemlost <>1";       
   my $sth=$dbh->prepare($query);         
   #  print $query;           
   $sth->execute;           
