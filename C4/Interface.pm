@@ -204,7 +204,7 @@ sub returnwindow {
 
 sub borrowerwindow {
   my ($env,$borrower)=@_;
-  my $bt=Newt::Button("Modify Borrower");
+  my $bt1=Newt::Button("Modify Borrower");
   my $bt2=Newt::Button("New borrower");
   my $label=Newt::Label("Borrower");
   my $l1=Newt::Label("$borrower->{'firstname'} $borrower->{'surname'}");
