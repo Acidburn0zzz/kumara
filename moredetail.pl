@@ -73,6 +73,7 @@ print <<printend
 </TD>
 </tr>
 </table>
+</form>
 printend
 ;
 
@@ -85,6 +86,7 @@ print <<printend
 </TR>
 <tr VALIGN=TOP  >
 <TD width=220 >
+<form action=/cgi-bin/koha/moditem.pl method=post>
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
 <br>
@@ -131,6 +133,7 @@ print <<printend
 </TD>
 </tr>
 </table>
+</form>
 printend
 ;
 }

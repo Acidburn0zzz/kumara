@@ -340,7 +340,20 @@ sub modsubject {
       
     } else {
       $error="$subject[$i] does not exist in the subject authority file";
-    }
+
+      $query= "Select * from catalogueentry where
+      entrytype='s' and (catalogueentry like '$subject[$i] %' or 
+      catalogueentry like '% $subject[$i] %' or catalogueentry like
+      '% $subject[$i]')";
+      my $sth2=$dbh->prepare($query);
+#      print $query;
+      $sth2->execute;
+      while (my $data=$sth2->fetchrow_hashref){
+        $error=$error."<br>$data->{'catalogueentry'}";
+      }
+      $sth2->finish;
+#      $error=$error."<br>$query";
+   }
     $sth->finish;
   }
   if ($error eq ''){  
