@@ -817,7 +817,8 @@ sub getboracctrecord {
    }
    $sth->finish;
    $query="Select * from accountlines where
-   borrowernumber=$params->{'borrowernumber'} and itemnumber is NULL order by
+   borrowernumber=$params->{'borrowernumber'} and (itemnumber is NULL or
+   itemnumber=0) order by
    date desc";
    $sth=$dbh->prepare($query);
    $sth->execute;
