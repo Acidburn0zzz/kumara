@@ -76,19 +76,16 @@ sub Returns {
     #debug_msg($env,"item = $item");
     #if (($reason ne "Circ") && ($reason ne "Quit")) {
     if ($reason eq "")  {
-      ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
-      #if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
-        if ($reason eq "Returned") {
+      my $resp;
+      ($resp,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
+      if ($resp ne "") {
+        if ($resp eq "Returned") {
 	  my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
-      	  unshift @items,$fmtitem;
-          $reason = "";     	  
-  	} elsif ($reason eq "Item not found" ) {
-	  error_msg($env,"$reason");
-	  $reason = "";
-	} else {
-          #debug_msg($env,"R2. $reason");
+      	  unshift @items,$fmtitem;     	  
+  	} elsif ($resp ne "") {
+	  error_msg($env,"$resp");
 	}
-      #}
+      }
     }
   }
   clearscreen;
