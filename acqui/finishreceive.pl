@@ -28,9 +28,11 @@ my $bookseller=$input->param('bookseller');
 my $title=$input->param('title');
 my $author=$input->param('author');
 my $copyright=$input->param('copyright');
-if ($quantrec !=0){
-  $cost=$cost/$quantrec;
+
+if ($quantrec != 0){
+  $cost=$cost / $quantrec;
 }
+
 my $gst=$input->param('gst');
 my $freight=$input->param('freight');
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
