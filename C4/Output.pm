@@ -13,7 +13,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
 &startmenu &endmenu &mkheadr &center &endcenter &mkform &mkform2 &bold
-&gotopage);
+&gotopage &mkformnotable);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -105,14 +105,21 @@ sub mktablehdr {
 
 
 sub mktablerow {
+  #the last item in data may be a backgroundimage
   my ($cols,$colour,@data)=@_;
   my $i=0;
   my $string="<tr valign=top bgcolor=$colour>";
   while ($i <$cols){
-    if ($data[$i] eq "") {
-      $string=$string."<td>&nbsp;</td>";
+    if ($data[$cols] ne ''){
+    #check for backgroundimage
+      $string.="<td background=\"$data[$cols]\">";
     } else {
-      $string=$string."<td>$data[$i]</td>";
+      $string.="<td>";
+    }
+    if ($data[$i] eq "") {
+      $string.=" &nbsp; </td>";
+    } else {
+      $string.="$data[$i]</td>";
     } 
     $i++;
   }
@@ -165,6 +172,30 @@ sub mkform{
   #$string=$string.join("\n",@order);
   $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
   $string=$string.mktableft;
+  $string=$string."</form>";
+}
+
+sub mkformnotable{
+  my ($action,@inputs)=@_;
+  my $string="<form action=$action method=post>\n";
+  my $count=@inputs;
+  for (my $i=0; $i<$count; $i++){
+    if ($inputs[$i][0] eq 'hidden'){
+      $string=$string."<input type=hidden name=$inputs[$i][1] value=\"$inputs[$i][2]\">\n";
+    }
+    if ($inputs[$i][0] eq 'radio') {
+      $string.="<input type=radio name=$inputs[1] value=$inputs[$i][2]>$inputs[$i][2]";
+    } 
+    if ($inputs[$i][0] eq 'text') {
+      $string.="<input type=$inputs[$i][0] name=$inputs[$i][1] value=\"$inputs[$i][2]\">";
+    }
+    if ($inputs[$i][0] eq 'textarea') {
+        $string.="<textarea name=$inputs[$i][1] wrap=physical cols=40 rows=4>$inputs[$i][2]</textarea>";
+    }
+    if ($inputs[$i][0] eq 'reset'){
+      $string.="<input type=reset name=$inputs[$i][1] value=\"$inputs[$i][2]\">";
+    }    
+  }
   $string=$string."</form>";
 }
 
@@ -243,6 +274,9 @@ sub mkheadr {
   my $string;
   if ($type eq '1'){
     $string="<FONT SIZE=6><em>$text</em></FONT><br>";
+  }
+  if ($type eq '2'){
+    $string="<FONT SIZE=6><em>$text</em></FONT>";
   }
   return ($string);
 }
