@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&EnterReserves);
+@EXPORT = qw(&EnterReserves CalcReserveFee CreateReserve );
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -182,7 +182,7 @@ sub EnterReserves{
   return ($donext);  
 }
 
-sub CalcReservFee {
+sub CalcReserveFee {
   my ($env,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
   #check for issues;
   my $dbh = &C4Connect;
