@@ -50,7 +50,7 @@ my $offset2=$num+$offset;
 print "<br> Results $offset to $offset2 displayed";
 print mktablehdr;
 
-  print mktablerow(4,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
+  print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
 
 my $count2=@results;
 my $i=0;
@@ -60,7 +60,7 @@ while ($i < $count2){
     my $title2=$stuff[1];
     $title2=~ s/ /%20/g;
 
-      $stuff[1]=mklink("/cgi-bin/koha/detail.pl?bib=$stuff[2]&title=$title2",$stuff[1]);
+      $stuff[1]=mklink("/cgi-bin/koha/detail.pl?bib=$stuff[2]&title=$title2&type=opac",$stuff[1]);
       my $word=$stuff[0];
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
@@ -82,7 +82,7 @@ while ($i < $count2){
         $stuff[4]=$stuff[4]."S=$scount";
       }
     if ($colour == 1){
-      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
+      print mktablerow(4,'#efe5ef',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
       $colour=0;
     } else{
       print mktablerow(4,'white',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
@@ -91,7 +91,7 @@ while ($i < $count2){
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(4,'#cccc99',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
+print mktablerow(4,'#99cccc',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset&keyword=$keyword";

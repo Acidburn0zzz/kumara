@@ -11,12 +11,25 @@ use C4::Output;
 
 my $input = new CGI;
 print $input->header;
+#whether it is called from the opac of the intranet
+my $type=$input->param('type');
+#setup colours
+my $main;
+my $secondary;
+if ($type eq 'opac'){
+  $main='#99cccc';
+  $secondary='#efe5ef';
+} else {
+  $main='#cccc99';
+  $secondary='#ffffcc';
+}
 print startpage();
-print startmenu();
+print startmenu($type);
 my $blah;
 
 my $bib=$input->param('bib');
 my $title=$input->param('title');
+
 
 my @items=ItemInfo(\$blah,$bib,$title);
 #print @items;
@@ -24,7 +37,7 @@ my $count=@items;
 my $i=0;
 print center();
 print mktablehdr;
-print mktablerow(5,'#cccc99','Title','Barcode','DateDue','Location','Dewey'); 
+print mktablerow(5,$main,'Title','Barcode','DateDue','Location','Dewey'); 
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
@@ -32,7 +45,7 @@ while ($i < $count){
     $results[2]='Available';
   }
   if ($colour == 1){                                                                          
-    print mktablerow(5,'#ffffcc',@results);                                        
+    print mktablerow(5,$secondary,@results);                                        
     $colour=0;                                                                                
   } else{                                                                                     
     print mktablerow(5,'white',@results);                                          
@@ -42,5 +55,5 @@ while ($i < $count){
 }
 print endcenter();
 print mktableft();
-print endmenu();
+print endmenu($type);
 print endpage();
