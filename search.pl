@@ -112,7 +112,7 @@ if ($type ne 'opac'){
   }
 } else {
   if ($subject ne ''){
-   print mktablerow(1,$main,'<b>SUBJECT</b>');
+   print mktablerow(6,$main,'<b>SUBJECT</b>',' &nbsp; ',' &nbsp; ');
   } else {
    print mktablerow(6,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('BRANCH'),'');
   }
