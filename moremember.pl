@@ -48,7 +48,7 @@ Ethnicity: $data->{'ethnicity'}, $data->{'ethnotes'}<BR>
 DoB: $data->{'dateofbirth'}<BR>
 Sex: $data->{'sex'}<P>
 Postal Address: $data->{'streetaddress'}, $data->{'city'}<BR>
-Home Address: $data->{'streetaddress'}, $data->{'city'}<BR>
+Home Address: $data->{'physstreet'}, $data->{'streetcity'}<BR>
 Phone (Home): $data->{'phone'}<BR>
 Phone (Daytime): $data->{'phoneday'}<BR>
 Fax: $data->{'faxnumber'}<BR>

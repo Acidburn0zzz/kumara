@@ -281,8 +281,8 @@ print <<printend
 <tr><td>&nbsp; </TD></TR>
 <tr valign=top bgcolor=white>
 
-<td  COLSPAN=3><input type=text name=streetaddress size=40 value="$data->{'physstreetaddress'}"></td>
-<td><input type=text name=streetcity size=20 value="$data->{'physcity'}"></td>
+<td  COLSPAN=3><input type=text name=streetaddress size=40 value="$data->{'physstreet'}"></td>
+<td><input type=text name=streetcity size=20 value="$data->{'streetcity'}"></td>
 </tr>
 </tr>
 <tr valign=top bgcolor=white>

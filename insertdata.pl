@@ -38,7 +38,7 @@ if (my $data=$sth->fetchrow_hashref){
   altrelationship='$data{'altrelationship'}',othernames='$data{'othernames'}',phoneday='$data{'phoneday'}',
   categorycode='$data{'categorycode'}',city='$data{'city'}',area='$data{'area'}',phone='$data{'phone'}',
   borrowernotes='$data{'borrowernotes'}',altphone='$data{'altphone'}',surname='$data{'surname'}',
-  initials='$data{'initials'}',streetaddress='$data{'address'}',ethnicity='$data{'ethnicity'}'
+  initials='$data{'initials'}',physstreet='$data{'streetaddress'}',ethnicity='$data{'ethnicity'}'
   where borrowernumber=$data{'borrowernumber'}";
 #  print $query;
 
@@ -50,13 +50,14 @@ if (my $data=$sth->fetchrow_hashref){
   $query="insert into borrowers (title,expiry,cardnumber,sex,ethnotes,streetaddress,faxnumber,
   firstname,altnotes,dateofbirth,contactname,emailaddress,dateenrolled,streetcity,
   altrelationship,othernames,phoneday,categorycode,city,area,phone,borrowernotes,altphone,surname,
-  initials,ethnicity,borrowernumber) values ('$data{'title'}','$data{'expiry'}','$data{'cardnumber'}',
+  initials,ethnicity,borrowernumber,physstreet) 
+  values ('$data{'title'}','$data{'expiry'}','$data{'cardnumber'}',
   '$data{'sex'}','$data{'ethnotes'}','$data{'address'}','$data{'faxnumber'}',
   '$data{'firstname'}','$data{'altnotes'}','$data{'dateofbirth'}','$data{'contactname'}','$data{'emailaddress'}',
   '$data{'joining'}','$data{'streetcity'}','$data{'altrelationship'}','$data{'othernames'}',
   '$data{'phoneday'}','$data{'categorycode'}','$data{'city'}','$data{'area'}','$data{'phone'}',
   '$data{'borrowernotes'}','$data{'altphone'}','$data{'surname'}','$data{'initials'}',
-  '$data{'ethnicity'}','$data{'borrowernumber'}')";
+  '$data{'ethnicity'}','$data{'borrowernumber'}','$data{'streetaddress'}')";
 }
 #print $query;
   my $sth2=$dbh->prepare($query);
