@@ -112,7 +112,7 @@ sub Returns {
       }
     }
   }
-  clearscreen;
+#  clearscreen;
   $dbh->disconnect;
   return($reason);
   }

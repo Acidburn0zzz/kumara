@@ -1,4 +1,4 @@
-package C4::Circulation::Borrower; #assumes C4/Circulation/Borrower
+package C4::Ciecrculation::Borrower; #assumes C4/Circulation/Borrower
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
@@ -159,7 +159,7 @@ sub findoneborrower {
       $borrower =$sth->fetchrow_hashref;
       $sth->finish;					         
     } elsif ($cntbor > 0) {
-      my ($cardnum) = selborrower($env,$dbh,\@borrows,\@bornums);
+      my ($cardnum) = C4::InterfaceCDK::selborrower($env,$dbh,\@borrows,\@bornums);
       my $query = "select * from borrowers where cardnumber = '$cardnum'";   
       $sth = $dbh->prepare($query);                          
       $sth->execute;                          
@@ -184,7 +184,7 @@ sub checktraps {
   my $amount;
   while ($traps_done ne "DONE") {
     my @traps_set;
-    $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
+    $amount=C4::Accounts::checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     if ($amount > 0) { push (@traps_set,"CHARGES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
     #check if member has a card reported as lost
@@ -225,7 +225,7 @@ sub process_traps {
   while ($trapact ne "NONE") {
     $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
     if ($trapact eq "CHARGES") {
-      &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
+      C4::Accounts::reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
       ($odues,$issues,$amount)=borrdata2($env,$bornum);          
       if ($amount <= 0) {
         $traps{'CHARGES'} = 0;
@@ -242,7 +242,7 @@ sub process_traps {
     } elsif ($trapact eq "WAITING") {
       reserveslist($env,$borrower,$amount,$odues,$waiting);
     } elsif ($trapact eq "ODUES") {
-      &bulkrenew($env,$dbh,$bornum,$amount,$borrower,$odues);
+      C4::Circulation::Renewals::bulkrenew($env,$dbh,$bornum,$amount,$borrower,$odues);
       ($odues,$issues,$amount)=borrdata2($env,$bornum);
       if ($odues == 0) {
         $traps{'ODUES'} = 0;

@@ -172,7 +172,7 @@ sub previousissue {
       }    
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
-      my $resp = &msg_yn($env,$text,"Mark as returned?");
+      my $resp = C4::InterfaceCDK::msg_yn($env,$text,"Mark as returned?");
       if ( $resp eq "Y") {
         &returnrecord($env,$dbh,$borrower->{'borrowernumber'},$itemnum);
       }	else {
@@ -256,7 +256,7 @@ sub scanbook {
 sub scanborrower {
   my ($env,$interface)=@_;
   #scan barcode
-  my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
+  my ($number,$reason,$book)=C4::InterfaceCDK::borrower_dialog($env); #C4::InterfaceCDK
   $number= $number;
   $book=uc $book;
   return ($number,$reason,$book);

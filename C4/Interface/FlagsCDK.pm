@@ -50,10 +50,10 @@ my $priv_func = sub {
   
 sub trapscreen {
   my ($env,$bornum,$borrower,$amount,$traps_set)=@_;
-  my $titlepanel = titlepanel($env,$env->{'sysarea'},"Borrower Flags");
+  my $titlepanel = C4::InterfaceCDK::titlepanel($env,$env->{'sysarea'},"Borrower Flags");
   my @borinfo;
   #debug_msg($env,"owwing = $amount");
-  my $borpanel = borrowerbox($env,$borrower,$amount);
+  my $borpanel = C4::InterfaceCDK::borrowerbox($env,$borrower,$amount);
   $borpanel->draw();
   my $hght = @$traps_set+4;
   my $flagsset = new Cdk::Scroll ('Title'=>"Act On Flag",
