@@ -408,7 +408,8 @@ sub CatSearch  {
   while (my $data=$sth->fetchrow_hashref){
   if ($type ne 'subject' && $type ne 'precise'){
      $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
-  } elsif ($search->{'isbn'} ne ''){
+  } elsif ($search->{'isbn'} ne '' || $search->{'item'} ne ''){
+     $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
   } else {  
 $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
      }
