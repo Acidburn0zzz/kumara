@@ -302,7 +302,7 @@ sub modsubtitle {
   my ($bibnum,$subtitle)=@_;
   my $dbh=C4Connect;
   my $query="update bibliosubtitle set subtitle='$subtitle' where biblionumber=$bibnum";
-  print $query;
+#  print $query;
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
@@ -314,19 +314,35 @@ sub modsubject {
   my ($bibnum,@subject)=@_;
   my $dbh=C4Connect;
   my $count=@subject;
-  my $query="Delete from bibliosubject where biblionumber=$bibnum";
-#  print $query;
-  my $sth=$dbh->prepare($query);
-#  print $query;
-  $sth->execute;
-  $sth->finish;
+  my $error;
   for (my $i=0;$i<$count;$i++){
-    $sth=$dbh->prepare("Insert into bibliosubject values ('$subject[$i]',$bibnum)");
-#    print $subject[$i];
+    my $query="select * from catalogueentry where entrytype='s' and
+    catalogueentry='$subject[$i]'";
+    my $sth=$dbh->prepare($query);
     $sth->execute;
+    if (my $data=$sth->fetchrow_hashref){
+      
+    } else {
+      $error="$subject[$i] does not exist";
+    }
     $sth->finish;
   }
+  if ($error eq ''){  
+    my $query="Delete from bibliosubject where biblionumber=$bibnum";
+#  print $query;
+    my $sth=$dbh->prepare($query);
+#  print $query;
+    $sth->execute;
+    $sth->finish;
+    for (my $i=0;$i<$count;$i++){
+      $sth=$dbh->prepare("Insert into bibliosubject values ('$subject[$i]',$bibnum)");
+#     print $subject[$i];
+      $sth->execute;
+      $sth->finish;
+    }
+  }
   $dbh->disconnect;
+  return($error);
 }
 
 sub modbibitem {

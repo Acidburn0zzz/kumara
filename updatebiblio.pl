@@ -54,6 +54,12 @@ my $subject=$input->param('Subject');
 my @sub=split(/\|/,$subject);
 #print @sub;
 #
-modsubject($bibnum,@sub);
 
-print $input->redirect("detail.pl?type=intra&bib=$bibnum");
+my $error=modsubject($bibnum,@sub);
+if ($error ne ''){
+  print $input->header();
+#  print $input->dump;
+  print $error;
+} else {
+  print $input->redirect("detail.pl?type=intra&bib=$bibnum");
+}
