@@ -134,7 +134,15 @@ print <<printend
 <b>Notes:</b> $items[$i]->{'itemnotes'}<br>
 <b>Renewals:</b> $items[$i]->{'renewals'}<br>
 <b>Accession Date: $items[$i]->{'dateaccessioned'}<br>
-<b>Cancelled: $items[$i]->{'withdrawn'}<br>
+printend
+;
+if ($items[$i]->{'wthdrawn'} eq '1'){
+  $items[$i]->{'wthdrawn'}="Yes";
+} else {
+  $items[$i]->{'wthdrawn'}="No";
+}
+print <<printend
+<b>Cancelled: $items[$i]->{'wthdrawn'}<br>
 <b>Total Issues:</b> $items[$i]->{'issues'}<br>
 <b>Group Number:</b> $bi <br>
 <b>Biblio number:</b> $bib <br>
