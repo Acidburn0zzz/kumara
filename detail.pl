@@ -13,6 +13,9 @@ my $input = new CGI;
 print $input->header;
 #whether it is called from the opac of the intranet
 my $type=$input->param('type');
+if ($type eq ''){
+  $type='intra';
+}
 #setup colours
 my $main;
 my $secondary;
@@ -25,6 +28,7 @@ if ($type eq 'opac'){
 }
 print startpage();
 print startmenu($type);
+#print $type;
 my $blah;
 my $bib=$input->param('bib');
 my $title=$input->param('title');
@@ -33,7 +37,7 @@ if ($type ne 'opac'){
 }
 
 
-my @items=ItemInfo(\$blah,$bib,$title);
+my @items=ItemInfo(\$blah,$bib,$type);
 my $dat=bibdata($bib);
 my $count=@items;
 my @temp=split('\t',$items[0]);

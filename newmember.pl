@@ -78,6 +78,7 @@ if ($insert eq ''){
    print mktablerow(2,'white',bold('Fee'),$data{'fee'});
    if ($data{'joining'} eq ''){
      $data{'joining'}=ParseDate('today');
+     $data{'joining'}=&UnixDate($data{'joining'},'%Y-%m-%d');
    }
    print mktablerow(2,'white',bold('Joining Date'),$data{'joining'});
    if ($data{'expiry'} eq ''){
@@ -89,6 +90,8 @@ if ($insert eq ''){
    print mktablerow(2,$main,bold('PERSONAL DETAILS'),"",$image);
    my $ethnic=$data{'ethnicity'}." ".$data{'ethnicnotes'};
    print mktablerow(2,'white',bold('Ethnicity'),$ethnic);
+   $data{'dateofbirth'}=ParseDate($data{'dateofbirth'});
+   $data{'dateofbirth'}=UnixDate($data{'dateofbirth'},'%Y-%m-%d');
    print mktablerow(2,'white',bold('Date of Birth'),$data{'dateofbirth'});
    my $sex;
    if ($data{'sex'} eq 'M'){

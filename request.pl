@@ -106,7 +106,7 @@ for ($i=0;$i<$count2;$i++){
   <TD>$stuff[6]</td>
   <TD>$stuff[4]
   </td>																								
-  <td></td>
+  <td>$stuff[9]</td>
   <td></td>
   <td></td>
   <td></td>
@@ -151,7 +151,9 @@ my $type=$reserves->[$i]{'constrainttype'};
 if ($type eq 'a'){
   $type='Next Available';
 } elsif ($type eq 'o'){
-  $type='This type only';
+  $type="This type only $reserves->[$i]{'biblioitemnumber'}";
+#  my @data=ItemInfo(\$blah,$reserves->[$i]{'borrowernumber'});
+  
 }
 print "<tr VALIGN=TOP  >
 <TD><select name=rank-request>

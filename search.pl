@@ -13,7 +13,10 @@ my $env;
 my $input = new CGI;
 print $input->header;
 #whether it is called from the opac of the intranet                                                            
-my $type=$input->param('type');                                                                                
+my $type=$input->param('type');                                                  
+if ($type eq ''){
+  $type = 'intra';
+}
 #setup colours                                                                                                 
 my $main;                                                                                                      
 my $secondary;                                                                                                 
@@ -135,7 +138,7 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/koha/search.pl?author=$word&type=$type";
       $stuff[0]=mklink($url,$stuff[0]);
-      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
+      my ($count,$lcount,$nacount,$fcount,$scount,$lostcount)=itemcount($env,$stuff[2],$type);
       $stuff[4]=$count;
       if ($nacount > 0){
         $stuff[5]=$stuff[5]."On Loan";
@@ -162,6 +165,13 @@ while ($i < $count2){
         $stuff[5]=$stuff[5]."Shannon";
          if ($scount >1 ){                                                                                                         
 	  $stuff[5]=$stuff[5]." ($scount)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";	
+      }
+      if ($lostcount > 0){
+        $stuff[5]=$stuff[5]."Lost";
+         if ($lostcount >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($lostcount)";                                                                                            
          }                                                                                                                         
 	 $stuff[5].=" ";	
       }

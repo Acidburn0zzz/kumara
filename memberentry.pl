@@ -72,7 +72,7 @@ print <<printend
 </td></tr>
 <tr valign=top bgcolor=white>
 <td><SELECT NAME="title" SIZE="1">
-<OPTION value=" ">
+<OPTION value=" ">No Title
 <OPTION value=Miss
 printend
 ;

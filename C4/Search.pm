@@ -455,13 +455,17 @@ sub subsearch {
 
 
 sub ItemInfo {
-  my ($env,$biblionumber)=@_;
+  my ($env,$biblionumber,$type)=@_;
   my $dbh = &C4Connect;
   my $query="Select * from items,biblio,biblioitems,branches 
   where (items.biblioitemnumber = biblioitems.biblioitemnumber)
   and biblioitems.biblionumber=biblio.biblionumber
   and biblio.biblionumber='$biblionumber' and branches.branchcode=
-  items.holdingbranch and items.itemlost<>1";
+  items.holdingbranch ";
+#  print $type;
+  if ($type ne 'intra'){
+    $query.=" and items.itemlost<>1";
+  }
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
@@ -477,7 +481,9 @@ sub ItemInfo {
       my @temp=split('-',$idata->{'date_due'});
       $datedue = "$temp[2]/$temp[1]/$temp[0]";
     }
-
+    if ($data->{'itemlost'} eq '1'){
+        $datedue='Itemlost';
+    }
     $isth->finish;
     my $class = $data->{'classification'};
     my $dewey = $data->{'dewey'};
@@ -494,7 +500,6 @@ sub ItemInfo {
     my @temp=split('-',$data->{'datelastseen'});
     my $date="$temp[2]/$temp[1]/$temp[0]";
 $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class\t$data->{'itemnumber'}\t$data->{'itemtype'}\t$date\t$data->{'biblioitemnumber'}\t$data->{'volumeddesc'}";
-
     $i++;
   }
   $sth->finish;
@@ -510,8 +515,7 @@ sub GetItems {
    #debug_msg($env,$query);
    my $sth=$dbh->prepare($query);
    $sth->execute;
-   #debug_msg($env,"executed query");
-      
+   #debug_msg($env,"executed query");      
    my $i=0;
    my @results;
    while (my $data=$sth->fetchrow_hashref) {
@@ -820,10 +824,13 @@ sub getboracctrecord {
 }
 
 sub itemcount { 
-  my ($env,$bibnum)=@_; 
+  my ($env,$bibnum,$type)=@_; 
   my $dbh=C4Connect;   
   my $query="Select * from items where     
-  biblionumber=$bibnum and itemlost <>1";       
+  biblionumber=$bibnum ";
+  if ($type ne 'intra'){
+    $query.=" and itemlost <>1";      
+  }
   my $sth=$dbh->prepare($query);         
   #  print $query;           
   $sth->execute;           
@@ -832,10 +839,11 @@ sub itemcount {
   my $nacount=0;                 
   my $fcount=0;
   my $scount=0;
+  my $lostcount=0;
   while (my $data=$sth->fetchrow_hashref){
     $count++;                     
     my $query2="select * from issues where itemnumber=                          
-    '$data->{'itemnumber'}' and returndate is NULL"; 
+    '$data->{'itemnumber'}' and returndate is NULL and itemlost <> 1"; 
     my $sth2=$dbh->prepare($query2);     
     $sth2->execute;         
     if (my $data2=$sth2->fetchrow_hashref){         
@@ -850,13 +858,16 @@ sub itemcount {
       if ($data->{'holdingbranch'} eq 'S' || $data->{'holdingbranch'} eq 'SP'){         
         $scount++;               
       }                       
+      if ($data->{'itemlost'} eq '1'){
+        $lostcount++;
+      }
 
     }                             
     $sth2->finish;     
   }                                 
   $sth->finish; 
   $dbh->disconnect;                   
-  return ($count,$lcount,$nacount,$fcount,$scount); 
+  return ($count,$lcount,$nacount,$fcount,$scount,$lostcount); 
 }
 
 sub ItemType {
