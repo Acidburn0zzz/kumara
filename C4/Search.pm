@@ -355,9 +355,9 @@ sub CatSearch  {
 	     $query="select count(*) from biblio
 	     where                            
 	     (biblio.title='$search->{'title'}' or (biblio.unititle = '$search->{'title'}'
-	     or biblio.unititle like '$search->{'title'}|%' or 
-	     biblio.unititle like '%|$search->{'title'}|%' or
-	     biblio.unititle like '%|$search->{'title'}'))";
+	     or biblio.unititle like '$search->{'title'} |%' or 
+	     biblio.unititle like '%| $search->{'title'} |%' or
+	     biblio.unititle like '%| $search->{'title'}'))";
 	   } else {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
