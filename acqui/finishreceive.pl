@@ -22,16 +22,20 @@ my $bibitemno=$input->param('biblioitemnum');
 my $replacement=$input->param('rrp');
 my $branch=$input->param('branch');
 my $bookfund=$input->param('bookfund');
-
+my $itemtype=$input->param('format');
+my $isbn=$input->param('ISBN');
 my $bookseller=$input->param('bookseller');
 my $title=$input->param('title');
 my $author=$input->param('author');
 my $copyright=$input->param('copyright');
-
+if ($quantrec !=0){
+  $cost=$cost/$quantrec;
+}
 my $gst=$input->param('gst');
 my $freight=$input->param('freight');
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
 modbiblio($biblio,$title,$author,$copyright);
+modbibitem($bibitemno,$itemtype,$isbn);
 my $barcode=$input->param('barcode');
 my @barcodes;
 if ($quantrec > 1){

@@ -13,7 +13,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&getorders &bookseller &breakdown &basket &newbasket &bookfunds
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
- &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems);
+ &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -283,7 +283,21 @@ sub modbiblio {
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
-  return($bibnum);
+    return($bibnum);
+
+}
+
+sub modbibitem {
+  my ($bibitemnum,$itemtype,$isbn)=@_;
+  my $dbh=C4Connect;
+  my $query="update biblioitems set itemtype='$itemtype',
+  isbn='$isbn' where
+  biblioitemnumber=$bibitemnum";
+  my $sth=$dbh->prepare($query);
+#    print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
 }
 
 sub newbiblioitem {
@@ -386,7 +400,7 @@ sub receiveorder {
   my $dbh=C4Connect;
   my $query="update aqorders set quantityreceived='$quantrec',
   datereceived=now(),booksellerinvoicenumber='$invoiceno',
-  biblioitemnumber=$bibitemno,unitprice=$cost,freight=$freight
+  biblioitemnumber=$bibitemno,unitprice='$cost',freight='$freight'
   where biblionumber=$biblio and ordernumber=$ordnum
   ";
 #  print $query;
