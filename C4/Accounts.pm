@@ -53,6 +53,19 @@ my $priv_func = sub {
 sub checkaccount  {
   #take borrower number
   #check accounts and list amounts owing
+  my ($bornumber,$dbh)=@_;
+  my $sth=$dbh->prepare("Select * from accountlines where
+  borrowernumber=$bornumber");
+  $sth->execute;
+  my $total=0;
+  while (my @data=$sth->fetchrow_array){
+    $total=$total+$data[8];
+  }
+  $sth->finish;
+  if ($total > 0){
+    print "borrower owes $total\n";
+  }
+  return($total);
 }    
 
 sub reconcileaccount {

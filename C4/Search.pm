@@ -55,12 +55,13 @@ my $priv_func = sub {
 sub CatSearch  {
   my ($searchstring,$type)=@_;
   my $dbh = &C4Connect;
-  my $query="Select * from biblio where $type like '%$searchstring%'";
+  my $query="Select * from catalogueentry where catalogueentry like
+  '%$searchstring%' and entrytype like '$type%'";
   print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   while (my @data=$sth->fetchrow_array){
-    print @data,"\n";
+    print "$data[0]\n";
   }
   $sth->execute;
   $sth->finish;

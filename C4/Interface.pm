@@ -3,7 +3,9 @@ package C4::Interface; #asummes C4/Interface
 #uses newt
 
 use strict;
-use Newt qw(:anchors :macros);
+use Curses;
+use Curses::Widgets;
+
 require Exporter;
 use DBI;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -52,25 +54,154 @@ sub userdialog{
  #create a dialog
  my ($type,$text)=@_;
  if ($type eq 'console'){
-    &newtdialog($text);
+   my ($mwh, $dwh); 
+   my ($colours); 
+   $mwh = new Curses; 
+   $colours = has_colors(); 
+   noecho(); 
+   cbreak(); 
+   halfdelay(10); 
+   $mwh->keypad(1);
+   init_colours();
+   main_win($mwh);
+   $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
+   dialog($text,'red',$dwh,$mwh);
+   grab_key($mwh);
+   my @input=&input($mwh,$text);
  }
 }
 
-sub newtdialog {
-  my ($text)=@_;
-  Newt::Init();
-  Newt::Cls();
-  Newt::DrawRootText(0, 0, "Get Item barcode");
-  my $label = Newt::Label($text);
-  my $width=10;
-  my $flags="oi";
-  my $entry = Newt::Entry($width, $flags);
-  my $main = Newt::Panel(1,2, 'Barcode')
-  ->Add(0, 0, $entry, NEWT_ANCHOR_LEFT, 0, 0, 0, 1)
-  ->Run(); 
-  my $data= $entry->Get();
-  Newt::Finished; 
-  return($data);
+sub main_win {
+  my ($mwh)=@_;
+  $mwh->erase();        
+  # This function selects a few common colours for the  foreground colour 
+  select_colour(\$mwh, 'red');
+  $mwh->box(ACS_VLINE, ACS_HLINE);        
+  $mwh->attrset(0);                
+  $mwh->standout();                        
+  $mwh->addstr(0, 1, "Welcome to the Kumara Issues Screen");             
+  $mwh->standend();
+  
+}              
+
+sub dialog {
+  my ($text, $colour,$dwh,$mwh) = @_;
+  my (@lines) = split(/\n/, $text);        
+  my ($i, $j, $line);                  
+  for ($i = 1; $i < 7; $i++) {     
+    if (defined ($lines[$i -1])) {                                
+      $line = $lines[$i -1] . "\n";
+    } else {                        
+      $line ="\n";                                          
+    }
+  $dwh->addstr($i, 2, $line);                
+  }                                
+  select_colour(\$dwh,$colour);                                         
+  $dwh->box(ACS_VLINE, ACS_HLINE);
+  $dwh->attrset(0);        
+  touchwin($mwh);                
+  $mwh->refresh();                        
+}        
+
+sub input{
+  my ($mwh,$text)=@_;
+  my ($text, $content) = txt_field(   'window'               => \$mwh, 
+  'title'   =>$text,                  
+  'xpos' => 1,     
+  'ypos'               => 9, 
+  'lines'              => 5,                             
+  'cols'               => $COLS - 4,                     
+  'content'    => ' ',                                   
+  'border' =>'green');
+  return($content);
 }
+
+sub grab_key {
+  my ($mwh)=@_;
+  my ($key) = -1;                                       
+  while ($key eq -1) {  
+    $key= $mwh->getch();                  
+  }                                       
+  
+  return $key;  
+}  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			
 END { }       # module clean-up code here (global destructor)

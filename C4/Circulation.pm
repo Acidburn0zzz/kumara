@@ -52,11 +52,14 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub Issue  {
-  my ($bornum)=@_;
+  #get borrowerbarcode from scanner
+  my $borcode=&scanborrower;
+#  print $bornum;
   my $dbh=&C4Connect;  
-  my $sth=$dbh->prepare("Select * from borrowers where borrowernumber=$bornum");
+  my $sth=$dbh->prepare("Select * from borrowers where barcode=$borcode");
   $sth->execute;
   my @borrower=$sth->fetchrow_array;
+  my $bornum=$borrower[0];
   $sth->finish;
   #process borrower traps (could be function)
   #check first GNA trap (no address this is the 22nd item in the table)
@@ -79,12 +82,12 @@ sub Issue  {
   #call overdue checker
   &checkoverdues($bornum);
   #check amountowing
-  my $amount=checkaccount($bornum);    #from C4::Accounts
+  my $amount=checkaccount($bornum,$dbh);    #from C4::Accounts
   #check if borrower has any items waiting
   &checkwaiting;
   #deal with any money still owing
   if ($amount > 0){
-    &reconcileamount($bornum);
+    &reconcileaccount($bornum,$dbh);
   }
   #deal with alternative loans
   #now check items
@@ -95,7 +98,7 @@ sub Issue  {
 
 sub processitems { 
   my ($bornum)=@_;
-  my $itemnum=&scan;
+  my $itemnum=&scanbook;
   my $dbh=&C4Connect;  
   my $sth=$dbh->prepare("Select * from items where barcode = '$itemnum'");
   $sth->execute;
@@ -136,12 +139,16 @@ sub checkoverdues{
 
 sub previousissue {
   my ($itemnum,$dbh)=@_;
-  my $sth=$dbh->prepare("Select borrowernumber from issues where itemnumber='$itemnum'");
+  my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
+  from issues,borrowers where 
+  issues.itemnumber='$itemnum' and
+  issues.borrowernumber=borrowers.borrowernumber");
   $sth->execute;
   my @borrower=$sth->fetchrow_array;
   $sth->finish;
   if ($borrower[0] ne ''){
-    print "book is issued to borrower $borrower[0]\n";
+    print "book is issued to borrower $borrower[0] $borrower[1] borrowernumber
+    $borrower[2]\n";
     return("out");
   } 
 }
@@ -152,10 +159,17 @@ sub checkwaiting{
 
 }
 
-sub scan {
+sub scanbook {
   #scan barcode
-  my $number='L01470967';  
-#  my $number=&userdialog('console','Please enter a book barcode');
+#  my $number='L01781778';  
+  my $number=&userdialog('console','Please enter a book barcode');
+  return ($number);
+}
+
+sub scanborrower {
+  #scan barcode
+#  my $number='L01781778';  
+  my $number=&userdialog('console','Please enter a borrower barcode');
   return ($number);
 }
 
