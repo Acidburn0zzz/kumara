@@ -216,8 +216,23 @@ sub KeywordSearch {
   for ($i=1;$i<$count;$i++){
     $query.=" and (notes like '$key[$i]%' or notes like '% $key[$i]%')";
   }
+  if ($search->{'keyword'} =~ /new zealand/i){
+    $query.= "or (title like 'nz%' or title like '% nz %' or title like '% nz' or subtitle like 'nz%'
+    or subtitle like '% nz %' or subtitle like '% nz' or author like 'nz %' 
+    or author like '% nz %' or author like '% nz')"
+  }
+  if ($search->{'keyword'} =~ /nz/i){
+    $query.= "or (title like 'new zealand%' or title like '% new zealand %'
+    or title like '% new zealand' or subtitle like 'new zealand%' or
+    subtitle like '% new zealand %'
+    or subtitle like '% new zealand' or author like 'new zealand%' 
+    or author like '% new zealand %' or author like '% new zealand' or 
+    seriestitle like 'new zealand%' or seriestitle like '% new zealand %'
+    or seriestitle like '% new zealand')"
+  }
+
   $query=$query.")) group by biblio.biblionumber order by author,title";
-#  print $query;
+  #print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $i=0;

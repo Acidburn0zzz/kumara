@@ -79,6 +79,7 @@ if ($itemnumber ne '' || $isbn ne ''){
       ($count,@results)=&KeywordSearch(\$blah,'intra',\%search,$num,$offset);
     } elsif ($search{'front'} ne '') {
     ($count,@results)&FrontSearch(\$blah,'intra',\%search,$num,$offset);
+    print "hey";
     }else {
       ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
 #            print "hey";
