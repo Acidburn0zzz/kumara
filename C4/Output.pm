@@ -12,7 +12,7 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
-&startmenu &endmenu &mkheadr &center &endcenter);
+&startmenu &endmenu &mkheadr &center &endcenter &mkform &bold);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -94,6 +94,19 @@ sub mktableft {
   return($string);
 }
 
+sub mkform{
+  my ($action,%inputs)=@_;
+  my $string="<form action=$action method=post>\n";
+  $string=$string.mktablehdr();
+  my $key;
+  while ( my ($key, $value) = each %inputs) {
+    $string=$string.mktablerow(2,'white',$key,"<input type=text name=$key value=\"$value\">");
+  }
+  $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
+  $string=$string.mktableft;
+  $string=$string."</form>";
+}
+
 sub endpage{
   my $string="</body></html>\n";
   return($string);
@@ -125,6 +138,12 @@ sub endcenter {
   my $string="</CENTER>\n";
   return ($string);
 }  
+
+sub bold {
+  my ($text)=@_;
+  my $string="<b>$text</b>";
+  return($string);
+}
 
 END { }       # module clean-up code here (global destructor)
     

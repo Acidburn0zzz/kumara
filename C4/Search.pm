@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&CatSearch &BornameSearch &ItemInfo);
+@EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -50,6 +50,40 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
+sub KeywordSearch {
+  my ($env,$type,$search,$num,$offset)=@_;
+  my $dbh = &C4Connect;
+  my $query="Select * from biblio,catalogueentry
+  where (catalogueentry.catalogueentry=biblio.author and
+  catalogueentry.entrytype='a' and catalogueentry.catalogueentry like
+  '$search->{'keyword'}%') union select * from biblio,catalogueentry where 
+  (catalogueentry.catalogueentry=biblio.title and 
+  catalogueentry.entrytype='t' and catalogueentry.catalogueentry like
+  '%$search->{'keyword'}%') order by biblio.title"; 
+  my $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  my $i=0;
+  my $count=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+    $count++;
+  }
+  $sth->finish;
+  $query=$query." limit $num,$offset";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+#  print $query;
+  while (my $data=$sth->fetchrow_hashref){
+     $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
+    $data->{'author'}";
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($count,@results);
+}
+
 sub CatSearch  {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
@@ -61,7 +95,10 @@ sub CatSearch  {
          and (catalogueentry.catalogueentry like '$search->{'author'}%') 
          and (entrytype = 'a'))";
          if ($search->{'title'} ne ''){
-    	   $query=$query."((catalogueentry.catalogueentry = biblio.title)
+	   $query= "Select biblionumber from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.author)
+            and (catalogueentry.catalogueentry like '$search->{'author'}%') 
+            and (entrytype = 'a')) intersect select biblionumber from
+            biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
            and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
            and (entrytype = 't'))";
 	 }

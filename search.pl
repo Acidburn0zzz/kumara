@@ -47,10 +47,20 @@ if ($itemnumber ne '' || $isbn ne ''){
   if ($subject ne ''){
     ($count,@results)=&CatSearch(\$blah,'subject',\%search,$num,$offset);
   } else {
-    ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
+    if ($keyword ne ''){
+      ($count,@results)=&KeywordSearch(\$blah,'intra',\%search,$num,$offset);
+    } else {
+      ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
+    }
   }
 }
-print "You searched on $title $author $keyword $subject $itemnumber $isbn, $count results found";
+print "You searched on ";
+while ( my ($key, $value) = each %search) {                                 
+  if ($value ne ''){
+    print bold("$key $value,");
+  }                          
+}
+print " $count results found";
 my $offset2=$num+$offset;
 print "<br> Results $offset to $offset2 displayed";
 print mktablehdr;
@@ -103,6 +113,11 @@ if ($offset < $count){
       $author=~ s/ /%20/g;
       $search=$search."&author=$author";
     }
+    if ($keyword ne ''){
+      $keyword=~ s/ /%20/g;
+      $search=$search."&keyword=$keyword";
+    }
+    
     my $stuff=mklink("/cgi-bin/kumara/search.pl?$search",'More');
     print $stuff;
 }

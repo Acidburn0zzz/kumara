@@ -12,7 +12,15 @@ my $input = new CGI;
 print $input->header;
 print startpage();
 print startmenu();
-print mktablehdr();
-print mktableft();
+my %inputs;
+
+$inputs{'Title'}='';
+$inputs{'Unititle'}='';
+$inputs{'Notes'}='';
+$inputs{'Author'}='';
+$inputs{'Series Title'}='';
+print mkform('wah',%inputs);
+#print mktablehdr();
+#print mktableft();
 print endmenu();
 print endpage();
