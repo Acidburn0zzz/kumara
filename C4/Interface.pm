@@ -20,7 +20,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
-&fmtstr &fmtdec);
+&selborrower &fmtstr &fmtdec);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -153,6 +153,21 @@ sub list {
   return($reason,$data);
 }
 
+
+sub selborrower {
+  my ($env,$dbh,@borrows,@bornums)=@_;
+  my $panel = Newt::Panel(1, 4, "Select Borrower");
+  my $li = Newt::Listbox(15,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  $li->Add(@borrows);
+  $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
+  $panel->AddHotKey(NEWT_KEY_F11);
+  my ($reason,$data)=$panel->Run();
+  my @stuff=$li->Get();
+  debug_msg("",@stuff[0]);
+  my $data=$stuff[0];
+  return($reason,$data);
+  }
+	      
 sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$amountowing)=@_;
   my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);

@@ -86,12 +86,12 @@ sub findborrower  {
 	my @borrows;
         my @bornums;
         while ($borrower= $sthb->fetchrow_hashref) {
-	   $borrows[$cntbor]=
-	     fmtstr(($borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
-	     ', '.$borrower->{'othernames'}),"L50");
+	   my $line = $borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
+	      ', '.$borrower->{'othernames'};
+	   @borrows[$cntbor] = fmtstr($env,$line,"L50");
 	   $bornums[$cntbor]=$borrower->{'borroernumber'};
-	   $cntbor++
-	}
+	   $cntbor++;
+       	}
 	if ($cntbor == 1)  {
            $bornum = $bornums[0];
 	} elsif ($cntbor > 0) {
