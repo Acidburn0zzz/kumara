@@ -101,7 +101,7 @@ for (my$i=0;$i<$numaccts;$i++){
   }
   print "<td>$accts->[$i]{'date'}</td>";
 #  print "<TD>$accts->[$i]{'accounttype'}</td>";
-  print "<TD>$accts->[$i]{'description'}</td>
+  print "<TD>$accts->[$i]{'description'} $accts->[$i]{'title'}</td>
   <TD>$amount</td><td>$amount2</td>
   </tr>";
 #}
