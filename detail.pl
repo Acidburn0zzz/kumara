@@ -55,7 +55,14 @@ if ($type ne 'opac'){
  print "background=\"/images/background-mem.gif\"";
 }
 print <<printend
-><B>BIBLIO RECORD $bib</TD></TR>
+><B>BIBLIO RECORD 
+printend
+;
+if ($type ne 'opac'){
+  print "$bib";
+}
+print <<printend
+</TD></TR>
 
 
 <tr VALIGN=TOP  >
