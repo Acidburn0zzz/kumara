@@ -61,7 +61,7 @@ print <<printend
 <td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>AMOUNT OWING</TD>
 </TR>
 <form action=/cgi-bin/koha/pay.pl method=post>
-
+<input type=hidden name=bornum value=$bornum>
 printend
 ;
 for (my $i=0;$i<$numaccts;$i++){
