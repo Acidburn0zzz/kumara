@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&FindReserves &CreateReserve);
+@EXPORT = qw(&FindReserves &CreateReserve &updatereserves);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -59,11 +59,11 @@ sub FindReserves {
   if ($bib ne ''){
     $query=$query." where reserves.biblionumber=$bib and
     reserves.borrowernumber=borrowers.borrowernumber and
-biblio.biblionumber=$bib";
+biblio.biblionumber=$bib and cancellationdate is NULL";
   } else {
     $query=$query." where borrowers.borrowernumber=$bor and
     reserves.borrowernumber=borrowers.borrowernumber and reserves.biblionumber
-    =biblio.biblionumber";
+    =biblio.biblionumber and cancellationdate is NULL";
   }
   $query.=" order by priority";
   my $sth=$dbh->prepare($query);
@@ -220,7 +220,24 @@ sub getnextacctno {
   return($nextaccntno);                   
 }              
 
-
+sub updatereserves{
+  #subroutine to update a reserve 
+  my ($rank,$biblio,$borrower,$del)=@_;
+  my $dbh=C4Connect;
+  my $query="Update reserves ";
+  if ($del ==0){
+    $query.="set  priority='$rank' where
+    biblionumber=$biblio and borrowernumber=$borrower";
+  } else {
+    $query.="set cancellationdate=now() where biblionumber=$biblio 
+    and borrowernumber=$borrower";
+  }
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  
+  $dbh->disconnect;
+}
 
 
 
