@@ -47,6 +47,7 @@ if ($existing eq 'no'){
 
 } else {
   $bibnum=$input->param('biblio');
+  $bibitemnum=$input->param('bibitemnum');
   modbiblio($bibnum,$title,$author,$copyright);
 
 }

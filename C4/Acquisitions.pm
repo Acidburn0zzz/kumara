@@ -358,7 +358,7 @@ sub neworder {
   ($bibnum,'$title',$ordnum,$basket,$quantity,$listprice,'$supplier',now(),
   '$who','$who','$notes',$bibitemnum)";
   my $sth=$dbh->prepare($query);
-#  print $query;
+  print $query;
   $sth->execute;
   $sth->finish;
   $query="insert into aqorderbreakdown (ordernumber,bookfundid) values
@@ -421,6 +421,9 @@ sub curconvert {
   $sth->finish;
   $dbh->disconnect;
   my $cur=$data->{'rate'};
+  if ($cur==0){
+    $cur=1;
+  }
   my $price=$price / $cur;
   return($price);
 }
