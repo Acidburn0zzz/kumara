@@ -46,7 +46,7 @@ Card Number: $data->{'cardnumber'}<BR>
 Membership: $data->{'categorycode'}<BR>
 Area: $data->{'area'}<BR>
 Fee:$30/year, Paid<BR>
-Joined: $data->{'dateenrolled'},  Expires: <BR>
+Joined: $data->{'dateenrolled'},  Expires: $data->{'expiry'} <BR>
 Joining Branch: Levin<P>
 Ethnicity: $data->{'ethnicity'}, $data->{'ethnotes'}<BR>
 DoB: $data->{'dateofbirth'}<BR>

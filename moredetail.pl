@@ -59,7 +59,7 @@ print <<printend
 <b>Biblionumber:</b> $bib<br>
 <b>Item Type:</b> $data->{'itemtype'}<br>
 <b>Loan Length:</b> $data->{'loanlength'}<br>
-<b>Rental Charge:</b> $data->{'rentalscharge'}<br>
+<b>Rental Charge:</b> $data->{'rentalcharge'}<br>
 <b>Classification:</b> $data->{'classification'}$data->{'dewey'}$data->{'subclass'}<br>
 <b>ISBN:</b> $data->{'isbn'}<br>
 <b>Publisher:</b> $data->{'publishercode'} <br>
