@@ -79,7 +79,7 @@ sub findborrower  {
         $sth->finish;
       } else {
         $sth->finish;
-	my $borquery = "Select * from borrowers where surname like '$borcode'";
+	my $borquery = "Select * from borrowers where surname ~* '$borcode'";
 	my $sthb =$dbh->prepare($borquery);
 	$sthb->execute;
 	my $cntbor = 0;
