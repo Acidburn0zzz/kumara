@@ -109,7 +109,7 @@ sub checkissue {
      if (my $issuerec=$sth->fetchrow_hashref) {
      $sth->finish;
      $query = "select * from borrowers where
-       (borrowernumber = '$issuerec->{'borrowernumber'}')";
+     (borrowernumber = '$issuerec->{'borrowernumber'}')";
      my $sth= $dbh->prepare($query);
      $sth->execute;
      $borrower = $sth->fetchrow_hashref;

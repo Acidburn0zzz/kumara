@@ -192,7 +192,8 @@ sub selborrower {
 
 sub returnwindow {
   my ($env,$title,$item,$items,$borrower,$amountowing)=@_;
-  my $panel    = Newt::Panel(5,10,$title);
+  my $panel    = Newt::Panel(1,4,$title);
+  my $panel2   = Newt::Panel(3,2,"");
   my $entry    = Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $accchk   = Newt::Checkbox("Accumulate", " ", " NY");
   my $la1      = Newt::Label("Total Amount");
@@ -204,12 +205,13 @@ sub returnwindow {
     $li1->Add($items->[$i]);
     $i++;
   }
-  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,0,$accchk,NEWT_ANCHOR_LEFT);
-  $panel->Add(2,0,$la1,NEWT_ANCHOR_RIGHT);
-  $panel->Add(2,1,$fee,NEWT_ANCHOR_RIGHT);
-  $panel->Add(0,2,$l1,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,3,$li1,NEWT_ANCHOR_LEFT);
+  $panel2->Add(0,0,$entry,NEWT_ANCHOR_LEFT);
+  $panel2->Add(1,0,$accchk,NEWT_ANCHOR_LEFT);
+  $panel2->Add(2,0,$la1,NEWT_ANCHOR_RIGHT);
+  $panel2->Add(2,1,$fee,NEWT_ANCHOR_RIGHT);
+  $panel->Add(0,0,$panel2,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,1,$l1,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,2,$li1,NEWT_ANCHOR_LEFT);
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
   my ($reason,$data)=$panel->Run();
