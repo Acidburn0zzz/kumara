@@ -54,7 +54,7 @@ win.document.write("</font></body></html>");
 <input type=hidden name=freight value=$freight>
 <input type=hidden name=gst value=$gst>
 <input type=image  name=submit src=/images/save-changes.gif border=0 width=187 height=42 align=right>
-<FONT SIZE=6><em>$results[0]->{'ordernumber'} - Recieve Order</em></FONT><br>
+<FONT SIZE=6><em>$results[0]->{'ordernumber'} - Receive Order</em></FONT><br>
 Shopping Basket For: $booksellers[0]->{'name'}
 <br> Order placed: $date
 <P>
@@ -170,7 +170,7 @@ print <<EOP
 </td>
 </tr>
 <TR VALIGN=TOP bgcolor=#ffffcc>
-<TD><B>Quantity Recieved *</B></td>
+<TD><B>Quantity Received *</B></td>
 <td><input type=text size=20 name=quantityrec value=$results[0]->{'quantityreceived'}>
 </td>
 </tr>
