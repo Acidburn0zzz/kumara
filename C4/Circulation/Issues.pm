@@ -74,8 +74,8 @@ sub Issue  {
       #C4::Circulation::Borrowers
       if ($reason ne "") {
         $done = $reason;
-      } elsif ($issuesallowed ne 1) {
-        error_msg($env,"No Issues Allowed");
+      } elsif ($issuesallowed eq "0") {
+        error_msg($env,"No Issues Allowed =$issuesallowed");
       } else {
         $env->{'bornum'} = $bornum;
         $env->{'bcard'}  = $borrower->{'cardnumber'};
