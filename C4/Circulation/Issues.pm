@@ -335,6 +335,15 @@ sub updateissues{
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
+  $query = "Select * from items where itemnumber=$itemno";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $item=$sth->fetchrow_hashref;
+  $sth->finish;
+  $item->{'issues'}++;
+  $query="Update items set issues=$items->{'issues'} where itemnumber=$itemno";
+  $sth->execute;
+  $sth->finish;
   #my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($datedue);
   my @datearr = split('-',$dateduef);
   my $dateret = join('-',$datearr[2],$datearr[1],$datearr[0]);
