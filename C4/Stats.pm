@@ -152,7 +152,7 @@ sub TotalPaid {
   } else {
     $query.=" and date='$time'";
   }
-  $query.=" order by timestamp";
+#  $query.=" order by timestamp";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -163,6 +163,7 @@ sub TotalPaid {
   }
    $sth->finish;
   $dbh->disconnect; 
+#  print $query;
   return(@results);
 }
 
@@ -171,7 +172,8 @@ sub getcharges{
   my $dbh=C4Connect;
   my $timestamp2=$timestamp-1;
   my $query="Select * from accountlines where borrowernumber=$borrowerno
-  and timestamp <= '$timestamp' and accounttype <> 'Pay'";
+  and timestamp <= '$timestamp' and accounttype <> 'Pay' and
+  accounttype <> 'W'";
   my $sth=$dbh->prepare($query);
 #  print $query,"<br>";
   $sth->execute;
