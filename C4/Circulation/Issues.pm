@@ -94,6 +94,7 @@ sub Issue  {
             &processitems($env,$bornum,$borrower,$items,
 	    $items2,$it2p,$amountdue,$itemsdet);
        }
+     #&endint($env);
      }
    }   
    $dbh->disconnect;
@@ -242,9 +243,9 @@ sub issueitem{
 	   if ($ans eq "Y") {
 	     my $rquery = "update reserves 
 	       set found = 'F'
-	       where reservedate = '$resrec->{'reservedate'}
-	       and borrowernumber = '$resrec->{'borrowernumber'}
-	       and biblionumber = '$resrec->{'biblionumber'}";
+	       where reservedate = '$resrec->{'reservedate'}'
+	       and borrowernumber = '$resrec->{'borrowernumber'}'
+	       and biblionumber = '$resrec->{'biblionumber'}'";
              my $rsth = $dbh->prepare($rquery);
 	     $rsth->execute;
              $rsth->finish;
