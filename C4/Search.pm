@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-#use C4::InterfaceCDK;
+use C4::InterfaceCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -243,7 +243,8 @@ sub ItemInfo {
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
-     $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class;
+
+$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class";
   
     $i++;
   }
