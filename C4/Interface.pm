@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&userdialog &resultout);
+@EXPORT = qw(&userdialog &resultout &startint &endint);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -50,11 +50,10 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
-sub userdialog{
- #create a dialog
- my ($type,$text)=@_;
- if ($type eq 'console'){
-   my ($mwh, $dwh); 
+sub startint {
+  my ($type)=@_;
+  if ($type eq 'console'){
+   my ($mwh); 
    my ($colours); 
    $mwh = new Curses; 
    $colours = has_colors(); 
@@ -64,33 +63,34 @@ sub userdialog{
    $mwh->keypad(1);
    init_colours();
    main_win($mwh);
-   $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
-   grab_key($mwh);
-   my $input=&input($mwh,$text);
-   endwin();
-   return($input);
-  }
- 
+   return($mwh);
+  } 
+}
+
+sub endint{
+  endwin();
+}
+
+sub userdialog{
+  #create a dialog
+  my ($type,$text,$mwh)=@_;
+  if ($type eq 'console'){
+    main_win($mwh);
+    my$dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
+#   grab_key($mwh);
+    my $input=&input($mwh,$text);
+    return($input);
+  } 
 }
 
 sub resultout{
   #outputsome results
-  my ($type,$results)=@_;
+  my ($type,$results,$mwh)=@_;
   if ($type eq 'console'){
-   my ($mwh, $dwh); 
-   my ($colours); 
-   $mwh = new Curses; 
-   $colours = has_colors(); 
-   noecho(); 
-   cbreak(); 
-   halfdelay(10); 
-   $mwh->keypad(1);
-   init_colours();
    main_win($mwh);
-   $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
+   my $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
    dialog($results,'red',$dwh,$mwh);
    grab_key($mwh); 
-   endwin();
   }
 }
 
@@ -104,7 +104,6 @@ sub main_win {
   $mwh->standout();                        
   $mwh->addstr(0, 1, "Welcome to the Kumara Issues Screen");             
   $mwh->standend();
-  
 }              
 
 sub dialog {
