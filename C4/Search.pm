@@ -372,7 +372,7 @@ sub CatSearch  {
 	$sth1->finish;
       }
   }
-print $query;
+#print $query;
   my $sth=$dbh->prepare($query);
 #  if ($search->{'isbn'} eq ''){
     $sth->execute;
@@ -862,37 +862,29 @@ sub getboracctrecord {
    my ($env,$params) = @_;
    my $dbh=C4Connect;
    my @acctlines;
-   my $numlines;
-   my $query = "Select * from accountlines,items,biblio
-   where (borrowernumber = $params->{'borrowernumber'}) and
-   ((accountlines.itemnumber=items.itemnumber and
-   items.biblionumber=biblio.biblionumber))
-   order by date desc";
+   my $numlines=0;
+   my $query= "Select * from accountlines where borrowernumber=$params->{'borrowernumber'} order by date desc";
    my $sth=$dbh->prepare($query);
 #   print $query;
    $sth->execute;
    my $total=0;
    while (my $data=$sth->fetchrow_hashref){
+#      if ($data->{'itemnumber'} ne ''){
+#        $query="Select * from items,biblio where items.itemnumber=
+#	'$data->{'itemnumber'}' and biblio.biblionumber=items.biblionumber";
+#	my $sth2=$dbh->prepare($query);
+#	$sth2->execute;
+#	my $data2=$sth2->fetchrow_hashref;
+#	$sth2->finish;
+#	$data=$data2;
+ #     }
       $acctlines[$numlines] = $data;
       $numlines++;
       $total = $total+ $data->{'amountoutstanding'};
    }
    $sth->finish;
-   $query="Select * from accountlines where
-   borrowernumber=$params->{'borrowernumber'} and (itemnumber is NULL or
-   itemnumber=0) order by
-   date desc";
-   $sth=$dbh->prepare($query);
-   $sth->execute;
-   while (my $data=$sth->fetchrow_hashref){
-      $acctlines[$numlines] = $data;
-      $numlines++;
-      $total = $total+ $data->{'amountoutstanding'};
-   }
-      $sth->finish;
    $dbh->disconnect;
    return ($numlines,\@acctlines,$total);
-
 }
 
 sub itemcount { 
