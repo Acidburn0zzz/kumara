@@ -1,6 +1,8 @@
 package C4::Output; #asummes C4/Output
 
 #package to deal with marking up output
+#You will need to edit parts of this pm
+#set the value of path to be where your html lives
 
 use strict;
 require Exporter;
@@ -38,9 +40,11 @@ my @more   = ();
 # all file-scoped lexicals must be created before
 # the functions below that use them.
 
-# file-private lexicals go here
-my $priv_var    = '';
-my %secret_hash = ();
+#
+# Change this value to reflect where you will store your includes
+#
+my $path="/usr/local/www/hdl/htdocs/includes";
+
 
 # here's a file-private function as a closure,
 # callable as &$priv_func;  it cannot be prototyped.
@@ -64,19 +68,20 @@ sub gotopage{
 
 
 sub startmenu{
+  # edit the paths in here
   my ($type)=@_;
   if ($type eq 'issue') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc') || die;
+    open (FILE,'$path/issues-top.inc') || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-top.inc') || die;
+    open (FILE,'$path/opac-top.inc') || die;
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-top.inc') || die;
+    open (FILE,'$path/members-top.inc') || die;
   } elsif ($type eq 'acquisitions'){
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-top.inc') || die;
+    open (FILE,'$path/aquisitions-top.inc') || die;
   } elsif ($type eq 'report'){
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/reports-top.inc') || die;
+    open (FILE,'$path/reports-top.inc') || die;
   } else {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc') || die;
+    open (FILE,'$path/cat-top.inc') || die;
   }
   my @string=<FILE>;
   close FILE;
@@ -89,17 +94,17 @@ sub startmenu{
 sub endmenu{
   my ($type)=@_;
   if ($type eq 'issue'){
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc') || die;
+    open (FILE,'$path/issues-bottom.inc') || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-bottom.inc') || die;
+    open (FILE,'$path/opac-bottom.inc') || die;
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-bottom.inc') || die;
+    open (FILE,'$path/members-bottom.inc') || die;
   } elsif ($type eq 'acquisitions') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-bottom.inc') || die;
+    open (FILE,'$path/aquisitions-bottom.inc') || die;
   } elsif ($type eq 'report') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/reports-bottom.inc') || die;
+    open (FILE,'$path/reports-bottom.inc') || die;
   } else {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc') || die;
+    open (FILE,'$path/cat-bottom.inc') || die;
   }
   my @string=<FILE>;
   close FILE;
