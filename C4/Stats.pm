@@ -53,14 +53,14 @@ my $priv_func = sub {
 
 sub UpdateStats {
   #module to insert stats data into stats table
-  my ($env,$branch,$type,$amount,$other)=@_;
+  my ($env,$branch,$type,$amount,$other,$itemnum)=@_;
   my $dbh=C4Connect();
   my $branch=$env->{'branchcode'};
   my $user = $env->{'usercode'};
   my $sth=$dbh->prepare("Insert into statistics
-     (datetime,branch,type,usercode,value,other) 
+     (datetime,branch,type,usercode,value,other,itemnumber) 
      values (now(),'$branch',
-     '$type','$user','$amount','$other')");
+     '$type','$user','$amount','$other','$itemnumber')");
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
