@@ -37,6 +37,7 @@ while ( my ($key, $value) = each %inp){
   }
 }
 #print $input->header;
+$bornum=$input->param('bornum');
 print $input->redirect("/cgi-bin/koha/pay.pl?bornum=$bornum");
 
 #needs to be shifted to a module when time permits
