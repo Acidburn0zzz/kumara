@@ -71,7 +71,7 @@ sub remoteprint {
   print PRINTER "Fax:    367-9218\r\n";   
   print PRINTER "Email:  renewals\@library.org.nz\r\n\r\n\r\n";
   print PRINTER "$borrower->{'cardnumber'}\r\n";
-  print PRINTER "$borrower->{'firstname'} $borrower->{'surname'}\r\n";
+  print PRINTER "$borrower->{'title'} $borrower->{'initials'} $borrower->{'surname'}\r\n";
   while ($items->[$i]){
     my $itemdata = $items->[$i];
     print PRINTER "$itemdata->{'title'}\r\n";
