@@ -1,3 +1,6 @@
+
+
+
 package C4::Reserves; #asummes C4/Reserves
 
 #requires DBI.pm to be installed
@@ -6,6 +9,7 @@ package C4::Reserves; #asummes C4/Reserves
 use strict;
 require Exporter;
 use DBI;
+use C4::Database;
 use C4::Format;
 use C4::Interface;
 use C4::Interface::Reserveentry;
@@ -59,70 +63,91 @@ sub EnterReserves{
   my @fldlens = ("5","15","15","50","50","50","50");
   my ($reason,$num,$itemnumber,$isbn,$title,$keyword,$author,$subject) =
      FindBiblioScreen($env,"Reserves",7,\@flds,\@fldlens);
-  my %search;
-  #debug_msg($env,"ti $title");
-  #debug_msg($env,"key $keyword");
-  #debug_msg($env,"au $author");
-  #debug_msg($env,"su $subject");
-  $search{'title'}= $title;
-  $search{'keyword'}=$keyword;
-  $search{'author'}=$author;
-  $search{'subject'}=$subject;
-  $search{'item'}=$itemnumber;
-  $search{'isbn'}=$isbn;
-  my @results;
-  my $count;
-  if ($num < 1 ) {
-    $num = 30;
-  }
-  my $offset = 0;
-  titlepanel($env,"Reserves","Searching");
-  if ($itemnumber ne '' || $isbn ne ''){
-    ($count,@results)=&CatSearch($env,'precise',\%search,$num,$offset);
-  } else {
-    if ($subject ne ''){
-      ($count,@results)=&CatSearch($env,'subject',\%search,$num,$offset);
+  debug_msg($env,"reason $reason");
+  my $donext ="Circ";
+  if ($reason ne "1") {
+    $donext = $reason;
+  } else {  
+    my %search;
+    #debug_msg($env,"ti $title");
+    #debug_msg($env,"key $keyword");
+    #debug_msg($env,"au $author");
+    #debug_msg($env,"su $subject");
+    $search{'title'}= $title;
+    $search{'keyword'}=$keyword;
+    $search{'author'}=$author;
+    $search{'subject'}=$subject;
+    $search{'item'}=$itemnumber;
+    $search{'isbn'}=$isbn;
+    my @results;
+    my $count;
+    if ($num < 1 ) {
+      $num = 30;
+    }
+    my $offset = 0;
+    titlepanel($env,"Reserves","Searching");
+    if ($itemnumber ne '' || $isbn ne ''){
+      ($count,@results)=&CatSearch($env,'precise',\%search,$num,$offset);
     } else {
-      if ($keyword ne ''){
-        ($count,@results)=&KeywordSearch($env,'intra',\%search,$num,$offset);
-      } else { 
-        ($count,@results)=&CatSearch($env,'loose',\%search,$num,$offset);
+      if ($subject ne ''){
+        ($count,@results)=&CatSearch($env,'subject',\%search,$num,$offset);
+      } else {
+        if ($keyword ne ''){
+          ($count,@results)=&KeywordSearch($env,'intra',\%search,$num,$offset);
+        } else { 
+          ($count,@results)=&CatSearch($env,'loose',\%search,$num,$offset);
+        }
       }
     }
+    my $no_ents = @results;
+    my $biblionumber;
+    if ($no_ents > 0) {
+      if ($no_ents > 1) {
+        my %biblio_xref;
+        my @bibtitles;
+        my $i = 0;
+        my $line;
+        while ($i < $no_ents) {
+          my @ents = split("\t",@results[$i]);
+          $line = fmtstr($env,@ents[1],"L60");
+	  my $auth = substr(@ents[2],0,20);
+	  substr($line,(60-length($auth)-2),length($auth)+2) = "  ".$auth;
+          @bibtitles[$i]=$line;	 
+          $biblio_xref{$line}=@ents[0];
+          $i++;
+        }
+        titlepanel($env,"Reserves","Select Title");
+        my ($results,$bibres)  =  SelectBiblio($env,$count,\@bibtitles);
+        if ($results ne 1) {
+  	  $biblionumber = $biblio_xref{$bibres};
+          if ($biblionumber eq "")  {
+            error_msg($env,"No item selected");
+          } else {
+	    $donext = $results;
+	  }  
+	}  
+      } else  {
+        my @ents = split("\t",@results[0]);
+        $biblionumber  = @ents[0];
+      }
+      if ($biblionumber ne "") {
+        my @items = GetItems($env,$biblionumber);
+        my $cnt_it = @items;
+        error_msg($env,"$cnt_it items found");
+	my $dbh = &C4Connect;
+        my $query = "Select * from biblio where biblionumber = $biblionumber";
+	my $sth = $dbh->prepare($query);
+	$sth->execute;
+	my $data=$sth->fetchrow_hashref;
+	titlepanel($env,"Reserves","Create Reserve");
+	my ($reason) = MakeReserveScreen($env, $data, \@items);
+	
+      }
+    } else {
+      error_msg($env,"No items found"); 
+    }
   }
-  my $no_ents = @results;
-  my $biblionumber;
-  if ($no_ents > 1) {
-    my %biblio_xref;
-    my @bibtitles;
-    my $i = 0;
-    while ($i < $no_ents) {
-       my @ents = split("\t",@results[$i]);
-       my $line;
-       my $totlen = length(@ents[1]) + length(@ents[2]);
-       if ($totlen < 60) {
-         $line = join(": ",@ents[1],@ents[2]);
-       } else {
-	 my $len2 = length(@ents[2]);
-	 if ($len2 > 20) {
-	   $line = join(": ",substr(@ents[1],0,40),@ents[2]);
-	 } else {
-	   $line = join(": ",substr(@ents[1],1,(59-$len2)),@ents[2])
-         }
-         $line = substr($line,0,60);
-       }
-       @bibtitles[$i]=$line;	 
-       $biblio_xref{$line}=@ents[0];
-       $i++;
-     }
-     titlepanel($env,"Reserves","Select Title");
-     my ($results,$bibres)  =  SelectBiblio($env,$count,\@bibtitles);
-     debug_msg($env,$bibres);
-     $biblionumber = $biblio_xref{$bibres};
-   } elsif ($no_ents = 1) {
-     my @ents = split("\t",@results[0]);
-     $biblionumber  = @ents[0];
-   } 
+  return ($donext);
   
 }
 

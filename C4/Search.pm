@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-
+use C4::Interface;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -15,7 +15,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
-&itemdata &bibdata); 
+&itemdata &bibdata &GetItems); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -93,6 +93,7 @@ sub CatSearch  {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
   my $query = '';
+  my $title = lc($search->{'title'}); 
   if ($type eq 'loose') {
 #      $query="Select count(*) from biblio,catalogueentry"; 
       if ($search->{'author'} ne ''){
@@ -100,7 +101,7 @@ sub CatSearch  {
          biblio,catalogueentry
          where (catalogueentry.entrytype='a' and 
 	 (catalogueentry.catalogueentry = biblio.author)	 
-         and (catalogueentry.catalogueentry ~* '$search->{'author'}')) union
+         and (lower(catalogueentry.catalogueentry) ~* lower('$search->{'author'}'))) union
 	 select biblio.biblionumber,title,author from biblio,biblioanalysis
          where	 biblioanalysis.analyticalauthor ~* '$search->{'author'}'
 	 and biblioanalysis.biblionumber=
@@ -109,16 +110,31 @@ sub CatSearch  {
 #	 }
       } else {
           if ($search->{'title'} ne ''){
-    	   $query="select biblio.biblionumber,title,author from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
-           and (catalogueentry.catalogueentry ~* '^$search->{'title'}') 
-           and (entrytype = 't')) union select
-           biblio.biblionumber,title,author from
-	   biblioanalysis,biblio where analyticaltitle ~*
-           '^$search->{'title'}' and
-biblio.biblionumber=biblioanalysis.biblionumber
-           union select biblio.biblionumber,title,author from
-           biblio,bibliosubtitle where subtitle ~* '^$search->{'title'}' and
-           biblio.biblionumber=bibliosubtitle.biblionumber";
+    	    $query="select biblio.biblionumber,title,author
+       	    from biblio,catalogueentry where
+	    (lower(catalogueentry.catalogueentry) = '$title'
+	    and entrytype = 't') 
+	    and
+	    (catalogueentry.catalogueentry = biblio.title)"
+	   #union select
+           #biblio.biblionumber,title,author from
+	   #biblioanalysis,biblio where analyticaltitle ~*
+           #'^$search->{'title'}' and
+           #biblio.biblionumber=biblioanalysis.biblionumber
+           #union select biblio.biblionumber,title,author from
+           #biblio,bibliosubtitle where subtitle ~* '^$search->{'title'}' and
+           #biblio.biblionumber=bibliosubtitle.biblionumber";
+	   #$query="select biblio.biblionumber,title,author from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
+           #and (lower(catalogueentry.catalogueentry) ~* lower('^$search->{'title'}')) 
+           #and (entrytype = 't')) union select
+           #biblio.biblionumber,title,author from
+	   #biblioanalysis,biblio where analyticaltitle ~*
+           #'^$search->{'title'}' and
+           #biblio.biblionumber=biblioanalysis.biblionumber
+           #union select biblio.biblionumber,title,author from
+           #biblio,bibliosubtitle where subtitle ~* '^$search->{'title'}' and
+           #biblio.biblionumber=bibliosubtitle.biblionumber";
+	 
 	 }
       }
   } 
@@ -131,8 +147,9 @@ biblio.biblionumber=biblioanalysis.biblionumber
    	    $query=$query." where ";
 	 }
 	 $search->{'subject'}=uc $search->{'subject'};
-	 $query=$query." ((catalogueentry.catalogueentry = bibliosubject.subject)        
-	 and (catalogueentry.catalogueentry like '$search->{'subject'}%') 
+	 $query=$query." ((lower(catalogueentry.catalogueentry) = lower(bibliosubject.subject))        
+	 and (lower(catalogueentry.catalogueentry) like
+lower('$search->{'subject'}%')) 
 	 and (entrytype = 's'))"; 
       }
    }
@@ -254,7 +271,8 @@ sub ItemInfo {
     if (my $idata=$isth->fetchrow_hashref){
       $datedue = $idata->{'date_due'};
     }
-    $isth->finish;
+
+$isth->finish;
 
 $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
      $i++;
@@ -264,6 +282,43 @@ $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchnam
   return(@results);
 }
 
+sub GetItems {
+   my ($env,$biblionumber)=@_;
+   my $dbh = &C4Connect;
+   my $query = "Select * from biblioitems where (biblionumber = $biblionumber)";
+   my $sth=$dbh->prepare($query);
+   $sth->execute;
+   debug_msg($env,"executed query");
+      
+   my $i=0;
+   my @results;
+   while (my $data=$sth->fetchrow_hashref) {
+      debug_msg($env,$data->{'biblioitemnumber'});
+      my $line = $data->{'biblioitemnumber'}."\t".$data->{'itemtype'};
+      $line = $line."\t$data->{'classification'}\t$data->{'dewey'}";
+      $line = $line."\t$data->{'subclass'}\t$data->{isbn}";
+      $line = $line."\t$data->{'volume'}\t$data->{number}";
+      my $isth= $dbh->prepare("select * from items where biblioitemnumber = $data->{'biblioitemnumber'}");
+      $isth->execute;
+      while (my $idata = $isth->fetchrow_hashref) {
+        my $iline = $idata->{'barcode'}."[".$idata->{'holdingbranch'}."[";
+	if ($idata->{'notforloan'} = 1) {
+	  $iline = $iline."NFL ";
+	}
+	if ($idata->{'itemlost'} = 1) {
+	  $iline = $iline."LOST ";
+	}        
+        $line = $line."\t$iline"; 
+      }
+      $isth->finish;
+      $results[$i] = $line;
+      $i++;      
+   }
+   $sth->finish;
+   $dbh->disconnect;
+   return(@results);
+}	     
+  
 sub itemdata {
   my ($barcode)=@_;
   my $dbh=C4Connect;
