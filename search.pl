@@ -85,10 +85,18 @@ print " $count results found";
 my $offset2=$num+$offset;
 print "<br> Results $offset to $offset2 displayed";
 print mktablehdr;
-if ($subject ne ''){
-  print mktablerow(1,$main,'<b>SUBJECT</b>');
+if ($type ne 'opac'){
+  if ($subject ne ''){
+   print mktablerow(1,$main,'<b>SUBJECT</b>','/images/background-mem.gif');
+  } else {
+   print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'),'/images/background-mem.gif');
+  }
 } else {
-  print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'),'/images/background-mem.gif');
+  if ($subject ne ''){
+   print mktablerow(1,$main,'<b>SUBJECT</b>');
+  } else {
+   print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'));
+  }
 }
 my $count2=@results;
 #print $count2;
@@ -137,7 +145,11 @@ while ($i < $count2){
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;','/images/background-mem.gif');
+if ($type ne 'opac'){
+ print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;','/images/background-mem.gif');
+} else {
+ print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp; ');
+}
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset&type=$type";
