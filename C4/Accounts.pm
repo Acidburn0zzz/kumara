@@ -60,7 +60,7 @@ sub checkaccount  {
   $sth->execute;
   my $total=0;
   while (my $data=$sth->fetchrow_hashref){
-    $total=$total+$data->{'amountoutstanding'};
+    $total=$total+$data->{'amount'};
   }
   $sth->finish;
   if ($total > 0){
@@ -90,7 +90,7 @@ sub reconcileaccount {
   output (1,3,"Item\tDate\tDescription\tAmount");
   while (my $data=$sth->fetchrow_hashref){
     my $line=$i+1;
-    my $amount=0+$data->{'amountoutstanding'};
+    my $amount=0+$data->{'amount'};
     $text="$line\t$data->{'date'}\t$data->{'description'}\t$amount";
     output (1,$row,$text);
     $row++;
@@ -140,10 +140,12 @@ sub recordpayment{
      set amountoutstanding = $newamtos";
      my $usth = $dbh->prepare($query);
      $usth->execute;
+     $usth->finish;
      $updquery = "insert into accountoffsets 
     (borrowernumber, accountno, offsetaccount,  offsetamount)
-     values ($bornumber,$accdata->{'accountno'},$nextaccntno,$newamtos";
+     values ($bornumber,$accdata->{'accountno'},$nextaccntno,$newamtos)";
      my $usth = $dbh->prepare($query);
+#     print $updquery
      $usth->execute;
      $usth->finish;
   }
