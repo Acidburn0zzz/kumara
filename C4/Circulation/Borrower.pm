@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&findborrower);
+@EXPORT = qw(&findborrower &Borenq);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -164,6 +164,14 @@ sub checktraps {
   }
   return ($issuesallowed);
 }
-    
+
+sub Borenq {
+  my ($env)=@_;
+  my $dbh=C4Connect;
+  #get borrower guff
+  my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
+  my ($data,$reason)=&borrowerwindow($env,$borrower);
+#  debug_msg("",$borrower->{'surname'});
+}  
 
 END { }       # module clean-up code here (global destructor)

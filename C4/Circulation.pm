@@ -9,6 +9,7 @@ use C4::Database;
 use C4::Circulation::Issues;
 use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
+use C4::Circulation::Borrower;
 use C4::Interface;
 use C4::Security;
 
@@ -65,17 +66,19 @@ sub Start_circ{
     ('Issues','Returns','Borrower Enquiries','Log In'));
 
     if ($data eq 'Issues') {  
-      $donext=Issue($env);
+      $donext=Issue($env); #C4::Circulation::Issues
     } elsif ($data eq 'Returns') {
-      $donext=Returns($env);
+      $donext=Returns($env); #C4::Circulation::Returns
     } elsif ($data eq 'Log In') {
-    debug_msg("","New user"); 
+    debug_msg("","New user"); #C4::Security
       &endint($env);
       &Login($env);
       &startint($env,'Circulation');
     } elsif ($data eq 'Quit') { 
       $donext = $data;
-    }  
+    }  elsif ($data eq 'Borrower Enquiries'){
+      $donext=Borenq($env); #C4::Circulation::Borrower
+    }
     debug_msg($env,"donext -  $donext");
   }
   &endint($env)  

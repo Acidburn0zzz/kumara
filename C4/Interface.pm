@@ -22,7 +22,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
-&selborrower &fmtstr &fmtdec &returnwindow &logondialog);
+&selborrower &fmtstr &fmtdec &returnwindow &logondialog &borrowerwindow);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -232,7 +232,26 @@ sub returnwindow {
   my $stuff=$entry->Get();
   return($reason,$stuff);
 }
+sub borrowerwindow {
+  my ($env,$borrower)=@_;
+  my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $label=Newt::Label("Borrower");
+  my $l1=Newt::Label("$borrower->{'firstname'} $borrower->{'surname'}");
+  my $l2=Newt::Label("Street Address: $borrower->{'streetaddress'}");
+  my $l3=Newt::Label("Suburb: $borrower->{'suburb'}");
+  my $l4=Newt::Label("City: $borrower->{'city'}");
+  my $l5=Newt::Label("Email: $borrower->{'email'}");
+  my $panel=Newt::Panel(10,10,'Borrower');
+  $panel->Add(0,0,$label);
+  $panel->Add(0,1,$l1);
+  $panel->Add(0,2,$l2);
+  $panel->Add(0,3,$l3);
+    $panel->Add(0,4,$l4);
+      $panel->Add(0,5,$l5);
+  $panel->Add(0,6,$entry);
+  my ($reason,$data)=$panel->Run();
   
+}  
   
 sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$amountowing)=@_;
@@ -293,6 +312,8 @@ sub issuewindow {
   my $stuff=$entry->Get();
   return($stuff,$reason);
 }
+
+
 
 
 sub dialog {
