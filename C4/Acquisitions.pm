@@ -15,7 +15,8 @@ $VERSION = 0.01;
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
 &getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
-&findall &needsmod &delitem &delbibitem &delbiblio &delorder &branches);
+&findall &needsmod &delitem &delbibitem &delbiblio &delorder &branches
+&getallorders);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -109,6 +110,28 @@ sub invoice {
   return($i,@results);
 }
 
+sub getallorders {
+  #gets all orders from a certain supplier, orders them alphabetically
+  my ($supid)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from aqorders,biblio,biblioitems where booksellerid='$supid'
+  and (cancelledby is NULL or cancelledby = '')
+  and biblio.biblionumber=aqorders.biblionumber and biblioitems.biblioitemnumber=                    
+  aqorders.biblioitemnumber group by aqorders.biblioitemnumber order by
+  biblio.title";
+  my $i=0;
+  my @results;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+}
+
 sub ordersearch {
   my ($search,$biblio)=@_;
   my $dbh=C4Connect;
@@ -157,7 +180,7 @@ sub ordersearch {
 sub bookseller {
   my ($searchstring)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from aqbooksellers where name like '$searchstring%' or
+  my $query="Select * from aqbooksellers where name like '%$searchstring%' or
   id = '$searchstring'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
