@@ -13,7 +13,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&UpdateStats &statsreport &Count);
+@EXPORT = qw(&UpdateStats &statsreport &Count &Overdues &TotalOwing);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -99,22 +99,34 @@ sub issuesrep {
 sub Count {
   my ($type,$time)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from statistics where type='$type'";
+  my $query="Select count(*) from statistics where type='$type'";
   if ($time eq 'today'){
     $query=$query." and datetime
     >=datetime('yesterday'::date)";
   }
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  my $i=0;
-  while (my $data=$sth->fetchrow_hashref){
-    $i++;
-  }
+  my $data=$sth->fetchrow_hashref;
   $sth->finish;
 #  print $query;
   $dbh->disconnect;
-  return($i);
+  return($data->{'count'});
+}
 
+sub Overdues{
+  my $dbh=C4Connect;
+  my $query="Select count(*) from issues where datetime(date_due::date) > datetime('yesterday'::date)";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $count=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($count->{'count'});  
+}
+
+sub TotalOwing{
+  my $dbh=C4Connect;
+  $dbh->disconnect; 
 }
 
 END { }       # module clean-up code here (global destructor)
