@@ -315,7 +315,7 @@ sub actloanlength {
       my $date = ParseDate($loanlength);
       if ( $date > ParseDate('today')){
         $validdate="Y";
-	my $fdate = substr($date,0,4).'-'.substr($date,4,2).'-'.substr($date,4,2);
+	my $fdate = substr($date,0,4).'-'.substr($date,4,2).'-'.substr($date,6,2);
 	#debug_msg($env,"$date $fdate");
         $env->{'loanlength'} = $fdate;
       } else { 
