@@ -169,11 +169,10 @@ sub MakeReserveScreen {
     my @blarr = split("\t",$bitline);
     my $line = @blarr[1]." ".@blarr[2];
     if (@blarr[3] > 0) {
-      my $line = @blarr[3];
+      my $line = $line.@blarr[3];
     }
-    my $line = @blarr[4]." ".@blarr[5];
+    my $line = $line.@blarr[4]." ".@blarr[5];
     $line = fmtstr($env,$line,"L40");
-    debug_msg($env,$i." ".$line);
     $bitx{$line} = @blarr[0];  
     $itemlist->Add($line);
     $i++;
@@ -186,8 +185,8 @@ sub MakeReserveScreen {
   $panel4->Add(0,1,$constraint,NEWT_ANCHOR_TOP);
   $panel->Add(0,0,$panel2);
   $panel->Add(0,1,$panel3);
-  $panel3->Add(0,0,$panel4,NEWT_ANCHOR_TOP);
-  $panel3->Add(1,0,$itemlist);
+  $panel3->Add(0,0,$panel4,NEWT_ANCHOR_LEFT);
+  $panel3->Add(1,0,$itemlist,NEWT_ANCHOR_RIGHT);
   Newt::PushHelpLine('F11 Menu:  F2 Issues:  F3 Returns:  F4 Reserves');
   $panel->AddHotKey(NEWT_KEY_F2);
   $panel->AddHotKey(NEWT_KEY_F3);

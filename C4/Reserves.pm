@@ -139,17 +139,41 @@ sub EnterReserves{
 	my $sth = $dbh->prepare($query);
 	$sth->execute;
 	my $data=$sth->fetchrow_hashref;
+	$sth->finish;
 	titlepanel($env,"Reserves","Create Reserve");
-	my ($reason) = MakeReserveScreen($env, $data, \@items);
-	
+	my ($reason,$borrnum,$branch,$constraint,$bibitems) = MakeReserveScreen($env, $data, \@items);
+	$borrnum="102";
+	if ($borrnum ne "") {
+          CreateReserve($env,$dbh,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
+	  $dbh->disconnect;
+        }
+      } else {
+        error_msg($env,"No items found"); 
       }
-    } else {
-      error_msg($env,"No items found"); 
     }
   }
-  return ($donext);
-  
+  return ($donext);  
 }
+  sub CreateReserve {
+  my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
+  my $dbh = &C4Connect;
+  
+  $dbh->{RaiseError} = 1;
+  $dbh->{AutoCommit} = 0;
+  eval {	   
+    # updates take place here
+    #my $sth=
+    $dbh->commit();
+  };
+  if (@_) {
+    # update failed
+    $dbh->rollback();
+    }
+  $dbh->disconnect();
+  return();
+}    
+    
+
 
 			
 END { }       # module clean-up code here (global destructor)
