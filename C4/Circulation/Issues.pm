@@ -61,45 +61,42 @@ my $priv_func = sub {
 
 
 sub Issue  {
-    my ($env) = @_;
-    my $dbh=&C4Connect;
-    #clear help
-    helptext('');
-    #clearscreen();
-    my $done;
-    my ($items,$items2,$amountdue);
-    $env->{'sysarea'} = "Issues";
-    $done = "Issues";
-    while ($done eq "Issues") {
-      my ($bornum,$issuesallowed,$borrower,$reason,$amountdue) = &findborrower($env,$dbh);      
-      #C4::Circulation::Borrowers
-      $env->{'loanlength'}="";
-      
-      if ($reason ne "") {
-        $done = $reason;
-      #} elsif ($issuesallowed eq "0") {
-      } elsif ($env->{'IssuesAllowed'} eq '0') {
-        error_msg($env,"No Issues Allowed =$env->{'IssuesAllowed'}");
-      } else {
-        $env->{'bornum'} = $bornum;
-        $env->{'bcard'}  = $borrower->{'cardnumber'};
-	#deal with alternative loans
-        #now check items 
-        ($items,$items2)=
-	  C4::Circulation::Main::pastitems($env,$bornum,$dbh); #from Circulation.pm
-        $done = "No";
-        my $it2p=0;
-        while ($done eq 'No'){
-          ($done,$items2,$it2p,$amountdue) =
-             &processitems($env,$bornum,$borrower,$items,
-	     $items2,$it2p,$amountdue);
-        }
-        #debug_msg("","after processitems done = $done");
-      }
-      #debug_msg($env,"after borrd $done");
-    }   
-    $dbh->disconnect;
-    return ($done);
+   my ($env) = @_;
+   my $dbh=&C4Connect;
+   #clear help
+   helptext('');
+   #clearscreen();
+   my $done;
+   my ($items,$items2,$amountdue);
+   $env->{'sysarea'} = "Issues";
+   $done = "Issues";
+   while ($done eq "Issues") {
+     my ($bornum,$issuesallowed,$borrower,$reason,$amountdue) = &findborrower($env,$dbh);      
+     #C4::Circulation::Borrowers
+     $env->{'loanlength'}="";
+     if ($reason ne "") {
+       $done = $reason;
+     #} elsif ($issuesallowed eq "0") {
+     } elsif ($env->{'IssuesAllowed'} eq '0') {
+       error_msg($env,"No Issues Allowed =$env->{'IssuesAllowed'}");
+     } else {
+       $env->{'bornum'} = $bornum;
+       $env->{'bcard'}  = $borrower->{'cardnumber'};
+       #deal with alternative loans
+       #now check items 
+       ($items,$items2)=
+       C4::Circulation::Main::pastitems($env,$bornum,$dbh); #from Circulation.pm
+       $done = "No";
+       my $it2p=0;
+       while ($done eq 'No'){
+         ($done,$items2,$it2p,$amountdue) =
+            &processitems($env,$bornum,$borrower,$items,
+	    $items2,$it2p,$amountdue);
+       }
+     }
+   }   
+   $dbh->disconnect;
+   return ($done);
 }    
 
 
@@ -113,21 +110,20 @@ sub processitems {
    if ($itemnum eq ""){
      $reason = "Finished user";
    } else {
-      my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
-      if ($datedue ne "") {
-         my $line = formatitem($env,$item,$datedue,$charge);
-         $items2->[$it2p] = $line;
-	 $it2p++;
-         $amountdue += $charge;
-      }
-      #$env->{'loanlength'}="";
+     my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
+     if ($datedue ne "") {
+       my $line = formatitem($env,$item,$datedue,$charge);
+       $items2->[$it2p] = $line;
+       $it2p++;
+       $amountdue += $charge;
+     }
    }   
    $dbh->disconnect;
    #check to see if more books to process for this user
    my @done;
    if ($env->{'newborrower'} ne "") {$reason = "Finished user";} 
    if ($reason eq 'Finished user'){
-     if ($items2 ne "") {
+     if (@$items2[0] ne "") {
        remoteprint($env,$items2,$borrower);
        if ($amountdue > 0) {
          &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);

@@ -13,7 +13,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&trapscreen &trapsnotes);
+@EXPORT = qw(&trapscreen &trapsnotes &reservesdisplay);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -90,6 +90,26 @@ sub trapsnotes {
     $notes = $borrower->{'borrowernotes'}; 
   }
   return $notes;
+}
+
+sub reservesdisplay {
+  my ($env,$borrower,$amount,$odues,$items) = @_;
+  my $titlepanel = titlepanel($env,$env->{'sysarea'},"Reserves Waiting");
+  my $borpanel = borrowerbox($env,$borrower,$amount);
+  $borpanel->draw();
+  my $x = 0;
+  my @itemslist;
+  while (@$items[$x] ne "") {
+    my $itemdata = @$items[$x];
+    my $itemrow = fmtstr($env,$itemdata->{'holdingbranch'},"L6");
+    $itemrow = $itemrow.$itemdata->{'title'}.": ".$itemdata->{'author'};
+    $itemrow = fmtstr($env,$itemrow,"L68").$itemdata->{'itemtype'};
+    @itemslist[$x] = $itemrow;
+    $x++;
+  }
+  my $reslist = new Cdk::Scroll('Title'=>"",'List'=>\@itemslist,
+    'Height'=>10,'Width'=>76,'Xpos'=>1,'Ypos'=>10);
+  $reslist->activate();    
 }
 
 END { }       # module clean-up code here (global destructor)

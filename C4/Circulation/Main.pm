@@ -200,16 +200,18 @@ sub checkreserve{
 sub checkwaiting{
   # check for reserves waiting
   my ($env,$dbh,$bornum)=@_;
-  my @itemswaiting="";
+  my @itemswaiting;
   my $query = "select * from reserves
     where (borrowernumber = '$bornum')
     and (reserves.found='W')";
   my $sth = $dbh->prepare($query);
   $sth->execute();
+  my $cnt=0;
   if (my $data=$sth->fetchrow_hashref) {
-    push @itemswaiting,$data->{'itemnumber'}; 
+    @itemswaiting[$cnt] =$data;
+    $cnt ++
   }
-  return (\@itemswaiting);
+  return ($cnt,\@itemswaiting);
 }
 
 sub scanbook {

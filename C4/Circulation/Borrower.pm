@@ -14,6 +14,7 @@ use C4::Circulation::Main;
 use C4::Circulation::Issues;
 use C4::Circulation::Renewals;
 use C4::Scan;
+use C4::Search;
 use C4::Stats;
 use C4::Format;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -197,12 +198,13 @@ sub checktraps {
     my $odues = &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
     if ($odues > 0) {push (@traps_set,"ODUES");}  
     #check if borrower has any items waiting
-    my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
-    my $nowaiting = @$itemswaiting;
-    if ($nowaiting > 0) { push (@traps_set,"WAITING");} 
+    my ($nowaiting,$itemswaiting) = 
+      &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
+    if ($nowaiting > 0) { push (@traps_set,"WAITING"); } 
     if (@traps_set[0] ne "" ) {
        $issuesallowed,$traps_done = 
-         process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set); 
+          process_traps($env,$dbh,$bornum,$borrower,
+	  $amount,$odues,\@traps_set,$itemswaiting);
        #debug_msg($env,"returned issuesallowed $env->{'IssuesAllowed'}");
     } else {
        $traps_done = "DONE";
@@ -213,7 +215,7 @@ sub checktraps {
 }
 
 sub process_traps {
-  my ($env,$dbh,$bornum,$borrower,$amount,$odues,$traps_set) = @_;
+  my ($env,$dbh,$bornum,$borrower,$amount,$odues,$traps_set,$waiting) = @_;
   my $issuesallowed = 1;
   my $x = 0;
   my %traps;
@@ -228,6 +230,8 @@ sub process_traps {
      $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
      if ($trapact eq "FINES") {
        &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
+     } elsif ($trapact eq "WAITING") {
+       reserveslist($env,$borrower,$amount,$odues,$waiting);
      } elsif ($trapact eq "ODUES") {
        &bulkrenew($env,$dbh,$bornum,$amount,$borrower,$odues);
      } elsif  ($trapact eq "NOTES") {
@@ -293,6 +297,22 @@ sub modifyuser {
   #return;
 }
 
+sub reserveslist {
+  my ($env,$borrower,$amount,$odues,$waiting) = @_;
+  my $dbh=C4Connect;
+  my @items;
+  my $x=0;
+  while (@$waiting[$x] ne "") {
+    my $resrec = @$waiting[$x];
+    debug_msg($env,$resrec->{'itemnumber'});
+    my $itemdata = itemnodata($env,$dbh,$resrec->{'itemnumber'});
+    push @items,$itemdata;
+    $x++;
+  }
+  reservesdisplay($env,$borrower,$amount,$odues,\@items);
+  $dbh->disconnect;
+}
+  
 sub NewBorrowerNumber {
   my $dbh=C4Connect;
   my $sth=$dbh->prepare("Select max(borrowernumber) from borrowers");
@@ -301,6 +321,7 @@ sub NewBorrowerNumber {
   $sth->finish;
   $data->{'max(borrowernumber)'}++;
   return($data->{'max(borrowernumber)'});
+
 }
 
 END { }       # module clean-up code here (global destructor)
