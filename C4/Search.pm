@@ -167,8 +167,8 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio
-         where (biblio.author like '%$key[0]%'";    
+         biblio,biblioitems
+         where biblioitems.biblionumber=biblio.biblionumber and (biblio.author like '%$key[0]%'";    
 	 while ($i < $count){ 
            $query=$query." and author like '%$key[$i]%'";   
            $i++;       
@@ -176,6 +176,9 @@ sub CatSearch  {
 	 $query=$query.")";
          if ($search->{'title'} ne ''){ 
 	   $query=$query. " and title like '%$search->{'title'}%'";
+	 }
+	 if ($search->{'class'} ne ''){
+	   $query.=" and biblioitems.itemtype='$search->{'class'}'";
 	 }
       } else {
           if ($search->{'title'} ne ''){
