@@ -14,7 +14,7 @@ $VERSION = 0.01;
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
-&getcurrencies &modsubtitle &modsubject &modaddauthor);
+&getcurrencies &modsubtitle &modsubject &modaddauthor &moditem);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -611,7 +611,15 @@ sub makeitems {
 }
 
 sub moditem {
-  my ($itemnum,$bibitemnum)
+  my ($itemnum,$bibitemnum)=@_;
+  my $dbh=C4Connect;
+  my $query="update items set biblioitemnumber=$bibitemnum where
+itemnumber=$itemnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
 
 END { }       # module clean-up code here (global destructor)
   
