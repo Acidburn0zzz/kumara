@@ -170,7 +170,7 @@ sub updateissues{
   my ($env,$itemno,$bitno,$dbh,$bornum)=@_;
   my $loanlength=21;
   debug_msg($env,"loan length");
-  my $query="Select loanlength from biblioitems,itemtypes
+  my $query="Select *  from biblioitems,itemtypes
   where (biblioitems.biblioitemnumber='$bitno') 
   and (biblioitems.itemtype = itemtypes.itemtype)";
   my $sth=$dbh->prepare($query);

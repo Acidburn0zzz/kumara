@@ -85,7 +85,7 @@ sub pastitems{
   my @items;
   my @items2;
   $items[0]=" "x40;
-  $items2[0]=" "x35;
+  $items2[0]=" "x36;
   while (my $data=$sth->fetchrow_hashref){
      my $line = "$data->{'date_due'} $data->{'title'}";
      $items[$i]=fmtstr($env,$line,"L40");
@@ -112,8 +112,7 @@ sub checkoverdues{
 
 sub previousissue {
   my ($env,$itemnum,$dbh,$bornum)=@_;
-  my $sth=$dbh->prepare("Select
-  firstname,surname,issues.borrowernumber,cardnumber,returndate
+  my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber,cardnumber,returndate
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
   issues.borrowernumber=borrowers.borrowernumber");
