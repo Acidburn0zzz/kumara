@@ -243,7 +243,11 @@ sub CatSearch  {
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
   if ($type ne 'precise' && $type ne 'subject'){
-    $query=$query." order by title limit $offset,$num";
+    if ($search->{'author'} ne ''){
+      $query=$query." order by author,title limit $offset,$num";
+    } else {
+          $query=$query." order by title limit $offset,$num";
+     }
   } else {
     if ($type eq 'subject'){
       $query=$query." order by subject limit $offset,$num";
