@@ -84,17 +84,24 @@ sub menu2 {
   my ($title,@items)=@_;
   my $numitems=@items;
   my $panel = Newt::Panel(1, 4, $title);
-  my $radio = Newt::VRadiogroup(@items);
-  my $okay  = Newt::Button("Okay");
-  $panel->Add(0,0,$radio,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,1,$okay);
+  my $b0 = Newt::Button(fmtstr("",@items[0],"C30"));
+  my $b1 = Newt::Button(fmtstr("",@items[1],"C30"));
+  my $b2 = Newt::Button(fmtstr("",@items[2],"C30"));
+  $b0->Tag(@items[0]);
+  $b1->Tag(@items[1]);
+  $b2->Tag(@items[2]);
+       
+  $panel->Add(0,0,$b0);
+  $panel->Add(0,1,$b1);
+  $panel->Add(0,2,$b2);
   $panel->AddHotKey(NEWT_KEY_F11);
   my ($reason,$data)=$panel->Run();
-  $stuff = @items[$radio->Get()];
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
        $stuff="Quit";
     }
+  } else {
+    $stuff = $data->Tag();  
   }
   return($reason,$stuff);
 }
@@ -172,14 +179,15 @@ sub issuewindow {
     $li2->Add($items2->[$i]); 
     $i++;
   }  
- # $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
- # "$borrower->{'city'}");
+  # $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
+  # "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
   $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,45);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,1,$l3,NEWT_ANCHOR_RIGHT);
+  $panel->Add(1,1,$l4,NEWT_ANCHOR_RIGHT);
+  $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);
   $panel->Add(0,2,$b1,NEWT_ANCHOR_LEFT);
   $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);
   $panel->Add(0,3,$b2,NEWT_ANCHOR_LEFT);
@@ -320,6 +328,9 @@ sub fmtstr {
   my $lenst = substr($fmt,1,length($fmt)-1);
   if ($align eq"R" ) {
      $strg = substr((" "x$lenst).$strg,0-$lenst,$lenst);
+  } elsif  ($align eq "C" ) {
+     $strg = 
+       substr((" "x(($lenst/2)-(length($strg)/2))).$strg.(" "x$lenst),0,$lenst);
   } else {
      $strg = substr($strg.(" "x$lenst),0,$lenst);
   } 

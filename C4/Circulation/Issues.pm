@@ -100,8 +100,6 @@ sub processitems {
    if ($itemnum ne ""){
       my ($item,$charge) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($item) {
-        debug_msg($env,$item->{'title'});
-        debug_msg($env,fmtstr($env,$item->{'title'},"L30"));
         $items2->[$it2p] = 
     	(fmtstr($env,$item->{'title'},"L30")." ".fmtdec($env,$charge,"22")); 	
         $row2++;	     
@@ -194,7 +192,30 @@ sub updateissues{
 sub calc_charges {
   # calculate charges due
   my ($env, $dbh, $itemno, $bornum)=@_;
-  my $charge;
+  my $charge=0;
+  my $item_type;
+  my $q1 = "select item_type,rentalcharge from items,biblioitems,itemtypes 
+    where (items.itemnumber ='$itemno')
+    and (biblioitems.biblioitemnumber = items.biblioitemnumber)
+    and (biblioitems.item_type = itemtypes,item_type)";
+  my $sth1= $dbh->prepare($q1);
+  $sth1->execute;
+  if (my $data1=$sth1->fetchrow_hashref) {
+     $item_type = $data1->{'item_type'};
+     $charge = $data1->{'rentalcharge'};
+      my $q2 = "select discount from borrowers,categoryitems 
+        where (borrowers.borrowernumber = '$bornum') 
+        and (borrower.categorycode = categories.categorycode)
+        and (categoryitems.item_item = '$item_type')";
+     my $sth2=$dbh->prepare($q2);
+     $sth2->execute;
+     if (my $data2=$sth2->fetchrow_hashref) {
+        my $discount = $data2->{'discount'};
+	$charge = ($charge * $discount) / 100;
+     }
+     $sth2->{'finish'};
+  }   
+  $sth1->{'finish'};
   return ($charge);
 }
 

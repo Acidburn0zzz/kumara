@@ -62,9 +62,34 @@ sub Return  {
 sub renewstatus {
   # check renewal status
   my ($env,$dbh,$bornum,$itemno)=@_;
+  my $renews = 1;
+  my $renewokay = 0;
+  my $q1 = "select * from issues 
+    where (borrowernumber = '$bornum')
+    and (itemnumber = '$itemno') 
+    and returndate is null";
+  my $sth1 = $dbh->prepare($q1);
+  $sth1->execute;
+  debug_msg($env,"before renew check");
+  if (my $data1 = $sth1->fetchrow_hashref) {
+    my $q2 = "select renewalsallowed from items,biblioitems,itemtypes
+       where (items.itemnumber = '$itemno')
+       and (items.biblioitemnuber = biblioitem.biblioitemnumber) 
+       and (biblioitems.itemtype = itemtype.itemtype)";
+     my $sth2 = $dbh->prepare($q2);
+     print $q2
+     $sth2->execute;
+     if (my $data2=$sth2->fetchrow_hashref) {
+       $renews = $data2->{'renewalsallowed'};
+     }
+     if ($renews > $data1->{'renewals'}) {
+       $renewokay = 1;
+     }
+  }   
   my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
-  return();
+  return($renewokay);    
 }
+
 
 sub renewbook {
   # mark book as renewed
