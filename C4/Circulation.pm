@@ -70,6 +70,8 @@ sub Start_circ{
       ($reason,$data) = menu('console','Circulation', 
         ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
       debug_msg($env,"data = $data");
+    } else {
+      $data = $donext;
     }
     if ($data eq 'Issues') {  
       $donext=Issue($env); #C4::Circulation::Issues
