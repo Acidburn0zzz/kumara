@@ -359,7 +359,7 @@ sub ItemInfo {
   where (items.biblioitemnumber = biblioitems.biblioitemnumber)
   and biblioitems.biblionumber=biblio.biblionumber
   and biblio.biblionumber='$biblionumber' and branches.branchcode=
-  items.holdingbranch";
+  items.holdingbranch and items.itemlost<>1";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
