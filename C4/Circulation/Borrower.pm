@@ -8,7 +8,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Accounts;
-use C4::Interface;
+use C4::InterfaceCDK;
 use C4::Circulation::Main;
 use C4::Circulation::Issues;
 use C4::Scan;
@@ -69,10 +69,9 @@ sub findborrower  {
   my $book;
   while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
-    titlepanel($env,$env->{'sysarea'},"Borrower Entry");
-    ($borcode,$reason,$book)=&C4::Circulation::Main::scanborrower(); 
+    my $title = titlepanel($env,$env->{'sysarea'},"Borrower Entry");
+    ($borcode,$reason,$book)=&C4::Circulation::Main::scanborrower($env); 
     #C4::Circulation::Main
-    # debug_msg($env,"Reaz = $reason");
     if ($reason eq "") {
       if ($borcode ne '') {
         ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
@@ -98,6 +97,8 @@ sub findborrower  {
   } 
   my $issuesallowed;
   if ($reason eq "") {
+    $env->{'bornum'} = $bornum;
+    $env->{'bcard'} = $borrower->{'cardnumber'};
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
 #    output(1,1,$borrowers);
     $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
@@ -112,6 +113,7 @@ sub findoneborrower {
   my $bornum;
   my $borrower;
   my $ucborcode = uc $borcode;
+  my $lcborcode = lc $borcode;
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$ucborcode'");
   $sth->execute;
   if ($borrower=$sth->fetchrow_hashref) {
@@ -119,8 +121,11 @@ sub findoneborrower {
     $sth->finish;
   } else {
     $sth->finish;
+    # my $borquery = "Select * from borrowers
+    # where surname ~* '$borcode' order by surname";
+	      
     my $borquery = "Select * from borrowers 
-      where surname ~* '$borcode' order by surname";
+      where lower(surname) = '$lcborcode' order by surname,firstname";
     my $sthb =$dbh->prepare($borquery);
     $sthb->execute;
     my $cntbor = 0;
@@ -162,15 +167,18 @@ sub checktraps {
   my $issuesallowed = "1";
   #process borrower traps (could be function)
   #check first GNA trap (no address this is the 22nd item in the table)
+  @traps_set;
   if ($borrower->{'gonenoaddress'} == 1){
     #got to membership update and update member info
-    output(20,1,"Borrower has no address");
-    pause();
+    push (@traps_set,"GNA");
+    # output(20,1,"Borrower has no address");
+    #pause();
   }
   #check if member has a card reported as lost
   if ($borrower->{'lost'} ==1){
+    push (@traps_set,"LOST");
     #update member info
-    output(20,1,"Borrower has lost card");
+    #output(20,1,"Borrower has lost card");
   }
   #check the notes field if notes exist display them
   if ($borrower->{'borrowernotes'} ne ''){

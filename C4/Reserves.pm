@@ -8,8 +8,8 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Format;
-use C4::Interface;
-use C4::Interface::Reserveentry;
+use C4::InterfaceCDK;
+use C4::Interface::ReserveentCDK;
 use C4::Circulation::Main;
 use C4::Circulation::Borrower;
 use C4::Search;
@@ -57,13 +57,13 @@ my $priv_func = sub {
 
 sub EnterReserves{
   my ($env)=@_;  
-  titlepanel($env,"Reserves","Enter Selection");
+  my $titlepanel = titlepanel($env,"Reserves","Enter Selection");
   my @flds = ("No of entries","Barcode","ISBN","Title","Keywords","Author","Subject");
   my @fldlens = ("5","15","15","50","50","50","50");
   my ($reason,$num,$itemnumber,$isbn,$title,$keyword,$author,$subject) =
      FindBiblioScreen($env,"Reserves",7,\@flds,\@fldlens);
   my $donext ="Circ";
-  if ($reason ne "1") {
+  if ($reason ne "") {
     $donext = $reason;
   } else {  
     my %search;
@@ -79,7 +79,7 @@ sub EnterReserves{
       $num = 30;
     }
     my $offset = 0;
-    titlepanel($env,"Reserves","Searching");
+    my $title = titlepanel($env,"Reserves","Searching");
     if ($itemnumber ne '' || $isbn ne ''){
       ($count,@results)=&CatSearch($env,'precise',\%search,$num,$offset);
     } else {
@@ -106,36 +106,46 @@ sub EnterReserves{
         my $line;
         while ($i < $no_ents) {
           my @ents = split("\t",@results[$i]);
-          $line = fmtstr($env,@ents[1],"L60");
-	  my $auth = substr(@ents[2],0,20);
-	  substr($line,(60-length($auth)-2),length($auth)+2) = "  ".$auth;
+          $line = fmtstr($env,@ents[1],"L70");
+	  my $auth = substr(@ents[2],0,30);
+	  substr($line,(70-length($auth)-2),length($auth)+2) = "  ".$auth;
           @bibtitles[$i]=$line;	 
           $biblio_xref{$line}=@ents[0];
           $i++;
         }
-        titlepanel($env,"Reserves","Select Title");
-        my ($results,$bibres) = SelectBiblio($env,$count,\@bibtitles);
-        if ($results == 1) {
+        my $title = titlepanel($env,"Reserves","Select Title");
+      	my ($results,$bibres) = SelectBiblio($env,$count,\@bibtitles);
+        if ($results eq "") {
        	  $biblionumber = $biblio_xref{$bibres};
-          if ($biblionumber eq "") {
-            error_msg($env,"No item selected");
-          } else {
-	    $donext = $results;
-	  }  
+        } else {
+	  $donext = $results;	    
 	}
       }
+      debug_msg($env,"Do Next $donext");
+      debug_msg($env,"Biblio $biblionumber ");           
+
+
+
       if ($biblionumber eq "") {
         error_msg($env,"No items found");   
       } else {
+        debug_msg($env,"getting items ");
+	
         my @items = GetItems($env,$biblionumber);
-        my $cnt_it = @items;
+         debug_msg($env,"got items ");
+	 
+	my $cnt_it = @items;
 	my $dbh = &C4Connect;
+	    debug_msg($env,"select biblio $biblionumber ");
+	    
         my $query = "Select * from biblio where biblionumber = $biblionumber";
 	my $sth = $dbh->prepare($query);
 	$sth->execute;
 	my $data=$sth->fetchrow_hashref;
 	$sth->finish;
         my @branches;
+	    debug_msg($env,"select branches ");
+	    
         my $query = "select * from branches order by branchname";
         my $sth=$dbh->prepare($query);
         $sth->execute;
@@ -147,9 +157,9 @@ sub EnterReserves{
 	$sth->finish;
         $donext = "";
 	while ($donext eq "") {
-	  clearscreen();
-          titlepanel($env,"Reserves","Create Reserve");
-       	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
+          my $title = titlepanel($env,"Reserves","Create Reserve");
+       	  debug_msg($env,"make reserves");
+	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
             MakeReserveScreen($env, $data, \@items, \@branches);
       	  my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
        	  if ($reason eq "") { 

@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-use C4::Interface;
+use C4::InterfaceCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -149,7 +149,7 @@ sub CatSearch  {
 	 $search->{'subject'}=uc $search->{'subject'};
 	 $query=$query." ((lower(catalogueentry.catalogueentry) = lower(bibliosubject.subject))        
 	 and (lower(catalogueentry.catalogueentry) like
-lower('$search->{'subject'}%')) 
+            lower('$search->{'subject'}%')) 
 	 and (entrytype = 's'))"; 
       }
    }
@@ -161,11 +161,36 @@ lower('$search->{'subject'}%'))
         items.biblionumber=biblio.biblionumber ";
       }
       if ($search->{'isbn'} ne ''){
+        my $search2=uc $search->{'isbn'};
+	#
+	# Commented code does not work properly, but would be much faster 
+	# if it did
+	# Can't make it returne the biblionumber properly
+	#
+        #my $query1 = "select biblionumber from biblioitems where isbn='$search2'";
+        #debug_msg($env,$query1);
+	#my $sth1=$dbh->prepare($query);
+	#$sth1->execute;
+	#my @biblioarr;
+	#my $bibcnt=0;
+	#while (my @data=$sth1->fetchrow_array) {
+        #  debug_msg($env,$data[0]);
+        #  @biblioarr[$bibcnt] = 
+	#    "biblio.biblionumber = '".$data[0]."'";
+	#  $bibcnt++;
+	#};
+	#$sth1->finish();
+	#my $bibsel = join(" or ",@biblioarr);
+        #debug_msg($env,$bibsel);
+        #$query = "select count(*) from items,biblio,biblioitems ";
+	#$query=$query." where ($bibsel) ";
+	#$query=$query." and items.biblionumber=biblioitems.biblionumber and";
+        #$query=$query." biblioitems.biblionumber=biblio.biblionumber";
         $query="select count(*) from items,biblio,biblioitems ";
         my $search2=uc $search->{'isbn'};
         $query=$query." where biblioitems.isbn='$search2' and
         items.biblioitemnumber=biblioitems.biblioitemnumber 
-	and biblioitems.biblionumber=biblio.biblionumber";
+        and biblioitems.biblionumber=biblio.biblionumber";
       }
     }
 #print $query;

@@ -8,7 +8,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Accounts;
-use C4::Interface;
+use C4::InterfaceCDK;
 use C4::Circulation::Main;
 use C4::Format;
 use C4::Scan;
@@ -120,6 +120,7 @@ sub checkissue {
        (borrowernumber = '$issuerec->{'borrowernumber'}')";
        my $sth= $dbh->prepare($query);
        $sth->execute;
+       $env->{'bornum'}=$issuerec->{'borrowernumber'};
        $borrower = $sth->fetchrow_hashref;
        $bornum = $issuerec->{'borrowernumber'};
        $itemno = $issuerec->{'itemnumber'};

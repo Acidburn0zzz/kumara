@@ -11,7 +11,7 @@ use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
 use C4::Circulation::Borrower;
 use C4::Reserves;
-use C4::Interface;
+use C4::InterfaceCDK;
 use C4::Security;
 use C4::Format;
 
@@ -61,9 +61,10 @@ my $priv_func = sub {
 sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;
-  my $sth=$dbh->prepare("Select * from issues,items,biblio
+  my $sth=$dbh->prepare("Select * from issues,items,biblio,biblioitems
     where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
     and items.biblionumber=biblio.biblionumber
+    and biblioitems.biblioitemnumber=items.biblioitemnumber     
     and returndate is null
     order by date_due");
   $sth->execute;
@@ -75,9 +76,11 @@ sub pastitems{
   $items[0]=" "x72;
   $items2[0]=" "x72;
   while (my $data=$sth->fetchrow_hashref) {
-     my $line = "$data->{'date_due'} $data->{'title'}";
+     my $line = C4::Issues::formatitem($env,$data,$data->{'date_due'},"");
+     #my $line = "$data->{'date_due'} $data->{'title'}";
      # $items[$i]=fmtstr($env,$line,"L29");
-     $items[$i]=fmtstr($env,$line,"L72");
+     #$items[$i]=fmtstr($env,$line,"L72");
+     $items[$i]=$line;
      $i++;
   }
   return(\@items,\@items2);
@@ -105,9 +108,10 @@ sub previousissue {
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
   issues.borrowernumber=borrowers.borrowernumber and issues.returndate is
-NULL");
+    NULL");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
+  my $cannissue = 0;
   $sth->finish;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
@@ -123,9 +127,6 @@ NULL");
       my $resp = &msg_yn($text,"Mark as returned?");
       if ($resp == "y") {
         &returnrecord($env,$dbh,$borrower->{'borrowernumber'},$itemnum);
-	# can issue
-      } else {
-        # can't issue
       }	
     }
   } 

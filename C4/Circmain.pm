@@ -12,7 +12,7 @@ use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
 use C4::Circulation::Borrower;
 use C4::Reserves;
-use C4::Interface;
+use C4::InterfaceCDK;
 use C4::Security;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -67,42 +67,42 @@ sub Start_circ{
   my $data;
   while ($donext ne 'Quit') {
     if ($donext  eq "Circ") {
-      #&startint($env,'Circulation');
+      &startint($env,'Circulation');
       clearscreen();
       ($reason,$data) = menu($env,'console','Circulation', 
         ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-      debug_msg($env,"data = $data");
+      #debug_msg($env,"data = $data");
+      #my $response = msg_yn("data",$data);
+      #debug_msg($env,"Resp $response");
       #&endint($env);
     } else {
       $data = $donext;
     }
     if ($data eq 'Issues') {  
       #&startint($env,'Circulation');
-      $donext=Issue($env); #C4::Circulation::Issues
+      $donext=Issue($env); #C4::Circulation::Issues 
       #debug_msg("","do next $donext");
       #&endint($env);         
     } elsif ($data eq 'Returns') {
       #&startint($env,'Circulation');
-      $donext=Returns($env); #C4::Circulation::Returns
+      $donext=Returns($env); #C4::Circulation::Returns 
       #&endint($env);
     } elsif ($data eq 'Borrower Enquiries'){
       #&startint($env,'Circulation');     
-      $donext=Borenq($env); #C4::Circulation::Borrower
+#  $donext=Borenq($env); #C4::Circulation::Borrower - conversion
       #&endint($env);
     } elsif ($data eq 'Reserves'){
-      #&startint($env,'Circulation');         
-      $donext=EnterReserves($env); #C4::Reserves
-      #&endint($env);
+      $donext=EnterReserves($env); #C4::Reserves 
     } elsif ($data eq 'Log In') {
-      &endint($env);
-      &Login($env);   #C4::Security
-      &startint($env,'Circulation');
+#      &endint($env); - conversion
+#      &Login($env);   #C4::Security - conversion
+#      &startint($env,'Circulation'); - conversion
     } elsif ($data eq 'Quit') { 
       $donext = $data;
     }
-    #debug_msg($env,"donext -  $donext");
+    debug_msg($env,"donext -  $donext");
   }
-  &endint($env)  
+  #&endint($env)  
 }
 
 

@@ -7,8 +7,8 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Format;
-use C4::Interface;
-use C4::Interface::Accounts;
+use C4::InterfaceCDK;
+use C4::Interface::AccountsCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking

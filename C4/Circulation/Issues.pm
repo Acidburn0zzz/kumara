@@ -8,7 +8,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Accounts;
-use C4::Interface;
+use C4::InterfaceCDK;
 use C4::Circulation::Main;
 use C4::Circulation::Borrower;
 use C4::Scan;
@@ -22,7 +22,7 @@ use Newt qw();
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&Issue);
+@EXPORT = qw(&Issue &formatitem);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -64,91 +64,109 @@ sub Issue  {
     my $dbh=&C4Connect;
     #clear help
     helptext('');
-    clearscreen();
+    #clearscreen();
     my $done;
-    my ($items,$items2);
+    my ($items,$items2,$amountdue);
     $env->{'sysarea'} = "Issues";
-    my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
+    $done = "Issues";
+    while ($done eq "Issues") {
+      my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
       #C4::Circulation::Borrowers
-    if ($reason ne "") {
-      clearscreen();
-      $done = $reason;
-    } else {
-      #deal with alternative loans
-      #now check items 
-      clearscreen();
-      ($items,$items2)=C4::Circulation::Main::pastitems($env,$bornum,$dbh); #from Circulation.pm
-      $done = "No";
-      my $row2=5;
-      my $it2p=0;
-      while ($done eq 'No'){
-        ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
-      }    
-      debug_msg("","after processitems done = $done");
-    }
+      if ($reason ne "") {
+        $done = $reason;
+      } else {
+        $env->{'bornum'} = $bornum;
+        $env->{'bcard'}  = $borrower->{'cardnumber'};
+	#deal with alternative loans
+        #now check items 
+        ($items,$items2)=
+	  C4::Circulation::Main::pastitems($env,$bornum,$dbh); #from Circulation.pm
+        $done = "No";
+        my $it2p=0;
+        while ($done eq 'No'){
+          ($done,$items2,$it2p) =
+             &processitems($env,$bornum,$borrower,$items,
+	     $items2,$it2p,$amountdue);
+        }    
+        #debug_msg("","after processitems done = $done");
+      }
+      #debug_msg($env,"after borrd $done");
+    }   
     $dbh->disconnect;
-   # if ($done ne 'Circ'){
-   #    debug_msg("","calling issue again with $done");
-   #    $done=Issue($env);      
-   # }
-   # if ($done ne 'Quit'){
-   #    debug_msg("","returning $done");
-   #    return($done); #to C4::Circulation
-   # }
-   return ($done);
+    return ($done);
 }    
 
 
 sub processitems {
   #process a users items
-#  clearscreen();
-#  output(1,1,"Processing Items");
-   helptext("F11 Ends processing for current borrower  F10 ends issues");
-   my ($env,$bornum,$borrower,$items,$items2,$row2,$it2p)=@_;
+   my ($env,$bornum,$borrower,$items,$items2,$it2p,$amountdue)=@_;
    my $dbh=&C4Connect;  
-   my $row=5;
-#  my $count=$$items;
-   my $i=0;
-   my $amountdue = 0;
-#   my @date;
-   my ($itemnum,$reason) = issuewindow($env,'Issues',$items,$items2,$borrower,
-     fmtdec($env,$amountdue,"32"));
+#  my $amountdue = 0;  
+   my ($itemnum,$reason) = 
+     issuewindow($env,'Issues',$items,$items2,$borrower,fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
       my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
-      if ($item) {
-        debug_msg("","date $datedue");
-        
-         # $items2->[$it2p] = 
-         # (fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")." ".$datedue); 	
-         $items2->[$it2p] = $datedue." ".
-            fmtstr($env,$item->{'title'},"L55")." ".fmtdec($env,$charge,"22");
-  	$i++;
-     	$amountdue += $charge;
-     }  
+      if ($datedue ne "") {
+         my $line = formatline($env,$item,$datedue,$charge);
+	 #$datedue." ".$item->{'title'}.", ".$item->{'author'};
+	 #my $iclass =  $item->{'itemtype'};
+	 #if ($item->{'dewey'} > 0) {
+	 #  $iclass = $iclass.$item->{'dewey'}.$item->{'subclass'};
+	 #};
+	 #my $llen = 65 - length($iclass);
+	 #my $line = fmtstr($env,$line,"L".$llen);
+	 #my $line = $line." $iclass ";
+         #my $line = $line.fmtdec($env,$charge,"22"); 		  
+         #$items2->[$it2p] = $datedue." ".
+         #  fmtstr($env,$item->{'title'},"L55")." ".fmtdec($env,$charge,"22");
+         $items2->[$it2p] = $line;
+	 $it2p++;
+         $amountdue += $charge;
+      }  
    }
    $dbh->disconnect;
    #check to see if more books to process for this user
+   my @done;
    if ($reason eq 'Finished user'){
-      return('New borrower');
+      remoteprint($env,$items2,$borrower);
+      @done = ("Issues");
    } elsif ($reason eq "Print"){
       remoteprint($env,$items2,$borrower);
+      @done = ("No",$items2,$it2p);
    } else {
       if ($reason ne 'Finished issues'){
          #return No to let them know that we wish to process more Items for borrower
-         return('No',$items2,$row2,$it2p);
+         @done = ("No",$items2,$it2p);
       } else  {
-         return('Circ');
+         @done = ("Circ");
       }
    }
+   #debug_msg($env, "return from issues $done[0]"); 
+   return @done;
 }
 
+sub formatitem {
+   my ($env,$item,$datedue,$charge) = @_;
+   my $line = $datedue." ".$item->{'title'}.", ".$item->{'author'};
+   my $iclass =  $item->{'itemtype'};
+   if ($item->{'dewey'} > 0) {
+     $iclass = $iclass.$item->{'dewey'}.$item->{'subclass'};
+   };
+   my $llen = 65 - length($iclass);
+   my $line = fmtstr($env,$line,"L".$llen);
+   my $line = $line." $iclass ";
+   my $line = $line.fmtdec($env,$charge,"22");
+   return $line;
+}   
+	 
 sub issueitem{
    my ($env,$dbh,$itemnum,$bornum,$items)=@_;
    $itemnum=uc $itemnum;
    my $canissue = 1;
    ##  my ($itemnum,$reason)=&scanbook();
-   my $query="Select * from items,biblio where (barcode='$itemnum') and
-      (items.biblionumber=biblio.biblionumber)";
+   my $query="Select * from items,biblio,biblioitems where (barcode='$itemnum') and
+      (items.biblionumber=biblio.biblionumber) and
+      (items.biblioitemnumber=biblioitems.biblioitemnumber) ";
    my $item;
    my $charge;
    my $datedue;
@@ -158,21 +176,27 @@ sub issueitem{
      $sth->finish;
      #check if item is restricted
      if ($item->{'restricted'} == 1 ){
-      error_msg($env,"Restricted Item");
-      #output(20,1,"whoop whoop restricted");
-      #check borrowers status to take out restricted items
-      # if borrower allowed {
-      #  $canissue = 1
-      # } else {
-      #  $canissue = 0
-      # }
-     } else {
-       #check if item is on issue already
+       error_msg($env,"Restricted Item");
+       #check borrowers status to take out restricted items
+       # if borrower allowed {
+       #  $canissue = 1
+       # } else {
+       #  $canissue = 0
+       # }
+     } 
+     #check if item is on issue already
+     if ($canissue == 1) {
        my $currbor = &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
+       if ($currbor ne "") {$canissue = 0;};
+     } 
+     if ($canissue == 1) {
        #check reserve
-       my $resbor = &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
-       #if charge deal with it
-     }   
+       my $resbor;
+       $resbor = &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
+       if ($resbor ne "") {$canissue = 0;};
+     }
+     #if charge deal with it
+        
      if ($canissue == 1) {
        $charge = calc_charges($env,$dbh,$item->{'itemnumber'},$bornum);
      }
@@ -181,12 +205,14 @@ sub issueitem{
        $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);        
        #debug_msg("","date $datedue");
        &UpdateStats($env,$env->{'branchcode'},'issue');
-     }
+     } else {
+       debug_msg($env,"can't issue");
+     }  
    } else {
      error_msg($env,"$itemnum not found - rescan");
    }
    $sth->finish;
-#   debug_msg("","date $datedue");
+   debug_msg($env,"date $datedue");
    return($item,$charge,$datedue);
 }
 
@@ -204,9 +230,7 @@ sub updateissues{
   }
   $sth->finish;
   my $ti = time;
-
-  my $datedue = time + ($loanlength * 86400) ;
-  
+  my $datedue = time + ($loanlength * 86400);
   my @datearr = localtime($datedue);
   my $dateduef = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
@@ -214,9 +238,10 @@ sub updateissues{
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
-  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($datedue);
-  $datedue="$mday-$mon-$year";
-  return($datedue);
+  #my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($datedue);
+  my $dateret=$datearr[3]."-".($datearr[4]+1)."-".(1900+$datearr[5]);
+  debug_msg($env,"returning $dateret");
+  return($dateret);
 }
 
 sub calc_charges {

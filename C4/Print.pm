@@ -2,7 +2,7 @@ package C4::Print; #asummes C4/Print.pm
 
 use strict;
 require Exporter;
-use C4::Interface;
+use C4::InterfaceCDK;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -49,7 +49,7 @@ my $priv_func = sub {
 
 sub remoteprint {
   my ($env,$items,$borrower)=@_;
-  debug_msg("","In print");
+  #debug_msg($env,"In print");
   my $file=time;
   open (FILE,">/tmp/$file");
   my $i=0;

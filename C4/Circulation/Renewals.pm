@@ -8,7 +8,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Accounts;
-use C4::Interface;
+use C4::InterfaceCDK;
 use C4::Circulation::Renewals;
 use C4::Scan;
 use C4::Stats;
