@@ -211,10 +211,7 @@ sub returnwindow {
   $panel->Add(0,0,$panel2,NEWT_ANCHOR_LEFT);
   $panel->Add(0,1,$l1,NEWT_ANCHOR_LEFT);
   $panel->Add(0,2,$li1,NEWT_ANCHOR_LEFT);
-  Newt::PushHelpLine('F11 QUIT');
-  Newt::PushHelpLine('F10 Menu');
-  Newt::PushHelpLine('F2 Issues');
-  Newt::PushHelpLine('F3 Returns');
+  Newt::PushHelpLine('F11 QUIT F10 Menu F2 Issues F3 Returns');
   $panel->AddHotKey(NEWT_KEY_F2);
   $panel->AddHotKey(NEWT_KEY_F3);
   $panel->AddHotKey(NEWT_KEY_F10);
@@ -421,6 +418,7 @@ sub borrower_dialog {
   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label2=Newt::Label(" Book: ");
   my $panel1=Newt::Panel(4,4,$name,1,1);
+  $panel1->AddHotKey(NEWT_KEY_F2);
   $panel1->AddHotKey(NEWT_KEY_F3);
   $panel1->AddHotKey(NEWT_KEY_F4); 
   $panel1->AddHotKey(NEWT_KEY_F11);
@@ -428,15 +426,17 @@ sub borrower_dialog {
   $panel1->Add(1,0,$entry,NEWT_ANCHOR_LEFT);
   $panel1->Add(2,0,$label2,NEWT_ANCHOR_LEFT);
   $panel1->Add(3,0,$entry2,NEWT_ANCHOR_LEFT);
-  Newt::PushHelpLine('F11 QUIT: F3 Returns:  F4 Reserves');
+  Newt::PushHelpLine('F11 QUIT: F2 Issues: F3 Returns: F4 Reserves');
     
   my ($reason,$data)=$panel1->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
     #debug_msg("","hot ");
     if ($data eq NEWT_KEY_F3) {
       $reason="Returns";
+    } elsif ($data eq NEWT_KEY_F2) {
+      $reason="Issues";
     } elsif ($data eq NEWT_KEY_F4) {
-       $reason="Reserves";
+      $reason="Reserves";
     } elsif ($data eq NEWT_KEY_F11) {  
       $reason="Circ";         
     } elsif ($data eq NEWT_KEY_F12){

@@ -197,14 +197,22 @@ sub Borenq {
   my ($env)=@_;
   my $dbh=C4Connect;
   #get borrower guff
-  my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
-  if ($reason eq "") {
-    my ($data,$reason)=&borrowerwindow($env,$borrower);
+  my $bornum;
+  my $issuesallowed;
+  my $borrower;
+  my $reason;
+  while ($reason eq "") {
+    ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
+    if ($reason eq "") {
+      my ($data,$reason)=&borrowerwindow($env,$borrower);
     if ($reason eq 'Modify'){
       modifyuser($env,$borrower);
+      $reason = "";
     } elsif ($reason eq 'New'){
-      Borenq($env);
+      $reason = "";
     }
+  }
+  $dbh->disconnect;
 #  debug_msg("",$reason);
 #  debug_msg("",$data);
   }
