@@ -39,6 +39,14 @@ my $count=@items;
 my $i=0;
 print center();
 
+my $dewey = $data->{'dewey'};                                                  
+$dewey =~ s/0+$//;                                                             
+if ($dewey eq "000.") { $dewey = "";};                                         
+if ($dewey < 10){$dewey='00'.$dewey;}                                          
+if ($dewey < 100 && $dewey > 10){$dewey='0'.$dewey;}                           
+if ($dewey <= 0){
+  $dewey='';                                                                   
+}               
 print <<printend
 <br>
 <a href=/cgi-bin/koha/request.pl?bib=$bib><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>
@@ -61,7 +69,7 @@ print <<printend
 <b>Item Type:</b> $data->{'itemtype'}<br>
 <b>Loan Length:</b> $data->{'loanlength'}<br>
 <b>Rental Charge:</b> $data->{'rentalcharge'}<br>
-<b>Classification:</b> $data->{'classification'}$data->{'dewey'}$data->{'subclass'}<br>
+<b>Classification:</b> $data->{'classification'}$dewey$data->{'subclass'}<br>
 <b>ISBN:</b> $data->{'isbn'}<br>
 <b>Publisher:</b> $data->{'publishercode'} <br>
 <b>Place:</b><br>
