@@ -673,14 +673,14 @@ sub BornameSearch  {
   my @data=split(' ',$searchstring);
   my $count=@data;
   my $query="Select * from borrowers 
-  where ((surname like '$data[0]%' or surname like '% $data[0]%' 
-  or firstname  like '$data[0]%' or firstname like '% $data[0]%' 
-  or othernames like '$data[0]%' or othernames like '% $data[0]%')
+  where ((surname like \"$data[0]%\" or surname like \"% $data[0]%\" 
+  or firstname  like \"$data[0]%\" or firstname like \"% $data[0]%\" 
+  or othernames like \"$data[0]%\" or othernames like \"% $data[0]%\")
   ";
   for (my $i=1;$i<$count;$i++){
-    $query=$query." and (surname like '$data[$i]%' or surname like '% $data[$i]%'                  
-    or firstname  like '$data[$i]%' or firstname like '% $data[$i]%'                    
-    or othernames like '$data[$i]%' or othernames like '% $data[$i]%')";
+    $query=$query." and (surname like \"$data[$i]%\" or surname like \"% $data[$i]%\"                  
+    or firstname  like \"$data[$i]%\" or firstname like \"% $data[$i]%\"                    
+    or othernames like \"$data[$i]%\" or othernames like \"% $data[$i]%\")";
   }
   $query=$query.") or cardnumber = '$searchstring'
   order by surname,firstname";
