@@ -149,8 +149,9 @@ for (my $i=0;$i<$count;$i++){
     print "<font color=red>";
   }
   print "$issue->[$i]{'title'}</td>
-  <TD>$issue->[$i]{'date_due'}</td>
-  <TD></td>";
+  <TD>$issue->[$i]{'date_due'}</td>";
+  #find the charge for an item
+  print "<TD></td>";
 
   if ($datedue < $today){
     print "<td>Overdue</td>";
@@ -168,7 +169,7 @@ for (my $i=0;$i<$count;$i++){
     <input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=n>N</td>
     </tr>
     ";
-  }
+  
 }
 print <<printend
 
