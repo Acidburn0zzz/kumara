@@ -670,6 +670,7 @@ sub itemnodata {
 sub BornameSearch  {
   my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
+  $searchstring=~ s/\'/\\\'/g;
   my @data=split(' ',$searchstring);
   my $count=@data;
   my $query="Select * from borrowers 
@@ -682,7 +683,7 @@ sub BornameSearch  {
     or firstname  like \"$data[$i]%\" or firstname like \"% $data[$i]%\"                    
     or othernames like \"$data[$i]%\" or othernames like \"% $data[$i]%\")";
   }
-  $query=$query.") or cardnumber = '$searchstring'
+  $query=$query.") or cardnumber = \"$searchstring\"
   order by surname,firstname";
 #  print $query,"\n";
   my $sth=$dbh->prepare($query);
