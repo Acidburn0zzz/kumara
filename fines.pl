@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#script to keep total of number of issues;
+#script to calculate fines
 
 
 use C4::Circulation::Fines;
