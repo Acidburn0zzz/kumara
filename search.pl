@@ -101,7 +101,7 @@ if ($type ne 'opac'){
   if ($subject ne ''){
    print mktablerow(1,$main,'<b>SUBJECT</b>');
   } else {
-   print mktablerow(6,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('LOCATION'),'');
+   print mktablerow(6,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('BRANCH'),'');
   }
 }
 my $count2=@results;
@@ -127,16 +127,32 @@ while ($i < $count2){
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[4]=$count;
       if ($nacount > 0){
-        $stuff[5]=$stuff[5]."On Loan 1";
+        $stuff[5]=$stuff[5]."On Loan";
+	if ($nacount >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($nacount)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";
       }
       if ($lcount > 0){
-        $stuff[5]=$stuff[5]." L$lcount";
+         $stuff[5]=$stuff[5]."Levin";
+         if ($lcount >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($lcount)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";
       }
       if ($fcount > 0){
-        $stuff[5]=$stuff[5]." F$fcount";
+        $stuff[5]=$stuff[5]."Foxton";
+         if ($fcount >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($fcount)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";	
       }
       if ($scount > 0){
-        $stuff[5]=$stuff[5]." S$scount";
+        $stuff[5]=$stuff[5]."Shannon";
+         if ($scount >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($scount)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";	
       }
       if ($type ne 'opac'){
         $stuff[6]=mklink("/cgi-bin/koha/request.pl?bib=$stuff[2]","Request");
