@@ -311,8 +311,16 @@ sub modsubtitle {
 sub modaddauthor {
   my ($bibnum,$author)=@_;
   my $dbh=C4Connect;
-  my $query="update additionalauthors set author='$author' where biblionumber=$bibnum";
+  my $query="Select * from additionalauthors where biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
+  $sth->execute;
+  if (my $data=$sth->fetchrow_hashref){
+    $query="update additionalauthors set author='$author' where biblionumber=$bibnum";
+  } else {
+    $query="insert into additionalauthors (author,biblionumber) values ('$author','$bibnum')";
+  }
+  $sth->finish;
+  $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
