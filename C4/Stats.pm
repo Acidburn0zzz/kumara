@@ -125,8 +125,18 @@ sub Overdues{
 }
 
 sub TotalOwing{
+  my ($type)=@_;
   my $dbh=C4Connect;
+  my $query="Select sum(amountoutstanding) from accountlines";
+  if ($type eq 'fine'){
+    $query=$query." where accounttype='F'";
+  }
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+   my $total=$sth->fetchrow_hashref;
+   $sth->finish;
   $dbh->disconnect; 
+  return($total->{'sum'});
 }
 
 END { }       # module clean-up code here (global destructor)
