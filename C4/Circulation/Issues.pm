@@ -155,7 +155,10 @@ sub formatitem {
    my $line = $datedue." ".$item->{'barcode'}." ".$item->{'title'}.": ".$item->{'author'};
    my $iclass =  $item->{'itemtype'};
    if ($item->{'dewey'} > 0) {
-     $iclass = $iclass.$item->{'dewey'}.$item->{'subclass'};
+     my $dewey = $item->{'dewey'};
+     $dewey =~ s/0*$//;
+     $dewey =~ s/\.$//;
+     $iclass = $iclass.$dewey.$item->{'subclass'};
    };
    my $llen = 65 - length($iclass);
    my $line = fmtstr($env,$line,"L".$llen);
