@@ -18,10 +18,10 @@ my $type=$input->param('type');
 my $main;                                                                                                      
 my $secondary;                                                                                                 
 if ($type eq 'opac'){                                                                                          
-  $main='#99cccc';                                                                                             
-  $secondary='#efe5ef';                                                                                        
+  $main='#99cccc';    
+  $secondary='#efe5ef';
 } else {                                                                                                       
-  $main='#cccc99';                                                                                             
+  $main='#99cc33';                                                                                             
   $secondary='#ffffcc';                                                                                        
 }       
 
@@ -88,9 +88,10 @@ print mktablehdr;
 if ($subject ne ''){
   print mktablerow(1,$main,'<b>SUBJECT</b>');
 } else {
-  print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
+  print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'),'/images/background-mem.gif');
 }
 my $count2=@results;
+#print $count2;
 my $i=0;
 my $colour=1;
 while ($i < $count2){
@@ -110,16 +111,16 @@ while ($i < $count2){
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
       if ($nacount > 0){
-        $stuff[4]=$stuff[4]."N/A=$nacount";
+        $stuff[4]=$stuff[4]."On Loan 1";
       }
       if ($lcount > 0){
-        $stuff[4]=$stuff[4]."L=$lcount";
+        $stuff[4]=$stuff[4]." L$lcount";
       }
       if ($fcount > 0){
-        $stuff[4]=$stuff[4]."F=$fcount";
+        $stuff[4]=$stuff[4]." F$fcount";
       }
       if ($scount > 0){
-        $stuff[4]=$stuff[4]."S=$scount";
+        $stuff[4]=$stuff[4]." S$scount";
       }
     } else {
       my $word=$stuff[1];
@@ -136,7 +137,7 @@ while ($i < $count2){
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
+print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;','/images/background-mem.gif');
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset&type=$type";

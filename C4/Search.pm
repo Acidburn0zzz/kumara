@@ -249,16 +249,16 @@ sub CatSearch  {
   my $i2=0;
   my $limit=$num+$offset;
 
-  if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
-    while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
-      if ($i >= $offset){
-
-$results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
-        $i2++;
-      }
-      $i++;
-    }
-  } else {
+#  if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
+#    while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
+#      if ($i >= $offset){
+#
+#        $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
+#        $i2++;
+#      }
+#      $i++;
+#    }
+#  } else {
     while (my $data=$sth->fetchrow_hashref){
      if ($type ne 'subject'){
       $results[$i]="$data->{'author'}\t$data->{'title'}\t
@@ -270,7 +270,7 @@ $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
      }
      $i++;
     }
-  }
+#  }
   $sth->finish;
 #    print "$query\n";
   #only update stats if search is from opac
