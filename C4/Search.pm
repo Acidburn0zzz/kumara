@@ -396,32 +396,32 @@ sub itemcount {
   biblionumber=$bibnum";       
   my $sth=$dbh->prepare($query);         
   #  print $query;           
-	    $sth->execute;           
-	      my $count=0;             
-	        my $lcount=0;               
-		  my $nacount=0;                 
-		    while (my $data=$sth->fetchrow_hashref){
-		        $count++;                     
-			    my $query2="select * from issues where
-itemnumber=                          
-    '$data->{'itemnumber'}'"; 
-    #    print $query2;     
-        my $sth2=$dbh->prepare($query2);     
-	#    $sth2->execute;         
-	#    if (my $data2=$sth2->fetchrow_hashref){         
-	#      $nacount++;         
-	#    } else {         
-	      if ($data->{'holdingbranch'}='L'){         
-	              $lcount++;               
-		            }                       
-			        }                             
-				#    $sth2->finish;     
-				#  }                                 
-				  $sth->finish; 
-				    print $lcount;      
-				      print $nacount;           
-				          $dbh->disconnect;                   
-					    return $count; 
+  $sth->execute;           
+  my $count=0;             
+  my $lcount=0;               
+  my $nacount=0;                 
+  while (my $data=$sth->fetchrow_hashref){
+    $count++;                     
+    my $query2="select * from issues where itemnumber=                          
+    '$data->{'itemnumber'}' and returndate is NULL"; 
+ #   print $query2;     
+    my $sth2=$dbh->prepare($query2);     
+    $sth2->execute;         
+    if (my $data2=$sth2->fetchrow_hashref){         
+       $nacount++;         
+    } else {         
+      if ($data->{'holdingbranch'}='L'){         
+        $lcount++;               
+      }                       
+    }                             
+    $sth2->finish;     
+  }                                 
+  $sth->finish; 
+#  print $lcount;      
+#  print $nacount;           
+#  print $count;
+  $dbh->disconnect;                   
+  return ($count,$lcount,$nacount); 
 
 
 }

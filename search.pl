@@ -90,18 +90,24 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
       $stuff[2]=mklink($url,$stuff[2]);
-      my $count=itemcount($env,$stuff[0]);
+      my ($count,$lcount,$nacount)=itemcount($env,$stuff[0]);
       $stuff[3]=$count;
+      if ($nacount > 0){
+        $stuff[4]=$stuff[4]."N/A=$nacount";
+      }
+      if ($lcount > 0){
+        $stuff[4]=$stuff[4]."L=$lcount";
+      }
     } else {
       my $word=$stuff[1];
       $word=~ s/ /%20/g;
       $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
     }
     if ($colour == 1){
-      print mktablerow(3,'#ffffcc',$stuff[1],$stuff[2],$stuff[3]);
+      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[2],$stuff[3],$stuff[4]);
       $colour=0;
     } else{
-      print mktablerow(3,'white',$stuff[1],$stuff[2],$stuff[3]);
+      print mktablerow(4,'white',$stuff[1],$stuff[2],$stuff[3],$stuff[4]);
       $colour=1;
     }
     $i++;
