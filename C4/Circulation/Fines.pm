@@ -76,7 +76,7 @@ sub CalcFine {
   and items.biblioitemnumber=biblioitems.biblioitemnumber and
 biblioitems.itemtype=itemtypes.itemtype and
 categoryitem.itemtype=itemtypes.itemtype and
-categoryitem.categorycode='$bortype'";
+categoryitem.categorycode='$bortype' and items.itemlost <> 1";
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;

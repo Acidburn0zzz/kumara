@@ -10,7 +10,7 @@ my ($count,$data)=Getoverdues();
 #print $count;
 my $count2=0;
 #$count=1000;
-my $date=Date_DaysSince999(1,1,2000);
+my $date=Date_DaysSince999(1,2,2000);
 my $bornum;
 my $borrower;
 my $max=5;
