@@ -54,12 +54,13 @@ sub accountsdialog {
   my $titlepanel = titlepanel($env,$env->{'sysarea'},"Money Owing");
   my @borinfo;
   my $reason;
-  $borinfo[0]  = "$borrower->{'cardnumber'}";
-  $borinfo[1] = "$borrower->{'surname'}, $borrower->{'title'} $borrower->{'firstname'} ";
-  $borinfo[2] = "$borrower->{'streetaddress'}, $borrower->{'city'}";
-  $borinfo[3] = "<R>Total Due:  </B>".fmtdec($env,$amountowing,"52");
-  my $borpanel = 
-  new Cdk::Label ('Message' =>\@borinfo, 'Ypos'=>4, 'Xpos'=>"RIGHT");
+  #$borinfo[0]  = "$borrower->{'cardnumber'}";
+  #$borinfo[1] = "$borrower->{'surname'}, $borrower->{'title'} $borrower->{'firstname'} ";
+  #$borinfo[2] = "$borrower->{'streetaddress'}, $borrower->{'city'}";
+  #$borinfo[3] = "<R>Total Due:  </B>".fmtdec($env,$amountowing,"52");
+  #my $borpanel = 
+  #  new Cdk::Label ('Message' =>\@borinfo, 'Ypos'=>4, 'Xpos'=>"RIGHT");
+  my $borpanel = borrowerbox($env,$borrower,$amountowing);
   $borpanel->draw();
   my $acctlist = new Cdk::Scroll ('Title'=>"Outstanding Items",
       'List'=>\@$accountlines,'Height'=>12,'Width'=>76,
@@ -67,7 +68,7 @@ sub accountsdialog {
   $acctlist->draw();
   my $amountentry = new Cdk::Entry('Label'=>"Amount:  ",
      'Max'=>"10",'Width'=>"10",
-     'Xpos'=>"1",'Ypos'=>"4",
+     'Xpos'=>"1",'Ypos'=>"3",
      'Type'=>"INT");
   $amountentry->preProcess ('Function' => sub{preamt(@_,$env,$acctlist);});
   #$amountentry->set('Value'=>$amountowing);
@@ -77,7 +78,10 @@ sub accountsdialog {
      #debug_msg($env,"escaped");
      #$reason="Finished user";
   }
-  #debug_msg($env,"exit");
+  $borpanel->erase();
+  $acctlist->erase();
+  $amountentry->erase();
+  $acctlist->unregister();
   return($amount,$reason);
 }
 

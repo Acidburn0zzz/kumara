@@ -330,12 +330,12 @@ sub actfmenu {
   if (!defined $funct) {
   } elsif ($funct == 0 ) {
     actloanlength ($env,$entryBox,$loanlength,$scroll1,$scroll2);
-  } elsif ($funct == 1 ) {
-    
+  } elsif ($funct == 1 ) { 
     $entryBox->erase();
     $scroll1->erase();
     $scroll2->erase();
     $loanlength->erase();
+    $funcmenu->erase();
     #debug_msg($env,"");
     C4::Circulation::Renewals::bulkrenew($env,$dbh,
       $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
@@ -346,6 +346,7 @@ sub actfmenu {
     $scroll1->erase();
     $scroll2->erase();
     $loanlength->erase();
+    $funcmenu->erase();
     C4::Accounts::reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},
     $amountowing,$borrower,$odues);
     Cdk::refreshCdkScreen();
@@ -395,9 +396,9 @@ sub prebook {
   my ($input,$env,$dbh,$funcmenu,$entryBox,$loanlength,
     $scroll1,$scroll2,$borrower,$amountowing,$odues)= @_;
   if ($input eq $key_tab) {    
-     actfmenu ($env,$dbh,$funcmenu,$entryBox,$loanlength,$scroll1,
+    actfmenu ($env,$dbh,$funcmenu,$entryBox,$loanlength,$scroll1,
        $scroll2,$borrower,$amountowing,$odues);
-  return 0;
+    return 0;
   }
   return 1;
 }

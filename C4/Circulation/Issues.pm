@@ -110,7 +110,9 @@ sub processitems {
    $env->{'newborrower'} = "";
    my ($itemnum,$reason) = 
      issuewindow($env,'Issues',$dbh,$items,$items2,$borrower,fmtdec($env,$amountdue,"32"));
-   if ($itemnum ne ""){
+   if ($itemnum eq ""){
+     $reason = "Finished user";
+   } else {
       my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($datedue ne "") {
          my $line = formatitem($env,$item,$datedue,$charge);
@@ -119,7 +121,7 @@ sub processitems {
          $amountdue += $charge;
       }
       #$env->{'loanlength'}="";
-   }
+   }   
    $dbh->disconnect;
    #check to see if more books to process for this user
    my @done;
@@ -127,19 +129,19 @@ sub processitems {
    if ($reason eq 'Finished user'){
      remoteprint($env,$items2,$borrower);
      if ($amountdue > 0) {
-     &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
+       &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
      } 	 
      @done = ("Issues");
    } elsif ($reason eq "Print"){
-      remoteprint($env,$items2,$borrower);
-      @done = ("No",$items2,$it2p);
+     remoteprint($env,$items2,$borrower);
+     @done = ("No",$items2,$it2p);
    } else {
-      if ($reason ne 'Finished issues'){
-         #return No to let them know that we wish to process more Items for borrower
-         @done = ("No",$items2,$it2p,$amountdue);
-      } else  {
-         @done = ("Circ");
-      }
+     if ($reason ne 'Finished issues'){
+       #return No to let them know that we wish to process more Items for borrower
+       @done = ("No",$items2,$it2p,$amountdue);
+     } else  {
+       @done = ("Circ");
+     }
    }
    #debug_msg($env, "return from issues $done[0]"); 
    return @done;
