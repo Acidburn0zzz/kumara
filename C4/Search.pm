@@ -87,6 +87,10 @@ sub OpacSearch {
   for ($i=1;$i<$count;$i++){
     $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
   }
+  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[$i]%')";
+  for ($i=1;$i<$count;$i++){
+    $query.=" and (notes like '$key[$i]%' or notes like '% $key[$i]%')";
+  }
   $query=$query.") order by title";
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -204,6 +208,10 @@ sub KeywordSearch {
   $query.= ") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0]%')";
   for ($i=1;$i<$count;$i++){
     $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
+  }
+  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[$i]%')";
+  for ($i=1;$i<$count;$i++){
+    $query.=" and (notes like '$key[$i]%' or notes like '% $key[$i]%')";
   }
   $query=$query.")) group by biblio.biblionumber order by author,title";
 #  print $query;
