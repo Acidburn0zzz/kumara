@@ -125,6 +125,7 @@ sub previousissue {
   return($borrower->{'borrowernumber'});
 }
 
+
 sub checkreserve{
   # Check for reserves for biblio 
   # does not look at constraints yet
@@ -144,7 +145,21 @@ sub checkreserve{
 }
 
 sub checkwaiting{
-
+  # check for reserves waiting
+  my ($env,$dbh,$bornum)=@_;
+  my @itemswaiting="";
+  my $query = "select * from reserves
+  where (borrowernumber = '$bornum')
+  and (reserves.found='W')";
+  if ($env->{'debug'} > 4) {
+    output(1,20,$query);
+  }
+  my $sth = $dbh->prepare($query);
+  $sth->execute();
+  if (my $data=$sth->fetchrow_hashref) {
+    push @itemswaiting,$data->{'itemnumber'}; 
+  }
+  return (\@itemswaiting);
 }
 
 sub scanbook {
@@ -159,8 +174,8 @@ sub scanbook {
 sub scanborrower {
   my ($env,$interface)=@_;
   #scan barcode
-#  my $number='V00126643';  
-  my ($number,$reason)=&dialog("Borrower Barcode:");
+# my $number='V00126643';  
+  my ($number,$reason)=&Borr_dialog($env);
   $number=uc $number;
   return ($number,$reason);
 }

@@ -14,7 +14,7 @@ use C4::Circulation;
 # tempuser - temporary user
 my %env = (
   branchcode => "", usercode => "", proccode => "lgon", borrowernumber => "",
-  logintime  => "", lasttime => "", tempuser => ""
+  logintime  => "", lasttime => "", tempuser => "", debug => "9"
   );
 Login(\%env);
 Start_circ(\%env);

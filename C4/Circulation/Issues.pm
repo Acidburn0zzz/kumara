@@ -61,25 +61,35 @@ sub Issue  {
   #clear help
   helptext('');
   clearscreen();
-  #get borrowerbarcode from scanner
-  my ($borcode,$reason)=&scanborrower();
-#  output(1,1,$borcode);
-  my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
-  $sth->execute;
-  my $borrower=$sth->fetchrow_hashref;
-  my $bornum=$borrower->{'borrowernumber'};
-  $sth->finish;
-  while ($bornum eq ''){
-    #If borrower not found enter loop until borrower is found
-    output(1,1,"Borrower not found, please rescan or reenter borrower code");
-    ($borcode,$reason)=&scanborrower();
-    $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
-    $sth->execute;
-    $borrower=$sth->fetchrow_hashref;
-    $bornum=$borrower->{'borrowernumber'};
-    $sth->finish;
-    
-   } 
+  my $bornum = "";
+  my $borrower = "";
+  my $sth = "";
+  while ($bornum eq '') {
+    #get borrowerbarcode from scanner
+    my ($borcode,$reason)=&scanborrower();
+    if ($borcode ne '') {
+      #  output(1,1,$borcode);
+      $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
+      $sth->execute;
+      $borrower=$sth->fetchrow_hashref;
+      $bornum=$borrower->{'borrowernumber'};
+      $sth->finish;
+      if ($bornum eq '') {
+        output(1,1,"Borrower not found, please rescan or reenter borrower code");
+      }
+    }
+  }  
+#  while ($bornum eq ''){
+#    #If borrower not found enter loop until borrower is found
+#    output(1,1,"Borrower not found, please rescan or reenter borrower code");
+#    ($borcode,$reason)=&scanborrower();
+#    $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
+#    $sth->execute;
+#    $borrower=$sth->fetchrow_hashref;
+#    $bornum=$borrower->{'borrowernumber'};
+#    $sth->finish;    
+#  } 
+
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},
     $borrower->{'surname'}));
     output(1,1,$borrowers);
@@ -107,7 +117,7 @@ sub Issue  {
     #check amountowing
     my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     #check if borrower has any items waiting
-    &checkwaiting;
+    my $itemswaiting = &checkwaiting($env,$dbh,$bornum);
     #deal with any money still owing
 #    output(30,1,$amount);
     if ($amount > 0){
@@ -132,6 +142,7 @@ sub Issue  {
       return($done);
     }
 }    
+
 
 sub processitems {
   #process a users items
@@ -209,8 +220,9 @@ sub updateissues{
    }
    $sth->finish;
    # this ought to also insert the branch, but doen't do so yet.
-   $query = "Insert into issues (borrowernumber,itemnumber,date_due)
-   values ($bornum,$itemno,datetime('now'::abstime)+$loanlength)";
+   $query = "Insert into issues (borrowernumber,itemnumber,date_due,branchcode)
+   values
+($bornum,$itemno,datetime('now'::abstime)+$loanlength,$env->{'branchcode'})";
    my $sth=$dbh->prepare($query);
 #   print "\n$query\n";
    $sth->execute;
