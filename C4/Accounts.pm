@@ -6,6 +6,7 @@ package C4::Accounts; #asummes C4/Accounts
 use strict;
 require Exporter;
 use DBI;
+use C4::Interface;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -53,7 +54,7 @@ my $priv_func = sub {
 sub checkaccount  {
   #take borrower number
   #check accounts and list amounts owing
-  my ($bornumber,$dbh)=@_;
+  my ($bornumber,$dbh,$interface)=@_;
   my $sth=$dbh->prepare("Select * from accountlines where
   borrowernumber=$bornumber");
   $sth->execute;
@@ -63,7 +64,10 @@ sub checkaccount  {
   }
   $sth->finish;
   if ($total > 0){
-    print "borrower owes $total\n";
+    &resultout('console',"borrower owes $total",$interface);
+    if ($total > 5){
+      reconcileaccount;
+    }
   }
   return($total);
 }    

@@ -75,8 +75,8 @@ sub userdialog{
   #create a dialog
   my ($type,$text,$mwh)=@_;
   if ($type eq 'console'){
-    main_win($mwh);
-    my$dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
+#    main_win($mwh);
+#    my$dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
 #   grab_key($mwh);
     my $input=&input($mwh,$text);
     return($input);
@@ -87,7 +87,7 @@ sub resultout{
   #outputsome results
   my ($type,$results,$mwh)=@_;
   if ($type eq 'console'){
-   main_win($mwh);
+#   main_win($mwh);
    my $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
    dialog($results,'red',$dwh,$mwh);
    grab_key($mwh); 

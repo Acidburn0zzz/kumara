@@ -51,11 +51,18 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
-sub Issue  {
+sub Start_circ{
   #connect to database
   my $dbh=&C4Connect;  
   #start interface
   my $interface=startint('console');
+  &Issue;
+}
+
+
+
+sub Issue  {
+
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower($interface);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
@@ -89,7 +96,7 @@ sub Issue  {
   #call overdue checker
   &checkoverdues($bornum);
   #check amountowing
-  my $amount=checkaccount($bornum,$dbh);    #from C4::Accounts
+  my $amount=checkaccount($bornum,$dbh,$interface);    #from C4::Accounts
   #check if borrower has any items waiting
   &checkwaiting;
   #deal with any money still owing
@@ -100,6 +107,7 @@ sub Issue  {
   #now check items 
   &processitems($bornum,$interface);
   $dbh->disconnect;
+  &endint();
   return (@borrower);
 }    
 
@@ -110,7 +118,7 @@ sub processitems {
   my $sth=$dbh->prepare("Select * from items where barcode = '$itemnum'");
   $sth->execute;
   my @item=$sth->fetchrow_array;  
-  print $itemnum,"\n",$item[0],"\n";
+#  print $itemnum,"\n",$item[0],"\n";
   $sth->finish;
   #check if item is restricted
   if ($item[23] ==1 ){
@@ -123,12 +131,12 @@ sub processitems {
     # }
   }
   #check if item is on issue already
-  my $status=&previousissue($item[0],$dbh,$bornum);
+  my $status=&previousissue($item[0],$dbh,$bornum,$interface);
   if ($status eq 'out'){
     #book is already out, deal with it
     #if its out to another deal with it
     #if its out the person ask if they want to renew it etc
-    print "book is out";
+#    print "book is out";
   }
   #check reserve
   &checkreserve;
@@ -145,7 +153,7 @@ sub checkoverdues{
 }
 
 sub previousissue {
-  my ($itemnum,$dbh)=@_;
+  my ($itemnum,$dbh,$bornum,$interface)=@_;
   my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
@@ -154,8 +162,8 @@ sub previousissue {
   my @borrower=$sth->fetchrow_array;
   $sth->finish;
   if ($borrower[0] ne ''){
-    print "book is issued to borrower $borrower[0] $borrower[1] borrowernumber
-    $borrower[2]\n";
+    my $text="book is issued to borrower $borrower[0] $borrower[1] borrowernumber  $borrower[2]";
+    &resultout('console',$text,$interface);
     return("out");
   } 
 }
