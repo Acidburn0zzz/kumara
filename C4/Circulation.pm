@@ -63,15 +63,23 @@ sub Issue  {
   my $dbh=&C4Connect;  
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower();
-  output(1,1,$borcode);
+#  output(1,1,$borcode);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
   my $bornum=$borrower->{'borrowernumber'};
   $sth->finish;
-  if ($bornum eq ''){
-    #borrower not found
-   } else {  
+  while ($bornum eq ''){
+    #If borrower not found enter loop until borrower is found
+    output(1,1,"Borrower not found, please rescan or reenter borrower code");
+    $borcode=&scanborrower();
+    $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
+    $sth->execute;
+    $borrower=$sth->fetchrow_hashref;
+    $bornum=$borrower->{'borrowernumber'};
+    $sth->finish;
+    
+   } 
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},
     $borrower->{'surname'}));
     output(1,1,$borrowers);
@@ -110,13 +118,16 @@ sub Issue  {
       $done=&processitems($bornum);
     }
     $dbh->disconnect;
-  }
+  
 #    return (@borrower);
  
 }    
 
 sub processitems {
-  output(1,1,"process");
+  #process a uses items
+  clearscreen();
+  output(1,1,"Processing Items");
+  helptext("F11 quits");
   my ($bornum,$interface)=@_;
   my ($itemnum,$reason)=&scanbook($interface);
   my $dbh=&C4Connect;  

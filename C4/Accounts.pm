@@ -108,6 +108,7 @@ sub reconcileaccount {
 }
 
 sub updateaccounts{
+  #here we update both the accountoffsets and the account lines
   my ($bornumber,$dbh,$data)=@_;
   
 }

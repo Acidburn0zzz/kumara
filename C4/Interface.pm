@@ -88,7 +88,7 @@ sub textbox {
   NEWT_FLAG_RETURNEXIT | NEWT_FLAG_WRAP,$text);
   $panel->Add(0,0,$box,NEWT_ANCHOR_LEFT);
   $panel->AddHotKey(NEWT_KEY_F11);
-   my ($reason,$data)=$panel->Draw();
+  my ($reason,$data)=$panel->Draw();
 }
 
 sub helptext {
@@ -113,8 +113,6 @@ sub list {
   my $stuff=$li->Get();
   return($stuff,$reason);
 }
-
-
 
 sub dialog {
   my ($name)=@_;
