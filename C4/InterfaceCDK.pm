@@ -434,8 +434,6 @@ sub borrowerbox {
   my ($env,$borrower,$amountowing,$odues) = @_;
   my @borrinfo;
   my $amountowing = fmtdec($env,$amountowing,"42");
-  #debug_msg($env,"borrbox");
-  debug_msg($env,"$amountowing");
   my $line = "$borrower->{'cardnumber'} ";
   $line = $line."$borrower->{'surname'}, ";
   $line = $line."$borrower->{'title'} $borrower->{'firstname'}";
