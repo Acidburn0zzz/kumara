@@ -530,7 +530,8 @@ while (my $data=$sth->fetchrow_hashref){
   $count++;
 }
 $sth->finish;
-
+$count--;
+#$count--;
 return($count,@results);
 }
 
