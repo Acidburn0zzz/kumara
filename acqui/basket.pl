@@ -22,7 +22,7 @@ my ($count2,@booksellers)=bookseller($results[0]->{'booksellerid'});
 print <<printend
 <div align=right>
 Our Reference: $basket<br>
-Authorsed By: $results[0]->{'authorisedby'}<br>
+Authorised By: $results[0]->{'authorisedby'}<br>
 $results[0]->{'entrydate'};
 
 </div>
