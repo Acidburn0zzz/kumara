@@ -137,7 +137,12 @@ for (my $i=0;$i<$count2;$i++){
 }      
 
 my $rrp=$results[0]->{'rrp'};
-
+if ($results[0]->{'quantityreceived'} == 0){
+  $results[0]->{'quantityreceived'}='';
+}
+if ($results[0]->{'unitprice'} == 0){
+  $results[0]->{'unitprice'}='';
+}
 print <<EOP
 </select>
 </td>
