@@ -74,9 +74,11 @@ datereceived is NULL) and (cancelledby is NULL or cancelledby = '')";
 sub getsingleorder {
   my ($ordnum)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from biblio,biblioitems,aqorders where ordernumber=$ordnum 
+  my $query="Select * from biblio,biblioitems,aqorders,aqorderbreakdown 
+  where aqorders.ordernumber=$ordnum 
   and biblio.biblionumber=aqorders.biblionumber and
-  biblioitems.biblioitemnumber=aqorders.biblioitemnumber";
+  biblioitems.biblioitemnumber=aqorders.biblioitemnumber and
+  aqorders.ordernumber=aqorderbreakdown.ordernumber";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;

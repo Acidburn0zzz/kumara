@@ -177,7 +177,11 @@ printend
 
 my ($count2,@bookfund)=bookfunds;
 for (my $i=0;$i<$count2;$i++){
-  print "<option value=$bookfund[$i]->{'bookfundid'}>$bookfund[$i]->{'bookfundname'}";
+  print "<option value=$bookfund[$i]->{'bookfundid'}";
+  if ($data->{'bookfundid'} == $bookfund[$i]->{'bookfundid'}){
+    print " Selected";
+  }
+  print ">$bookfund[$i]->{'bookfundname'}";
 }
 
 print <<printend
