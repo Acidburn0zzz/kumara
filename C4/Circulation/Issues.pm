@@ -141,7 +141,7 @@ sub processitems {
      if ($reason ne 'Finished issues'){
        #return No to let them know that we wish to 
        # process more Items for borrower
-       @done = ("No",$items,$it2p,$amountdue,$itemsdet);
+       @done = ("No",$items2,$it2p,$amountdue,$itemsdet);
      } else  {
        @done = ("Circ");
      }
