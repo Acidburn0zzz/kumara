@@ -12,11 +12,13 @@ use C4::Output;
 my $env;
 my $input = new CGI;
 print $input->header;
+#print $input->dump;
 #whether it is called from the opac of the intranet                                                            
 my $type=$input->param('type');                                                  
 if ($type eq ''){
   $type = 'intra';
 }
+my $ttype=$input->param('ttype');
 #setup colours                                                                                                 
 my $main;                                                                                                      
 my $secondary;                                                                                                 
@@ -49,6 +51,7 @@ my $datebefore=$input->param('date-before');
 $search{'date-before'};
 my $class=$input->param('class');
 $search{'class'}=$class;
+$search{'ttype'}=$ttype;
 my @results;
 my $offset=$input->param('offset');
 if ($offset eq ''){
@@ -60,6 +63,7 @@ if ($num eq ''){
 }
 print startpage();
 print startmenu($type);
+#print $search{'ttype'};
 if ($type ne 'opac'){
   print mkheadr(1,'Catalogue Search Results');
 } else {
@@ -248,7 +252,7 @@ if ($offset < $count){
       $keyword=~ s/ /%20/g;
       $search=$search."&class=$class";
     }
-    
+    $search.="&ttype=$ttype";    
     
     my $stuff=mklink("/cgi-bin/koha/search.pl?$search",'Next');
     print $stuff;
