@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-use C4::InterfaceCDK;
+#use C4::InterfaceCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -55,7 +55,7 @@ sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
   my $query ="Select count(*) from biblio where author like
-  '%$search->{'keyword'}%' or
+'%$search->{'keyword'}%' or
   title like '%$search->{'keyword'}%'";
 
   my $sth=$dbh->prepare($query);
@@ -154,14 +154,14 @@ sub CatSearch  {
   my $i=0;
   my $i2=0;
   my $limit=$num+$offset;
-#  print $query;
+
   if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
     while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
-#      if ($i >= $offset){
+      if ($i >= $offset){
         $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
         $i2++;
-#      }
-#      $i++;
+      }
+      $i++;
     }
   } else {
     while (my $data=$sth->fetchrow_hashref){
@@ -248,18 +248,18 @@ $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchnam
 
 sub GetItems {
    my ($env,$biblionumber)=@_;
-   #debug_msg($env,"GetItems");
+   debug_msg($env,"GetItems");
    my $dbh = &C4Connect;
    my $query = "Select * from biblioitems where (biblionumber = $biblionumber)";
    debug_msg($env,$query);
    my $sth=$dbh->prepare($query);
    $sth->execute;
-   #debug_msg($env,"executed query");
+   debug_msg($env,"executed query");
       
    my $i=0;
    my @results;
    while (my $data=$sth->fetchrow_hashref) {
-      #debug_msg($env,$data->{'biblioitemnumber'});
+      debug_msg($env,$data->{'biblioitemnumber'});
       my $line = $data->{'biblioitemnumber'}."\t".$data->{'itemtype'};
       $line = $line."\t$data->{'classification'}\t$data->{'dewey'}";
       $line = $line."\t$data->{'subclass'}\t$data->{isbn}";
@@ -389,40 +389,42 @@ sub getacctlist {
    return ($numlines,\@acctlines,$total);
 }
 
-sub itemcount {
-  my ($env,$bibnum)=@_;
-  my $dbh=C4Connect;
-  my $query="Select * from items where
-  biblionumber=$bibnum";
-  my $sth=$dbh->prepare($query); 
-#  print $query;
-  $sth->execute;
-  my $count=0;
-  my $lcount=0;
-  my $nacount=0;
-  while (my $data=$sth->fetchrow_hashref){
-    $count++;
-    my $query2="select * from issues where itemnumber=
-    '$data->{'itemnumber'}'";
-#    print $query2;
-    my $sth2=$dbh->prepare($query2);
-    $sth2->execute;
-    if (my $data2=$sth2->fetchrow_hashref){
-      $nacount++;
-    } else {
-      if ($data->{'holdingbranch'}='L'){
-        $lcount++;
-      }
-    }
-    $sth2->finish;
-  }
-  $sth->finish;
-  print $lcount;
-  print $nacount;
-  return $count;
-  $dbh->disconnect;
-}
+sub itemcount { 
+  my ($env,$bibnum)=@_; 
+  my $dbh=C4Connect;   
+  my $query="Select * from items where     
+  biblionumber=$bibnum";       
+  my $sth=$dbh->prepare($query);         
+  #  print $query;           
+	    $sth->execute;           
+	      my $count=0;             
+	        my $lcount=0;               
+		  my $nacount=0;                 
+		    while (my $data=$sth->fetchrow_hashref){
+		        $count++;                     
+			    my $query2="select * from issues where
+itemnumber=                          
+    '$data->{'itemnumber'}'"; 
+    #    print $query2;     
+        my $sth2=$dbh->prepare($query2);     
+	#    $sth2->execute;         
+	#    if (my $data2=$sth2->fetchrow_hashref){         
+	#      $nacount++;         
+	#    } else {         
+	      if ($data->{'holdingbranch'}='L'){         
+	              $lcount++;               
+		            }                       
+			        }                             
+				#    $sth2->finish;     
+				#  }                                 
+				  $sth->finish; 
+				    print $lcount;      
+				      print $nacount;           
+				          $dbh->disconnect;                   
+					    return $count; 
 
+
+}
 END { }       # module clean-up code here (global destructor)
 
 
