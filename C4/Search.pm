@@ -57,8 +57,16 @@ sub CatSearch  {
   SWITCH: {
     if ($type eq 'aa') {
       $query="Select * from biblio,catalogueentry,biblioanalysis
-      where (catalogueentry.catalogueentry = biblioanalysis.catalogueentry)
-      and (bibliosubject.biblionumber = biblio.biblionumber)
+      where (catalogueentry.catalogueentry = biblioanalysis.analyticalauthor)
+      and (biblioanalysis.biblionumber = biblio.biblionumber)
+      and (catalogueentry.catalogueentry like '%$searchstring%') 
+      and (entrytype like '$type%')";
+      last SWITCH;
+    };
+    if ($type eq 'st') {
+      $query="Select * from biblio,catalogueentry,bibliosubtitle
+      where (catalogueentry.catalogueentry = bibliosubtitle.subtitle)
+      and (bibliosubtitle.biblionumber = biblio.biblionumber)
       and (catalogueentry.catalogueentry like '%$searchstring%') 
       and (entrytype like '$type%')";
       last SWITCH;
@@ -66,7 +74,7 @@ sub CatSearch  {
     if ($type eq 'at') {
       $query="Select * from biblio,catalogueentry,biblioanalysis
       where (catalogueentry.catalogueentry = biblioanalysis.analyticaltitle)
-      and (bibliosubject.biblionumber = biblio.biblionumber)
+      and (biblioanalysis.biblionumber = biblio.biblionumber)
       and (catalogueentry.catalogueentry like '%$searchstring%') 
       and (entrytype like '$type%')";
       last SWITCH;
@@ -87,7 +95,7 @@ sub CatSearch  {
     };
     if ($type eq 's') {
       $query="Select * from biblio,catalogueentry,bibliosubject
-      where (catalogueentry.catalogueentry = bibliosubject.catalogueentry)
+      where (catalogueentry.catalogueentry = bibliosubject.subject)
       and (bibliosubject.biblionumber = biblio.biblionumber)
       and (catalogueentry.catalogueentry like '%$searchstring%')
       and (entrytype like '$type%')";
@@ -100,8 +108,9 @@ sub CatSearch  {
   print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  while (my @data=$sth->fetchrow_array){
-    print "$data[0]\n";
+  while (my $data=$sth->fetchrow_hashref){
+    print "$data->{'catalogueentry.catalogueentry'}
+    $data->{'biblio.biblionumber'} \n";
   }
   $sth->execute;
   $sth->finish;
