@@ -350,10 +350,11 @@ sub BornameSearch  {
   my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
   $searchstring = lc $searchstring;
-  my $query="Select * from borrowers where lower(surname) like
-  '%$searchstring%' or lower(firstname) like '%$searchstring%' 
-  or lower(othernames) like 
-  '%$searchstring' order by lower(surname),lower(firstname)";
+  my $query="Select * from borrowers 
+  where lower(surname) ~* '%$searchstring%' 
+  or lower(firstname) ~* '%$searchstring%' 
+  or lower(othernames) ~* '%$searchstring'
+  order by lower(surname),lower(firstname)";
   #print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
