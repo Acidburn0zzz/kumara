@@ -114,19 +114,20 @@ sub KeywordSearch {
   my $i=1;
   my @results;
   my $query ="Select * from biblio where
-  (title like '%$key[0]%' or ";
+  (title like '%$key[0]%' ";
   while ($i < $count){
     $query=$query." and title like '%$key[$i]%'";
     $i++;
   }
   $query=$query.") order by author,title";
+#  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $i=0;
   while (my $data=$sth->fetchrow_hashref){
     $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
 #      print $results[$i];
-$i++;
+    $i++;
   }
   $sth->finish;
   $sth=$dbh->prepare("Select biblionumber from bibliosubject where subject
