@@ -22,6 +22,8 @@ if ($action eq "M") {
 }  
 print startpage();
 print startmenu();
+print "Action $action<br>";
+print "Cardnumber  $cardnumber<br>";
 my %inputs;
 my $catlist=makelist("categories","categorycode","description");
 $inputs{'cardnumber'}   ="1\tR\tCard Number\ttext\t$data->{'cardnumber'}";
