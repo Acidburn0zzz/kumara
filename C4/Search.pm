@@ -51,7 +51,7 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub CatSearch  {
-  my (%env,$searchstring,$type)=@_;
+  my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
   my $query = '';
   SWITCH: {
