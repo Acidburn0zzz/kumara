@@ -84,9 +84,11 @@ categoryitem.categorycode='$bortype'";
   $sth->finish;
   my $amount=0;
   if ($difference >= $data->{'startcharge'}){
-      my $temp=$difference % $data->{'chargeperiod'};
-      $difference=$difference - $temp;
-      $amount=($difference / $data->{'chargeperiod'}) * $data->{'fine'};
+      if ($data->{'chargeperiod'} != 0){
+        my $temp=$difference % $data->{'chargeperiod'};
+        $difference=$difference - $temp;
+        $amount=($difference / $data->{'chargeperiod'}) * $data->{'fine'};
+      }
   }
   $dbh->disconnect;
   return($amount);

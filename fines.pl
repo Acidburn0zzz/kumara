@@ -30,8 +30,12 @@ for (my $i=0;$i<$count;$i++){
 	  if ($amount > $max){
   	    $amount=25;
 	  }
-          UpdateFine($data->[$i]->{'itemnumber'},$bornum,$amount);
-	  print "$amount\n";
+	  if ($amount > 0){
+            UpdateFine($data->[$i]->{'itemnumber'},$bornum,$amount);
+   	    print "$amount\n";
+	  } else {
+	    print "0 fine\n";
+	  }
       }
     }
 }
