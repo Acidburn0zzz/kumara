@@ -437,6 +437,7 @@ sub BornameSearch  {
   where surname like '%$searchstring%' 
   or firstname  like '%$searchstring%' 
   or othernames like '%$searchstring%'
+  or cardnumber = '$searchstring'
   order by surname,firstname";
   #print $query,"\n";
   my $sth=$dbh->prepare($query);
@@ -482,8 +483,14 @@ borrowernumber='$bornum' and date_due < now() and returndate is NULL");
   $sth->execute;
   my $data2=$sth->fetchrow_hashref;
   $sth->finish;
+  $sth=$dbh->prepare("Select sum(amountoutstanding) from accountlines where
+borrowernumber='$bornum'");
+  $sth->execute;
+  my $data3=$sth->fetchrow_hashref;
+  $sth->finish;
   $dbh->disconnect;
-  return($data2->{'count(*)'},$data->{'count(*)'});
+
+return($data2->{'count(*)'},$data->{'count(*)'},$data3->{'sum(amountoutstanding)'});
 }
 		  
 sub getacctlist {
