@@ -14,7 +14,7 @@ my $input=new CGI;
 my $bornum=$input->param('bornum');
 #get borrower details
 my $data=borrdata('',$bornum);
-my ($count,$issues)=borrissues($bornum);
+my ($count,$issues)=allissues($bornum);
 
 
 print $input->header;
@@ -25,7 +25,7 @@ print mkheadr(3,"$data->{'title'} $data->{'initials'} $data->{'surname'}");
 print mktablehdr();
 print mktablerow(4,'white',bold('TITLE'),bold('AUTHOR'),bold('DATE'));
 for (my $i=0;$i<$count;$i++){
-  print mktablerow(3,'white',$issues->[$i]->{'title'},$issues->[$i]->{'author'},$issues->[$i]->{'date_due'});
+  print mktablerow(3,'white',$issues->[$i]->{'title'},$issues->[$i]->{'author'},$issues->[$i]->{'returndate'});
 }
 print mktableft();
 print endmenu('member');
