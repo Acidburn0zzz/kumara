@@ -68,9 +68,7 @@ sub Issue  {
     #now check items 
     clearscreen();
     my ($items,$items2)=pastitems($env,$bornum,$dbh);
-   # my @items2;
-#    $items2[0]=" "x30;
-	 
+ 	 
 #    my @items2;
 #    $items2[0]=" "x30;
     my $done = "No";
@@ -105,20 +103,21 @@ sub processitems {
    #  }
    my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
    if ($itemnum ne ""){
-      debug_msg($env,"borrower $bornum");
+      debug_msg($env,"borrower $bornum item $itemnum");
       my ($item) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       output(40,$row2,$item->{'title'});
       #unshift $items2,substr(($item->{'title'}.(" "x30)),0,30);
-      $items2[$row2-5]=substr(($item->{'title'}.(" "x30)),0,30); 
+      #$items2[$row2-5]=substr(($item->{'title'}.(" "x30)),0,30); 
       $row2++;	      
    }  
+          
    $dbh->disconnect;
    #check to see if more books to process for this user
    if ($reason eq 'Finished user'){
       return('New borrower');
    } else {
       if ($reason ne 'Finished issues'){
-         #return No to let them no that we wish to process more Items for borrower
+         #return No to let them know that we wish to process more Items for borrower
          return('No',$items2,$row2);
       } else  {
          return('Circ');
@@ -130,36 +129,44 @@ sub issueitem{
    my ($env,$dbh,$itemnum,$bornum,$items)=@_;
    $itemnum=uc $itemnum;
    my $canissue = 1;
- #  my ($itemnum,$reason)=&scanbook();
-   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
+ ##  my ($itemnum,$reason)=&scanbook();
+   my $query="Select * from items,biblio where (barcode='$itemnum') and
+        (items.biblionumber=biblio.biblionumber)";
+  
+  # my $query="Select * from items where barcode ='$itemnum'"; 
+   my $item;
    my $sth=$dbh->prepare($query);  
    $sth->execute;
-   my $item=$sth->fetchrow_hashref;  
-   #$items2=(substr($item.(" "x30),0,30));
-   #$items2->Append(substr($item.(" "x30),0,30));
-   $sth->finish;
-   #check if item is restricted
-   if ($item->{'restricted'} == 1 ){
-      output(20,1,"whoop whoop restricted");
+   if (my $item=$sth->fetchrow_hashref) {
+     debug_msg($env,$item->{'title'});
+     #$items2=(substr($item.(" "x30),0,30));
+     #$items2->Append(substr($item.(" "x30),0,30));
+     $sth->finish;
+     #check if item is restricted
+     if ($item->{'restricted'} == 1 ){
+       output(20,1,"whoop whoop restricted");
       #check borrowers status to take out restricted items
       # if borrower allowed {
       #  $canissue = 1
       # } else {
       #  $canissue = 0
       # }
+     } else {
+       #check if item is on issue already
+       my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
+       #check reserve
+       my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});    
+       #if charge deal with it
+     }   
+     if ($canissue == 1) {
+       #now mark as issued
+       &debug_msg($env,"Issueing $item->{'itemnumber'} $item->{'biblioitemnumber'} $bornum");
+       &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum)
+       &UpdateStats($env,$env->{'branchcode'},'issue');
+     }
    } else {
-     #check if item is on issue already
-     my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
-     #check reserve
-     my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});    
-     #if charge deal with it
-   }   
-   if ($canissue == 1) {
-     #now mark as issued
-     &debug_msg($env,"Issue $item->{'itemnumber'} $item->{'biblioitemnumber'} $bornum");
-     &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum)
-     &UpdateStats($env,$env->{'branchcode'},'issue');
-   }
+     debug_msg($env,"$itemnum not found");
+   }  
    return($item);
 }
 
