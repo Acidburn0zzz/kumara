@@ -81,7 +81,7 @@ sub pastitems{
   $items[0]=" "x72;
   $items2[0]=" "x72;
   while (my $data1=$sth->fetchrow_hashref) {
-    my $data = itemnodata($env,$data,$data1->{'itemnumber'};
+    my $data = itemnodata($env,$dbh,$data1->{'itemnumber'});
     my $line = C4::Circulation::Issues::formatitem($env,$data,$data1->{'date_due'},"");
     $items[$i]=$line;
     $i++;
