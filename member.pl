@@ -21,9 +21,7 @@ my @inputs=(["text","member",$member],
 print mkheadr(2,'Member Search');
 print mkformnotable("/cgi-bin/koha/member.pl",@inputs);
 print <<printend 
-<A HREF="/cgi-bin/koha/memberentry.pl?type=Add"><img src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" BORDER=0 ></a><br>
-<INPUT TYPE="radio" name="chooseform" value="adult" checked>Adult
-<INPUT TYPE="radio" name="chooseform" value="organisation" >Organisation
+
 printend
 ;
 print "You Searched for $member<p>";
@@ -50,5 +48,11 @@ for (my $i=0; $i < $count; $i++){
   $results->[$i]{'borrowernotes'});
 }
 print mktableft;
+print <<printend
+<A HREF="/cgi-bin/koha/memberentry.pl?type=Add"><img src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" BORDER=0 ></a><br>
+<INPUT TYPE="radio" name="chooseform" value="adult" checked>Adult
+<INPUT TYPE="radio" name="chooseform" value="organisation" >Organisation
+printend
+;
 print endmenu('member');
 print endpage();
