@@ -83,10 +83,10 @@ sub menu2 {
   my ($title,@items)=@_;
   my $numitems=@items;
   my $panel = Newt::Panel(1, 4, $title);
-  my $b0 = Newt::Button(fmtstr("",@items[0],"C30"));
-  my $b1 = Newt::Button(fmtstr("",@items[1],"C30"));
-  my $b2 = Newt::Button(fmtstr("",@items[2],"C30"));
-  my $b3 = Newt::Button(fmtstr("",@items[3],"C30"));
+  my $b0 = Newt::Button(fmtstr("",@items[0],"C30"),1);
+  my $b1 = Newt::Button(fmtstr("",@items[1],"C30"),1);
+  my $b2 = Newt::Button(fmtstr("",@items[2],"C30"),1);
+  my $b3 = Newt::Button(fmtstr("",@items[3],"C30"),1);
   $b0->Tag(@items[0]);
   $b1->Tag(@items[1]);
   $b2->Tag(@items[2]);
