@@ -73,7 +73,7 @@ biblio.biblionumber=$bib";
     $results[$i]=$data;
     $i++;
   }
-  print $query;
+#  print $query;
   $sth->finish;
   $dbh->disconnect;
   return($i,\@results);
