@@ -67,7 +67,7 @@ sub Start_circ{
 sub Issue  {
   my $dbh=&C4Connect;  
   #get borrowerbarcode from scanner
-  my $borcode=&scanborrower();
+  my ($borcode,$reason)=&scanborrower();
 #  output(1,1,$borcode);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
   $sth->execute;
