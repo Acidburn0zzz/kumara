@@ -20,7 +20,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&Start_circ &scanborrower);
+#@EXPORT = qw(&Start_circ &scanborrower);
+@EXPORT = qw(&Start_circ);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -209,14 +210,14 @@ sub scanbook {
   return ($number,$reason);
 }
 
-sub scanborrower {
-  my ($env,$interface)=@_;
-  #scan barcode
-  my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
-  $number= $number;
-  $book=uc $book;
-  return ($number,$reason,$book);
-}
+#sub scanborrower {
+#  my ($env,$interface)=@_;
+#  #scan barcode
+#  my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
+#  $number= $number;
+#  $book=uc $book;
+#  return ($number,$reason,$book);
+#}
 
 
 END { }       # module clean-up code here (global destructor)

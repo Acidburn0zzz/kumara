@@ -1,5 +1,4 @@
-package C4::Circulation;
-#package C4::Circulation::Borrower; #assumes C4/Circulation/Borrower
+package C4::Circulation::Borrower; #assumes C4/Circulation/Borrower
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
@@ -21,7 +20,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&findborrower &Borenq &findoneborrower);
+@EXPORT = qw(&findborrower &Borenq &findoneborrower &scanborrower);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -62,9 +61,7 @@ sub findborrower  {
   my ($env,$dbh) = @_;
   helptext('');
   clearscreen();
-  titlepanel($env,$env->{'sysarea'},"Borrower Entry");
   my $bornum = "";
-  my $borrower = "";
   my $sth = "";
   my $borcode = "";
   my $borrower;
@@ -72,6 +69,7 @@ sub findborrower  {
   my $book;
   while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
+    titlepanel($env,$env->{'sysarea'},"Borrower Entry");
     ($borcode,$reason,$book)=&scanborrower(); #C4::Circulation
     debug_msg($env,"Reaz = $reason");
     if ($reason eq "") {
@@ -220,5 +218,15 @@ sub Borenq {
   }
   return $reason;
 }  
+
+sub scanborrower {
+  my ($env,$interface)=@_;
+  #scan barcode
+  my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
+  $number= $number;
+  $book=uc $book;
+  return ($number,$reason,$book);
+}
+
 
 END { }       # module clean-up code here (global destructor)
