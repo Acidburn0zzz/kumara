@@ -92,7 +92,7 @@ sub Issue  {
     }
     #check if member has a card reported as lost
     if ($borrower->{'lost'} ==1){
-      #updae member info
+      #update member info
       output(20,1,"Borrower has lost card");
     }
     #check the notes field if notes exist display them
@@ -168,7 +168,7 @@ sub processitems {
     # }
   } else {
     #check if item is on issue already
-    $my $currbor = &previousissue(\%env,$item->{'itemnumber'},$dbh,$bornum);
+    my $currbor = &previousissue(\%env,$item->{'itemnumber'},$dbh,$bornum);
     #check reserve
     &checkreserve;
     #if charge deal with it

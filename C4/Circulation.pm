@@ -5,6 +5,7 @@ package C4::Circulation; #asummes C4/Circulation
 use strict;
 require Exporter;
 use DBI;
+use C4::Interface;
 use C4::Database;
 use C4::Circulation::Issues;
 
@@ -54,7 +55,7 @@ sub Start_circ{
   my (%env)=@_;
   #connect to database
   #start interface
-  startint(\%env,'Circulation');
+  &startint(\%env,'Circulation');
   my ($reason,$data)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
   my $donext;
   if ($data eq 'Issues'){  
