@@ -183,11 +183,11 @@ while ($i < $count){
 #      }
     } else {
        $results[6]=ItemType($results[6]);
-       if ($results[6] =~ /Periodical/){
+#       if ($results[6] =~ /Periodical/){
           print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[9]);
-	} else {
-         print mktablerow(5,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7]);
-       }       
+#	} else {
+#         print mktablerow(5,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7]);
+#       }       
     } 
     $colour=0;                                                                                
   } else{                                                                                     
@@ -199,11 +199,11 @@ while ($i < $count){
 #      }
     } else {
       $results[6]=ItemType($results[6]);
-       if ($results[6] =~ /Periodical/){
+#       if ($results[6] =~ /Periodical/){
           print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[9]);
-	} else {
-         print mktablerow(5,'white',$results[6],$results[4],$results[3],$results[2],$results[7]);
-       }       
+#	} else {
+#         print mktablerow(5,'white',$results[6],$results[4],$results[3],$results[2],$results[7]);
+#       }       
     }
     $colour=1;                                                                                
   }
