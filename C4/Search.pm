@@ -117,6 +117,24 @@ sub CatSearch  {
   $dbh->disconnect;
 }    
 
+sub ItemInfo {
+  my ($bibliono)=@_;
+  my $dbh = &C4Connect;
+  my $query="Select * from items,issues,biblioitems 
+  where (items.bibliono = '%$bibliono%') 
+  and (items.itemnumber = issues.itemnumber)
+  and (issues.returndate is null)
+  and (";
+  print $query,"\n";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    print "$data->{'catalogueentry'}
+    $data->{'biblionumber'}"
+  }
+  $sth->finish;
+  $dbh->disconnect;
+}
 
 sub BornameSearch  {
   my ($searchstring,$type)=@_;
