@@ -97,7 +97,7 @@ sub Issue  {
     &reconcileaccount($bornum,$dbh);
   }
   #deal with alternative loans
-  #now check items
+  #now check items 
   &processitems($bornum,$interface);
   $dbh->disconnect;
   return (@borrower);
