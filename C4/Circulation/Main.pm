@@ -166,7 +166,7 @@ sub checkreserve{
     and (items.biblionumber = reserves.biblionumber)
     and ((reserves.found = 'W' 
       and items.itemnumber = reserves.itemnumber)
-      or (reserves.found = '')) 
+      or (reserves.found is null)) 
     order by priority";
   my $sth = $dbh->prepare($query);
   $sth->execute();
@@ -178,18 +178,19 @@ sub checkreserve{
       $resbor = $data->{'borrowernumber'}; 
     } else {
       my $found = 0;
-      my $cquery = "select * from reserveconstraints
-         where borrowernumber='$data->{'borrowernumber'}'
-	 and reservedate='$data->{'reservedate'}'
-	 and biblionumber='$data->{'biblionumber'}'
-	 and biblioitemnumber=$itemnum";
+      my $cquery = "select * from reserveconstraints,items 
+         where (borrowernumber='$data->{'borrowernumber'}') 
+         and reservedate='$data->{'reservedate'}'
+	 and reserveconstraints.biblionumber='$data->{'biblionumber'}'
+	 and (items.itemnumber=$itemnum and 
+	 items.biblioitemnumber = reserveconstraints.biblioitemnumber)";
       my $csth = $dbh->prepare($cquery);
       $csth->execute;
-      if (my $cdata=$csth->fetchrow_hashref) {$found = 1;}	   	
+      if (my $cdata=$csth->fetchrow_hashref) {$found = 1;}
       if ($const eq 'o') {
-        if ($found == 1) {$resbor = $data->{'borrowernumber'};}
+        if ($found eq 1) {$resbor = $data->{'borrowernumber'};}
       } else {
-        if ($found == 0) {$resbor = $data->{'borrowernumber'};} 
+        if ($found eq 0) {$resbor = $data->{'borrowernumber'};} 
       }
       $csth->finish();
     }     
