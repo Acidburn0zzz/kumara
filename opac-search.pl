@@ -68,20 +68,32 @@ while ($i < $count2){
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
       if ($nacount > 0){
-        $stuff[4]=$stuff[4]."On Loan $nacount";
+        $stuff[4]=$stuff[4]."On Loan";
+	if ($nacount >1 ){
+	  $stuff[4]=$stuff[4]." ($nacount)";
+	}
+	$stuff[4].=" ";
       }
       if ($lcount > 0){
         $stuff[4]=$stuff[4]."Levin";
 	if ($lcount >1 ){
-	  $stuff[4]=$stuff[4].$lcount;
+	  $stuff[4]=$stuff[4]." ($lcount)";
 	}
 	$stuff[4].=" ";
       }
       if ($fcount > 0){
-        $stuff[4]=$stuff[4]."F$fcount";
+        $stuff[4]=$stuff[4]."Foxton";
+	if ($fcount >1 ){
+	  $stuff[4]=$stuff[4]." ($fcount)";
+	}
+	$stuff[4].=" ";
       }
       if ($scount > 0){
-        $stuff[4]=$stuff[4]."S$scount";
+        $stuff[4]=$stuff[4]."Shannon";
+	if ($scount >1 ){
+	  $stuff[4]=$stuff[4]." ($scount)";
+	}
+	$stuff[4].=" ";
       }
     if ($colour == 1){
       print mktablerow(4,'#efe5ef',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
