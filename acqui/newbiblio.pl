@@ -22,6 +22,11 @@ my $data;
 if ($ordnum eq ''){
   $ordnum=newordernum;
   $data=bibdata($biblio);
+  if ($data->{'title'} eq ''){
+    $data->{'title'}=$title;
+    $data->{'author'}=$author;
+    $data->{'copyrightdate'}=$copyright;
+  }
 }else {
   $data=getsingleorder($ordnum);
   $biblio=$data->{'biblionumber'};
