@@ -5,26 +5,15 @@ use CGI;
 use strict;
 use C4::Acquisitions;
 use C4::Output;
+use C4::Search;
 
 my $input= new CGI;
-#print $input->header;
-#print $input->dump;
+print $input->header;
+print $input->dump;
 
 
-my $title=checkinp($input->param('Title'));
-my $author=checkinp($input->param('Author'));
+my $bibitemnum=checkinp($input->param('bibitemnum'));
 my $bibnum=checkinp($input->param('bibnum'));
-my $itemnum=checkinp($input->param('itemnumber'));
-my $copyright=checkinp($input->param('Copyright'));
-my $seriestitle=checkinp($input->param('Series'));
-my $serial=checkinp($input->param('Serial'));
-my $unititle=checkinp($input->param('Unititle'));
-my $notes=checkinp($input->param('Notes'));
-
-#modbiblio($bibnum,$title,$author,$copyright,$seriestitle,$serial,$unititle,$notes);
-
-#my $bibitemnum=checkinp($input->param('bibitemnum'));
-#my $olditemtype
 my $itemtype=checkinp($input->param('Item'));
 my $isbn=checkinp($input->param('ISBN'));
 my $publishercode=checkinp($input->param('Publisher'));
@@ -56,12 +45,53 @@ my $illus=checkinp($input->param('Illustrations'));
 my $pages=checkinp($input->param('Pages'));
 my $volumeddesc=checkinp($input->param('Volume'));
 
-my $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
-modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
-moditem($itemnum,$bibitemnum);
 
-  print $input->redirect("detail.pl?type=intra&bib=$bibnum");
-#print $bibitemnum;
+my (@items)=itemissues($bibitemnum);
+#print @items;           
+my $count=@items;
+print $count;
+my @barcodes;
+
+
+my $existing=$input->param('existing');
+if ($existing eq 'yes'){
+#  print "yes";
+  my $group=$input->param('existinggroup');
+  #go thru items assing selected ones to group
+  for (my $i=0;$i<$count;$i++){
+    my $temp="check_group_".$items[$i]->{'barcode'};
+    my $barcode=$input->param($temp);
+    if ($barcode ne ''){
+      moditem($items[$i]->{'itemnumber'},$group);
+    }
+  }
+} else {
+    my $flag;
+    my $flag2;
+    for (my $i=0;$i<$count;$i++){
+      my $temp="check_group_".$items[$i]->{'barcode'};
+      $barcodes[$i]=$input->param($temp);
+      if ($barcodes[$i] eq ''){
+        $flag="notall";
+      } else {
+        $flag2="leastone";
+      }
+   }
+   if ($flag eq 'notall'){
+      $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
+      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
+      for (my $i=0;$i<$count;$i++){
+        if ($barcodes[$i] ne ''){
+	  moditem($items[$i]->{'itemnumber'},$bibitemnum);
+	}
+      }
+      
+   } elsif ($flag2 eq 'leastone') {
+      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
+   }
+}
+print $input->redirect("moredetail.pl?type=intra&bib=$bibnum&bi=$bibitemnum");
+
 
 sub checkinp{
   my ($inp)=@_;

@@ -14,7 +14,8 @@ $VERSION = 0.01;
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
-&getcurrencies &modsubtitle &modsubject &modaddauthor &moditem);
+&getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
+&findall &needsmod);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -611,14 +612,67 @@ sub makeitems {
 }
 
 sub moditem {
-  my ($itemnum,$bibitemnum)=@_;
+  my ($itemnum,$bibitemnum,$barcode,$notes)=@_;
   my $dbh=C4Connect;
-  my $query="update items set biblioitemnumber=$bibitemnum where
-itemnumber=$itemnum";
+  my $query="update items set biblioitemnumber=$bibitemnum,
+  barcode='$barcode',itemnotes='$notes'
+  where itemnumber=$itemnum";
+  if ($barcode eq ''){
+    $query="update items set biblioitemnumber=$bibitemnum where itemnumber=$itemnum";
+  }
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
+}
+
+sub countitems{
+  my ($bibitemnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select count(*) from items where biblioitemnumber='$bibitemnum'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data->{'count(*)'});
+}
+
+sub findall {
+  my ($biblionumber)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from biblioitems,items,itemtypes where 
+  biblioitems.biblionumber=$biblionumber 
+  and biblioitems.biblioitemnumber=items.biblioitemnumber and
+  itemtypes.itemtype=biblioitems.itemtype
+  order by items.biblioitemnumber";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return(@results);
+}
+
+sub needsmod{
+  my ($bibitemnum,$itemtype)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from biblioitems where biblioitemnumber=$bibitemnum
+  and itemtype='$itemtype'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $result=0;
+  if (my $data=$sth->fetchrow_hashref){
+    $result=1;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($result);
 }
 
 END { }       # module clean-up code here (global destructor)

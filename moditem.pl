@@ -9,13 +9,14 @@ use strict;
 use C4::Search;
 use CGI;
 use C4::Output;
+use C4::Acquisitions;
 
 my $input = new CGI;
 print $input->header;
 my $bibitemnum=$input->param('bibitem');
 my $data=bibitemdata($bibitemnum);
 my $itemnum=$input->param('item');
-
+my $item=itemnodata('blah','',$itemnum);
 #my ($analytictitle)=analytic($biblionumber,'t');
 #my ($analyticauthor)=analytic($biblionumber,'a');
 print startpage();
@@ -37,23 +38,23 @@ if ($dewey <= 0){
   $dewey='';                                                                       
 } 
 $dewey=~ s/\.$//;
-#$inputs{'Barcode'}="text\t\$item->{'barcode'}\t0";
-$inputs{'Class'}="text\t$data->{'classification'}$dewey$data->{'subclass'}\t2";
-$inputs{'Item Type'}="text\t$data->{'itemtype'}\t3";
+$inputs{'Barcode'}="text\t$item->{'barcode'}\t0";
+$inputs{'Class'}="hidden\t$data->{'classification'}$dewey$data->{'subclass'}\t2";
+#$inputs{'Item Type'}="text\t$data->{'itemtype'}\t3";
 #$inputs{'Subject'}="textarea\t$sub\t4";
-#$inputs{'Publisher'}="text\t$data->{'publishercode'}\t5";
-$inputs{'Copyright date'}="text\t$data->{'copyrightdate'}\t6";
-$inputs{'ISBN'}="text\t$data->{'isbn'}\t7";
-#$inputs{'Publication Year'}="text\t$data->{'publicationyear'}\t8";
-$inputs{'Pages'}="text\t$data->{'pages'}\t9";
-$inputs{'Illustrations'}="text\t$data->{'illustration'}\t10";
+$inputs{'Publisher'}="hidden\t$data->{'publishercode'}\t5";
+#$inputs{'Copyright date'}="text\t$data->{'copyrightdate'}\t6";
+$inputs{'ISBN'}="hidden\t$data->{'isbn'}\t7";
+$inputs{'Publication Year'}="hidden\t$data->{'publicationyear'}\t8";
+$inputs{'Pages'}="hidden\t$data->{'pages'}\t9";
+$inputs{'Illustrations'}="hidden\t$data->{'illustration'}\t10";
 #$inputs{'Series Title'}="text\t$data->{'seriestitle'}\t11";
 #$inputs{'Additional Author'}="text\t$additional\t12";
 #$inputs{'Subtitle'}="text\t$subtitle->[0]->{'subtitle'}\t13";
 #$inputs{'Unititle'}="text\t$data->{'unititle'}\t14";
-#$inputs{'Notes'}="textarea\t$data->{'notes'}\t15";
-$inputs{'Serial'}="text\t$data->{'serial'}\t16";
-$inputs{'Volume'}="text\t$data->{'volumeddesc'}\t17";
+$inputs{'ItemNotes'}="textarea\t$item->{'itemnotes'}\t15";
+#$inputs{'Serial'}="text\t$data->{'serial'}\t16";
+$inputs{'Volume'}="hidden\t$data->{'volumeddesc'}\t17";
 #$inputs{'Analytic author'}="text\t\t18";
 #$inputs{'Analytic title'}="text\t\t19";
 
@@ -61,8 +62,51 @@ $inputs{'bibnum'}="hidden\t$data->{'biblionumber'}\t20";
 $inputs{'bibitemnum'}="hidden\t$data->{'biblioitemnumber'}\t21";
 $inputs{'itemnumber'}="hidden\t$itemnum\t22";
 
-print mkform3('updatebibitem.pl',%inputs);
-#print mktablehdr();
-#print mktableft();
+
+
+print <<printend
+<FONT SIZE=6><em>$data->{'title'} ($data->{'author'})</em></FONT><br>
+printend
+;
+my @formats=findall($data->{'biblionumber'});
+my $count=@formats;
+my $format="<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=\"220\">
+";
+my $i=0;
+while ($i<$count){
+  $format.="<TR VALIGN=TOP>
+  <td  bgcolor=\"#cccc99\" background=\"/images/background-mem.gif\">
+  <B>FORMAT - $formats[$i]->{'description'}</TD></TR>
+  <tr VALIGN=TOP  >
+  <TD>
+  <FONT SIZE=2  face=\"arial, helvetica\">
+  <b>ISBN:</b> $formats[$i]->{'isbn'}<br>
+  <b>Item type:</b> $formats[$i]->{'itemtype'}<br>
+  <b>Class:</b>  $formats[$i]->{'classification'}
+  ";
+  my $bibitemnumber=$formats[$i]->{'biblioitemnumber'};
+  while ($bibitemnumber == $formats[$i]->{'biblioitemnumber'}){
+    $format.="<hr>
+    <b>Item:</b> <a href=\"/cgi-bin/koha/moredetail.pl?item=36358&bib=12073&bi=61386\">$formats[$i]->{'barcode'}</a><br>
+    <b>Location:</b> $formats[$i]->{'holdingbranch'}<br>
+    <b>Last Seen:</b> $formats[$i]->{'datelastseen'}
+    </font>";
+    $bibitemnumber=$formats[$i]->{'biblioitemnumber'};
+    $i++;
+  }
+#  $i++;
+  $format.="</td></TR>";
+}
+					     
+
+$format.="</table>";
+my $rightside=mkform3('updateitem.pl',%inputs);
+
+
+print mktablehdr();
+print mktablerow(2,'white',$format,$rightside);
+
+print mktableft();
+
 print endmenu();
 print endpage();

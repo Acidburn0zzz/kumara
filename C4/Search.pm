@@ -18,7 +18,7 @@ $VERSION = 0.01;
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
 &getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle
-&addauthor); 
+&addauthor &bibitems); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -703,6 +703,7 @@ sub itemissues {
 
 sub itemnodata {
   my ($env,$dbh,$itemnumber) = @_;
+  $dbh=C4Connect;
   my $query="Select * from biblio,items,biblioitems
     where items.itemnumber = '$itemnumber'
     and biblio.biblionumber = items.biblionumber
@@ -711,7 +712,8 @@ sub itemnodata {
 #  print $query;
   $sth->execute;
   my $data=$sth->fetchrow_hashref;
-  $sth->finish;    
+  $sth->finish;  
+  $dbh->disconnect;
   return($data);	       
 }
 
@@ -950,6 +952,25 @@ sub ItemType {
   $dbh->disconnect;
   return ($dat->{'description'});
 }
+
+sub bibitems {
+  my ($bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from biblioitems,itemtypes where
+  biblionumber='$bibnum' and biblioitems.itemtype=itemtypes.itemtype";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $i=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+}
+
 END { }       # module clean-up code here (global destructor)
 
 

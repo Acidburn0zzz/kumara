@@ -53,7 +53,7 @@ print <<printend
 <a href=/cgi-bin/koha/request.pl?bib=$bib><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>
 <FONT SIZE=6><em>$data->{'title'} ($data->{'author'})</em></FONT><P>
 <p>
-<form action=/cgi-bin/koha/modbib.pl>
+<form action=/cgi-bin/koha/modbibitem.pl>
 <input type=hidden name=bibitem value=$bi>
 <!-------------------BIBLIO ITEM------------>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left>
@@ -89,7 +89,7 @@ printend
 
 for (my $i=0;$i<$count;$i++){
 print <<printend
-<img src="/images/holder.gif" width=16 height=250 align=left>
+<img src="/images/holder.gif" width=16 height=300 align=left>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=220 >				
 <TR VALIGN=TOP>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BARCODE $items[$i]->{'barcode'}</b></TD>
@@ -131,8 +131,6 @@ print <<printend
 <b>paid by:</b><br>
 <b>Notes:</b> $items[$i]->{'itemnotes'}<br>
 <b>Renewals:</b> $items[$i]->{'renewals'}<br>
-<b>Requests:</b> put in current reserves<br>
-  waiting: <br>
 <b>Accession Date: $items[$i]->{'dateaccessioned'}<br>
 <b>Cancelled: $items[$i]->{'withdrawn'}<br>
 <b>Total Issues:</b> $items[$i]->{'issues'}<br>

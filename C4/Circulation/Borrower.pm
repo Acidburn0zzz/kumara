@@ -1,4 +1,4 @@
-package C4::Ciecrculation::Borrower; #assumes C4/Circulation/Borrower
+package C4::Circulation::Borrower; #assumes C4/Circulation/Borrower
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
