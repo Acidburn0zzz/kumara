@@ -43,7 +43,8 @@ for (my $i=0; $i < $count; $i++){
   } else {
     $toggle="white";
   }
-  print mktablerow(8,$toggle,mklink("/cgi-bin/koha/memberentry.pl?bornum=".$results->[$i]{'borrowernumber'},$results->[$i]{'cardnumber'}),
+  #mklink("/cgi-bin/koha/memberentry.pl?bornum=".$results->[$i]{'borrowernumber'},$results->[$i]{'cardnumber'}),
+  print mktablerow(8,$toggle,mklink("/cgi-bin/koha/moremember.pl?bornum=".$results->[$i]{'borrowernumber'},$results->[$i]{'cardnumber'}),
   $results->[$i]{'surname'},$results->[$i]{'firstname'},
   $results->[$i]{'categorycode'},$results->[$i]{'streetaddress'}." ".$results->[$i]{'city'},"$od/$issue",$fines,
   $results->[$i]{'borrowernotes'});

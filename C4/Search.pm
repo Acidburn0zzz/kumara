@@ -16,7 +16,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
-&OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata); 
+&OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -499,7 +499,7 @@ sub BornameSearch  {
   }
   $query=$query.") or cardnumber = '$searchstring'
   order by surname,firstname";
-  print $query,"\n";
+#  print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -531,6 +531,27 @@ sub borrdata {
   $sth->finish;
   $dbh->disconnect;
   return($data);
+}
+
+sub borrissues {
+  my ($bornum)=@_;
+  my $dbh=C4Connect;
+  my $query;
+  $query="Select * from issues,biblio,items where borrowernumber='$bornum' and
+items.itemnumber=issues.itemnumber and
+items.biblionumber=biblio.biblionumber and issues.returndate is NULL";
+  #print $query;
+  my $sth=$dbh->prepare($query);
+    $sth->execute;
+  my @result;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $result[$i]=$data;;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@result);
 }
 
 
