@@ -82,6 +82,7 @@ if ($insert eq ''){
    print mktablerow(2,'white',bold('Joining Date'),$data{'joining'});
    if ($data{'expiry'} eq ''){
      $data{'expiry'}=ParseDate('in 1 year');
+     $data{'expiry'}=&UnixDate($data{'expiry'},'%Y-%m-%d');
    }
    print mktablerow(2,'white',bold('Expiry Date'),$data{'expiry'});
    print mktablerow(2,'white',bold('Joining Branch'),$data{'joinbranch'});
@@ -90,7 +91,7 @@ if ($insert eq ''){
    print mktablerow(2,'white',bold('Ethnicity'),$ethnic);
    print mktablerow(2,'white',bold('Date of Birth'),$data{'dateofbirth'});
    my $sex;
-   if ($data{'sex'} eq 'm'){
+   if ($data{'sex'} eq 'M'){
      $sex="Male";
    } else {
      $sex="Female";
