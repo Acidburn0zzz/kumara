@@ -12,6 +12,7 @@ use C4::Output;
 use C4::Acquisitions;
 
 my $input = new CGI;
+#print $input->header;
 my $item=$input->param('itemnum');
 delitem($item);
 my $bibitemnum=$input->param('bibitemnum');

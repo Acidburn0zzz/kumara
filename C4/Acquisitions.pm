@@ -685,8 +685,22 @@ sub needsmod{
 sub delitem{
   my ($itemnum)=@_;
   my $dbh=C4Connect;
-  my $query="update items set wthdrawn=1 where itemnumber=$itemnum";
+  my $query="select * from items where itemnumber=$itemnum";
   my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @data=$sth->fetchrow_array;
+  $sth->finish;
+  $query="Insert into deleteditems values (";
+  foreach my $temp (@data){
+    $query=$query."'$temp',";
+  }
+  $query=~ s/\,$/\)/;
+#  print $query;
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $query = "Delete from items where itemnumber=$itemnum";
+  $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
