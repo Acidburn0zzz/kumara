@@ -62,6 +62,7 @@ sub Start_circ{
   &startint($env,'Circulation');
   my $donext = 'Circ';
   while ($donext eq 'Circ') {
+    clearscreen();
     my ($reason,$data) = menu('console','Circulation', 
     ('Issues','Returns','Borrower Enquiries','Log In'));
 
