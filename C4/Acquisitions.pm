@@ -117,9 +117,9 @@ sub ordersearch {
   my @data=split(' ',$search);
   my $count=@data;
   for (my $i=0;$i<$count;$i++){
-    $query.= "(aqorders.title like '$data[$i]%' or aqorders.title like '% $data[$i]%') or ";
+    $query.= "(aqorders.title like '$data[$i]%' or aqorders.title like '% $data[$i]%') and ";
   }
-  $query=~ s/ or $//;
+  $query=~ s/ and $//;
   $query.=" ) or biblioitems.isbn='$search' 
   or aqorders.ordernumber='$search') 
   group by aqorders.ordernumber";
