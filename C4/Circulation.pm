@@ -118,6 +118,7 @@ sub processitems {
     #book is already out, deal with it
     #if its out to another deal with it
     #if its out the person ask if they want to renew it etc
+    print "book is out";
   }
   #check reserve
   &checkreserve;
@@ -153,8 +154,8 @@ sub checkwaiting{
 
 sub scan {
   #scan barcode
-#  my $number='L01470967';  
-  &userdialog('console','Please enter a book barcode');
+  my $number='L01470967';  
+#  my $number=&userdialog('console','Please enter a book barcode');
   return ($number);
 }
 
