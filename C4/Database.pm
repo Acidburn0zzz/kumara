@@ -66,14 +66,14 @@ sub sqlinsert {
   my $dbh=C4Connect;
   my $query="INSERT INTO $table \(";
   while (my ($key,$value) = each %data){
-    if ($key ne 'type'){
+    if ($key ne 'type' && $key ne 'updtype'){
       $query=$query."$key,";
     }
   }
   $query=~ s/\,$/\)/;
   $query=$query." VALUES (";
   while (my ($key,$value) = each %data){
-    if ($key ne 'type'){
+    if ($key ne 'type' && $key ne 'updtype'){
       $query=$query."'$value',";
     }
   }

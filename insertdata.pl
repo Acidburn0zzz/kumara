@@ -53,7 +53,7 @@ if ($data{'type'} eq 'biblio'){
       $keyfld = "borrowernumber";
     } else {
       my $bornum=getmax('borrowers','borrowernumber');
-      my $num=$bornum->{'max'};
+      my $num=$bornum->{'max(borrowernumber)'};
       $num++;
       $data{'borrowernumber'}=$num;
       $data{'branchcode'}="L";
