@@ -117,6 +117,7 @@ while ($i < $count2){
     my $copyright=$stuff[3];
     $author2=~ s/ /%20/g;
     $title2=~ s/ /%20/g;
+    $title2=~ s/\#/\&\#x23;/g;
       $stuff[1]=mklink("/cgi-bin/koha/acqui/newbiblio.pl?title=$title2&author=$author2&copyright=$copyright&id=$id&basket=$basket&biblio=$stuff[2]",$stuff[1]);
       my $word=$stuff[0];
 #      print $word;
