@@ -70,6 +70,7 @@ print <<printend
 <option value=L>Levin
 <option value=F>Foxton
 <option value=S>Shannon
+<option value=T>Tokomaru
 </select>
 </td>
 <td><input type=checkbox name=request value=any>Next Available, <br>(or choose from list below)</td>
@@ -172,21 +173,26 @@ print "</select>
 <TD><a href=/cgi-bin/koha/member.pl?member=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=levin";
+<option value=L";
 if ($reserves->[$i]{'branchcode'} eq 'L'){
   print " selected";
 }
 print ">Levin
-<option value=foxton";
+<option value=F";
 if ($reserves->[$i]{'branchcode'} eq 'F'){
   print " selected";
 }
 print ">Foxton
-<option value=Shannon";
+<option value=S";
 if ($reserves->[$i]{'branchcode'} eq 'S'){
   print " selected";
 }
 print">Shannon
+<option value=T";
+if ($reserves->[$i]{'branchcode'} eq 'T'){
+  print " selected";
+}
+print ">Tokomaru
 </select>
 </td>
 <TD>$type</td>

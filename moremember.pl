@@ -25,6 +25,18 @@ $data->{'dateenrolled'}="$temp[2]/$temp[1]/$temp[0]";
 $data->{'expiry'}="$temp[2]/$temp[1]/$temp[0]";
 @temp=split('-',$data->{'dateofbirth'});
 $data->{'dateofbirth'}="$temp[2]/$temp[1]/$temp[0]";
+if ($data->{'ethnicity'} eq 'maori'){
+  $data->{'ethnicity'} = 'Maori';
+}
+if ($data->{'ethnicity'}eq 'european'){
+  $data->{'ethnicity'} = 'European/Pakeha';
+}
+if ($data->{'ethnicity'}eq 'pi'){
+  $data->{'ethnicity'} = 'Pacific Islander';
+}
+if ($data->{'ethnicity'}eq 'asian'){
+  $data->{'ethnicity'} = 'Asian';
+}
 print <<printend
 <FONT SIZE=6><em>$data->{'othernames'} $data->{'surname'}</em></FONT><P>
 <p>
@@ -39,22 +51,24 @@ print <<printend
 </form>
 </P><br>
 <FONT SIZE=2  face="arial, helvetica">$data->{'title'} $data->{'othernames'}  $data->{'surname'} ($data->{'firstname'}, $data->{'initials'})<p>
-Membership Number: $data->{'borrowernumber'}<BR>
+
 Card Number: $data->{'cardnumber'}<BR>
-Membership: $data->{'categorycode'}<BR>
-Area: $data->{'area'}<BR>
-Fee:$30/year, Paid<BR>
-Joined: $data->{'dateenrolled'},  Expires: $data->{'expiry'} <BR>
-Joining Branch: Levin<P>
-Ethnicity: $data->{'ethnicity'}, $data->{'ethnotes'}<BR>
-DoB: $data->{'dateofbirth'}<BR>
-Sex: $data->{'sex'}<P>
 Postal Address: $data->{'streetaddress'}, $data->{'city'}<BR>
 Home Address: $data->{'physstreet'}, $data->{'streetcity'}<BR>
 Phone (Home): $data->{'phone'}<BR>
 Phone (Daytime): $data->{'phoneday'}<BR>
 Fax: $data->{'faxnumber'}<BR>
 E-mail: <a href="mailto:$data->{'emailaddress'}">$data->{'emailaddress'}</a><P>
+Membership Number: $data->{'borrowernumber'}<BR>
+Membership: $data->{'categorycode'}<BR>
+Area: $data->{'area'}<BR>
+Fee:$30/year, Paid<BR>
+Joined: $data->{'dateenrolled'},  Expires: $data->{'expiry'} <BR>
+Joining Branch: $data->{'homebranch'}<P>
+Ethnicity: $data->{'ethnicity'}, $data->{'ethnotes'}<BR>
+DoB: $data->{'dateofbirth'}<BR>
+Sex: $data->{'sex'}<P>
+
 Alternative Contact:$data->{'contactname'}<BR>
 Phone: $data->{'altphone'}<BR>
 Relationship: $data->{'altrelationship'}<BR>

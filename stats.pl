@@ -26,6 +26,11 @@ if ($time eq 'daybefore'){
   $date=ParseDate('2 days ago');
   $date2=ParseDate('yesterday');
 }
+if ($time=~ /\//){
+  $date=ParseDate($time);
+  $date2=ParseDateDelta('+ 1 day');
+  $date2=DateCalc($date,$date2);
+}
 $date=UnixDate($date,'%Y-%m-%d');
 $date2=UnixDate($date2,'%Y-%m-%d');
 my @payments=TotalPaid($date);
