@@ -113,7 +113,7 @@ sub findborrower  {
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
     my $odues;
     ($issuesallowed,$odues,$owing) = &checktraps($env,$dbh,$bornum,$borrower);
-    #debug_msg ($env,"owing =  $owing");
+#    error_msg ($env,"bcard =  $env->{'bcard'}");
   }
   #debug_msg ($env,"2 =  $env->{'IssuesAllowed'}");
   return ($bornum, $issuesallowed,$borrower,$reason,$owing);
@@ -196,8 +196,7 @@ sub checktraps {
     my $odues = &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
     if ($odues > 0) {push (@traps_set,"ODUES");}  
     #check if borrower has any items waiting
-    my ($nowaiting,$itemswaiting) = 
-      &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
+    my ($nowaiting,$itemswaiting) = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
     if ($nowaiting > 0) { push (@traps_set,"WAITING"); } 
     if (@traps_set[0] ne "" ) {
       ($issuesallowed,$traps_done,$amount,$odues) = 
@@ -335,12 +334,16 @@ sub reserveslist {
   my $dbh=C4Connect;
   my @items;
   my $x=0;
-  while (@$waiting[$x] ne "") {
-    my $resrec = @$waiting[$x];
-    my $itemdata = itemnodata($env,$dbh,$resrec->{'itemnumber'});
+  my $query="Select * from reserves where
+  borrowenumber='$borrower->{'borrowernumber'}' and found='W' and
+  cancellationdate is null";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    my $itemdata = itemnodata($env,$dbh,$data->{'itemnumber'});
     push @items,$itemdata;
-    $x++;
   }
+  $sth->finish;
   reservesdisplay($env,$borrower,$amount,$odues,\@items);
   $dbh->disconnect;
 }
