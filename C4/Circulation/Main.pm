@@ -193,9 +193,8 @@ sub checkreserve{
     where (items.itemnumber = '$itemnum')
     and (reserves.cancellationdate is NULL)
     and (items.biblionumber = reserves.biblionumber)
-    and ((reserves.found = 'W' 
-      and items.itemnumber = reserves.itemnumber)
-      or (reserves.found is null)) 
+    and ((reserves.found = 'W'  and items.itemnumber = reserves.itemnumber)
+    or (reserves.found is null)) 
     order by priority";
   my $sth = $dbh->prepare($query);
   $sth->execute();

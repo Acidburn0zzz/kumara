@@ -221,8 +221,7 @@ sub issueitem{
      } 
      if ($canissue == 1) {
        #check reserve
-       my ($resbor,$resrec) = 
-         &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
+       my ($resbor,$resrec) =  &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
        #debug_msg($env,$resbor);
        if ($resbor eq $bornum) { 
          my $rquery = "update reserves 
