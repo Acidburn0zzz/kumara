@@ -353,8 +353,7 @@ sub CatSearch  {
 	   if ($search->{'ttype'} eq 'exact'){
 	     $query="select count(*) from biblio
 	     where                            
-	     (biblio.title='$search->{'title'}')";
-
+	     (biblio.title='$search->{'title'}' or biblio.unititle like '%$search->{'title'}%')";
 	   } else {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
@@ -375,6 +374,10 @@ sub CatSearch  {
 	    $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0] %' or seriestitle like '% $key[0]')";
 	    for ($i=1;$i<$count;$i++){
 	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i] %')";
+	    }
+	    $query.=") or ((unititle like '$key[0]%' or unititle like '% $key[0] %' or unititle like '% $key[0]')";
+	    for ($i=1;$i<$count;$i++){
+	      $query.=" and (unititle like '$key[$i]%' or unititle like '% $key[$i] %')";
 	    }
 	    $query=$query."))";
 	    if ($search->{'class'} ne ''){
