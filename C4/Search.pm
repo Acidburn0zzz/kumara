@@ -19,7 +19,7 @@ $VERSION = 0.01;
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
 &getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle
-&addauthor &bibitems &barcodes); 
+&addauthor &bibitems &barcodes &findguarantees); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -54,6 +54,24 @@ my $priv_func = sub {
 };
 						    
 # make all your functions, whether exported or not;
+sub findguarantees{ 
+  my ($bornum)=@_; 
+  my $dbh=C4Connect;   
+  my $query="select cardnumber,borrowernumber from borrowers where     
+  guarantor='$bornum'";       
+  my $sth=$dbh->prepare($query);         
+  $sth->execute;           
+  my @dat;             
+  my $i=0;               
+  while (my $data=$sth->fetchrow_hashref){                 
+    $dat[$i]=$data;                   
+    $i++;                       
+  }                           
+  $sth->finish;                             
+  $dbh->disconnect; 
+  return($i,\@dat);     
+}
+
 
 sub NewBorrowerNumber {           
   my $dbh=C4Connect;        
