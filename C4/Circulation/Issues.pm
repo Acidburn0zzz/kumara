@@ -96,6 +96,7 @@ sub Issue  {
      }
    }   
    $dbh->disconnect;
+    Cdk::refreshCdkScreen();
    return ($done);
 }    
 
@@ -147,7 +148,7 @@ sub processitems {
      }
    }
    #debug_msg($env, "return from issues $done[0]"); 
-   $dbh->disconnect
+   $dbh->disconnect;
    return @done;
 }
 
