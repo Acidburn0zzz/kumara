@@ -1,4 +1,4 @@
-package C4::Circulation; #assumes C4/Circulation/Returns
+package C4::Circulation::Returns; #assumes C4/Circulation/Returns
 
 #package to deal with Returns
 #written 3/11/99 by olwen@katipo.co.nz
@@ -9,7 +9,7 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::Interface;
-use C4::Circulation;
+use C4::Circulation::Main;
 use C4::Format;
 use C4::Scan;
 use C4::Stats;

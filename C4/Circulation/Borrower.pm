@@ -9,7 +9,7 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::Interface;
-use C4::Circulation;
+use C4::Circulation::Main;
 use C4::Circulation::Issues;
 use C4::Scan;
 use C4::Stats;
@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&findborrower &Borenq &findoneborrower &scanborrower);
+@EXPORT = qw(&findborrower &Borenq &findoneborrower);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -67,11 +67,13 @@ sub findborrower  {
   my $borrower;
   my $reason = "";
   my $book;
+  #my $sillytest = &olwen($env); 
   while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
     titlepanel($env,$env->{'sysarea'},"Borrower Entry");
-    ($borcode,$reason,$book)=&scanborrower(); #C4::Circulation
-    debug_msg($env,"Reaz = $reason");
+    ($borcode,$reason,$book)=&C4::Circulation::Main::scanborrower(); 
+    #C4::Circulation::Main
+    # debug_msg($env,"Reaz = $reason");
     if ($reason eq "") {
       if ($borcode ne '') {
         ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
@@ -179,11 +181,11 @@ sub checktraps {
   }
   #check if borrower has overdue items
   #call overdue checker
-  &checkoverdues($env,$bornum,$dbh);
+  &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
   #check amountowing
   my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
   #check if borrower has any items waiting
-  my $itemswaiting = &checkwaiting($env,$dbh,$bornum);
+  my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
   #deal with any money still owing
 #    output(30,1,$amount);
   if ($amount > 0){
@@ -219,14 +221,6 @@ sub Borenq {
   return $reason;
 }  
 
-sub scanborrower {
-  my ($env,$interface)=@_;
-  #scan barcode
-  my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
-  $number= $number;
-  $book=uc $book;
-  return ($number,$reason,$book);
-}
 
 
 END { }       # module clean-up code here (global destructor)

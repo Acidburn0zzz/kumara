@@ -1,4 +1,4 @@
-package C4::Circulation; #asummes C4/Circulation
+package C4::Circulation::Main; #asummes C4/Circulation/Main
 
 #package to deal with circulation 
 
@@ -20,8 +20,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&Start_circ &scanborrower);
-#@EXPORT = qw(&Start_circ checkoverdues);
+@EXPORT = qw(&pastitems &checkoverdues &previousissue 
+&checkreserve &checkwaiting &scanbook &scanborrower );
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -56,44 +56,6 @@ my $priv_func = sub {
 };
 						    
 # make all your functions, whether exported or not;
-
-sub Start_circ{
-  my ($env)=@_;
-  #connect to database
-  #start interface
-  &startint($env,'Circulation');
-  my $donext = 'Circ';
-  my $reason;
-  my $data;
-  while ($donext ne 'Quit') {
-    if ($donext  eq "Circ") {
-      clearscreen();        
-      ($reason,$data) = menu($env,'console','Circulation', 
-        ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-      debug_msg($env,"data = $data");
-    } else {
-      $data = $donext;
-    }
-    if ($data eq 'Issues') {  
-      $donext=Issue($env); #C4::Circulation::Issues
-      #debug_msg("","do next $donext");
-    } elsif ($data eq 'Returns') {
-      $donext=Returns($env); #C4::Circulation::Returns
-    } elsif ($data eq 'Borrower Enquiries'){
-      $donext=Borenq($env); #C4::Circulation::Borrower
-    } elsif ($data eq 'Reserves'){
-      $donext=EnterReserves($env); #C4::Reserves
-    } elsif ($data eq 'Log In') {
-      &endint($env);
-      &Login($env);   #C4::Security
-      &startint($env,'Circulation');
-    } elsif ($data eq 'Quit') { 
-      $donext = $data;
-    }
-    #debug_msg($env,"donext -  $donext");
-  }
-  &endint($env)  
-}
 
 sub pastitems{
   #Get list of all items borrower has currently on issue

@@ -1,4 +1,4 @@
-package C4::Circulation; #asummes C4/Circulation/Issues
+package C4::Circulation::Issues; #asummes C4/Circulation/Issues
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
@@ -9,12 +9,12 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::Interface;
-use C4::Circulation;
+use C4::Circulation::Main;
 use C4::Circulation::Borrower;
 use C4::Scan;
 use C4::Stats;
 use C4::Print;
-
+use C4::Format;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Newt qw();
   
@@ -78,7 +78,7 @@ sub Issue  {
       #deal with alternative loans
       #now check items 
       clearscreen();
-      ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
+      ($items,$items2)=C4::Circulation::Main::pastitems($env,$bornum,$dbh); #from Circulation.pm
       $done = "No";
       my $row2=5;
       my $it2p=0;

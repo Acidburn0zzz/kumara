@@ -2,6 +2,7 @@ package C4::Interface; #asummes C4/Interface
 
 #uses Newt
 use C4::Format;
+use C4::Interface::Funkeys;
 use strict;
 #use Newt qw(:keys :exits :anchors :flags :colorsets :entry :fd :grid :macros
 #:textbox);
@@ -76,47 +77,36 @@ sub startint {
 }
 
 sub menu {
-  my ($type,$title,@items)=@_;
+  my ($env,$type,$title,@items)=@_;
   if ($type eq 'console'){
-    my ($reason,$data)=menu2($title,@items); 
+    my ($reason,$data)=menu2($env,$title,@items); 
     return($reason,$data);
     # end of menu
   } 
 }
 
 sub menu2 {
-  my ($title,@items)=@_;
+  my ($env,$title,@items)=@_;
   my $numitems=@items;
   my $panel = Newt::Panel(1, $numitems+1, $title);
   my @buttons;
   my $i=0;
+  $env->{'sysarea'}="Menu";
   while ($i < $numitems) {
     $buttons[$i] =  Newt::Button(fmtstr("",@items[$i],"C20"),1);
     $buttons[$i]->Tag(@items[$i]);
     $panel->Add(0,$i,$buttons[$i]);
     $i++;
   }
-  Newt::PushHelpLine('F11 QUIT:  F2 Issues:  F3 Returns:  F4 Reserves');
-  $panel->AddHotKey(NEWT_KEY_F2);
-  $panel->AddHotKey(NEWT_KEY_F3);
-  $panel->AddHotKey(NEWT_KEY_F4);
-  $panel->AddHotKey(NEWT_KEY_F11);
-  $panel->AddHotKey(NEWT_KEY_F12);
+  my $helpline = setupkeys($env,$panel);
+  Newt::PushHelpLine($helpline);
   my ($reason,$data)=$panel->Run();
-  if ($reason eq NEWT_EXIT_HOTKEY) {
-    #debug_msg("","hot ");
-    if ($data eq NEWT_KEY_F11) {
-       $stuff="Quit";
-    } elsif ($data eq NEWT_KEY_F3) {
-       $stuff="Returns";
-    } elsif ($data eq NEWT_KEY_F2) {
-       $stuff="Issues";	      
-    } elsif ($data eq NEWT_KEY_F4) {
-       $stuff="Reserves";
-    }	      
-  } else {
+  $stuff = checkkeys($env,$reason,$data); 
+  if ($stuff eq "") {
     $stuff = $data->Tag();  
   }
+  #debug_msg($env,$stuff);
+  Newt::PopHelpLine();
   return($reason,$stuff);
   # end of menu2
 }
@@ -233,6 +223,7 @@ sub returnwindow {
     $stuff=$entry->Get();
     $reason="";
   }
+  Newt::PopHelpLine();
   #debug_msg($env, "reas $reason");
   #debug_msg($env, "stuff $stuff");  
   return($reason,$stuff);
@@ -280,7 +271,6 @@ sub issuewindow {
   my $panel2 = Newt::Panel(10,10);
   $panel->Add(0,0,$panel1);
   $panel->Add(0,1,$panel2);
-  
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
   my $l3  = Newt::Label("Borrower Info");
@@ -345,7 +335,7 @@ sub issuewindow {
     }
     
   }
-  debug_msg("",$reason);
+#  debug_msg("",$reason);
 #  Newt::Finished();
   my $stuff=$entry->Get();
   return($stuff,$reason);
@@ -452,6 +442,7 @@ sub borrower_dialog {
   }
   # debug_msg($env,"Re $reason");
   # Newt::Finished();
+  Newt::PopHelpLine() ;
   my $stuff=$entry->Get();
   my $stuff2=$entry2->Get();
   return($stuff,$reason,$stuff2);

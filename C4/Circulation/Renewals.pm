@@ -1,4 +1,4 @@
-package C4::Circulation; #assumes C4/Circulation/Renewals
+package C4::Circulation::Renewals; #assumes C4/Circulation/Renewals
 
 #package to deal with Renewals
 #written 7/11/99 by olwen@katipo.co.nz
@@ -9,7 +9,7 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::Interface;
-use C4::Circulation;
+use C4::Circulation::Renewals;
 use C4::Scan;
 use C4::Stats;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);

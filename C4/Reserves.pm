@@ -10,7 +10,7 @@ use C4::Database;
 use C4::Format;
 use C4::Interface;
 use C4::Interface::Reserveentry;
-use C4::Circulation;
+use C4::Circulation::Main;
 use C4::Circulation::Borrower;
 use C4::Search;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
