@@ -108,7 +108,7 @@ print <<printend
 <b>Home Branch:</b> $items[$i]->{'homebranch'}<br>
 <b>Last seen:</b> $items[$i]->{'datelastseen'}<br>
 <b>Last borrowed:</b> $items[$i]->{'timestamp0'}<br>
-<b>Currently on issue to:</b> $items[$i]->{'card0'}<br>
+<b>Currently on issue to:</b> <a href=/cgi-bin/koha/moremember.pl?bornum=$items[$i]->{'borrower0'}>$items[$i]->{'card0'}</a><br>
 <b>Last Borrower 1:</b> $items[$i]->{'card'}<br>
 <b>Last Borrower 2:</b> $items[$i]->{'card1'}<br>
 <b>Current Branch:</b> $items[$i]->{'holdingbranch'}<br>

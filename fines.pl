@@ -14,7 +14,7 @@ my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =localtime(time);
 $mon++;
 $year=$year+1900;
 #my $date=Date_DaysSince999($mon,$mday,$year);
-my $date=Date_DaysSince999(2,2,2000);
+my $date=Date_DaysSince999(2,3,2000);
 my $bornum;
 my $borrower;
 my $max=5;

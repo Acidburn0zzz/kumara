@@ -640,6 +640,7 @@ sub itemissues {
       if (my $data2=$sth2->fetchrow_hashref){
         $data->{"timestamp$i2"}=$data2->{'timestamp'};
         $data->{"card$i2"}=$data2->{'cardnumber'};
+	$data->{"borrower$i2"}=$data2->{'borrowernumber'};
       }
     }
     $sth2->finish;
