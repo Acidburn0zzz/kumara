@@ -88,7 +88,8 @@ sub FindReserves {
 }
 
 sub CreateReserve {                                                           
-  my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems,$priority,$notes) = @_;   
+  my
+($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems,$priority,$notes,$title)= @_;   
   my $fee=CalcReserveFee($env,$borrnum,$biblionumber,$constraint,$bibitems);
   my $dbh = &C4Connect;       
   my $const = lc substr($constraint,0,1);       
@@ -102,7 +103,7 @@ sub CreateReserve {
     my $updquery = "insert into accountlines       
     (borrowernumber,accountno,date,amount,description,accounttype,amountoutstanding)                                              
 						          values
-    ($borrnum,$nextacctno,now(),$fee,'Reserve Charge','Res',$fee)";          
+    ($borrnum,$nextacctno,now(),$fee,'Reserve Charge - $title','Res',$fee)";          
     my $usth = $dbh->prepare($updquery);                      
     $usth->execute;             
     $usth->finish;                        
