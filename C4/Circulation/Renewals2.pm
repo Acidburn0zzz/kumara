@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&renewstatus &renewbook);
+@EXPORT = qw(&renewstatus &renewbook &calc_charges);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -133,6 +133,38 @@ sub renewbook {
 }
 
 
+sub calc_charges {         
+  # calculate charges due         
+  my ($env, $itemno, $bornum)=@_;           
+  my $charge=0;   
+  my $dbh=C4Connect;
+  my $item_type;               
+  my $q1 = "select itemtypes.itemtype,rentalcharge from
+  items,biblioitems,itemtypes     
+  where (items.itemnumber ='$itemno')         
+  and (biblioitems.biblioitemnumber = items.biblioitemnumber) 
+  and (biblioitems.itemtype = itemtypes.itemtype)";                 
+  my $sth1= $dbh->prepare($q1);                     
+  $sth1->execute;                       
+  if (my $data1=$sth1->fetchrow_hashref) {    
+    $item_type = $data1->{'itemtype'};     
+    $charge = $data1->{'rentalcharge'};
+    my $q2 = "select rentaldiscount from 
+    borrowers,categoryitem                        
+    where (borrowers.borrowernumber = '$bornum')         
+    and (borrowers.categorycode = categoryitem.categorycode)   
+    and (categoryitem.itemtype = '$item_type')";   
+    my $sth2=$dbh->prepare($q2);           
+    $sth2->execute;        
+    if (my$data2=$sth2->fetchrow_hashref) {                                           
+      my $discount = $data2->{'rentaldiscount'};         
+      $charge = ($charge *(100 - $discount)) / 100;                 
+    }                         
+    $sth2->{'finish'};                              
+  }                                   
+  $sth1->finish;  
+  return ($charge);         
+}       
 
 
 END { }       # module clean-up code here (global destructor)
