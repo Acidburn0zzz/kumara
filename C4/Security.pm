@@ -67,27 +67,30 @@ sub Login {
   my $valid = "f";
   &startint($env,"Logging In");
   until ($valid eq "t") {
-    my ($reason,$username,$password,$branch) = 
-      logondialog ($env,"Logon to System",\@branches);
+    my ($reason,$username,$password,$branch) = logondialog ($env,"Logon to System",\@branches);
     $username = uc $username;
     $password = uc $password;
-    my $query = "select * from users 
-      where usercode = '$username' and password ='$password'";
-    #sth->prepare($query);
+    my $query = "select * from users where usercode = '$username' and password ='$password'";
+    $sth=$dbh->prepare($query);
     $sth->execute;
+          debug_msg("",$query);
     if (my $userrec = $sth->fetchrow_hashref) {
+    if ($userrec->{'usercode'} ne ''){
       if ($branch ne "") {
         $valid = "t";
         my @dummy = split ' ', $branch;
-        $branch = @dummy[0];
-        $env->{usercode} = $username;
-        $env->{branchcode} = $branch;
+        $branch = $dummy[0];
+        $env->{'usercode'} = $username;
+        $env->{'branchcode'} = $branch;
       }
+     
     } else {
       debug_msg("","not found");
     }
+    }
     $sth->finish;
   }
+  $dbh->disconnect;
   &endint();
 }
   
