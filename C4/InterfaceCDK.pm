@@ -6,6 +6,7 @@ use strict;
 use Cdk;
 use Date::Manip;
 use C4::Accounts;
+use C4::Circulation::Borrissues;
 use C4::Circulation::Renewals;
 #use C4::Circulation;
 
@@ -289,7 +290,7 @@ sub selborrower {
 
 sub issuewindow {
   my ($env,$title,$dbh,$items1,$items2,$borrower,$amountowing,$odues)=@_;
-  my @functs=("Due Date","Renewals","Payments","Current","Previous");
+  my @functs=("Due Date","Renewals","Payments","Print","Current","Previous");
   my $titlepanel = titlepanel($env,"Issues","Issue an Item");
   my $scroll2 = new Cdk::Scroll ('Title'=>"Previous Issues",
     'List'=>\@$items1,'Height'=> 8,'Width'=>78,'Ypos'=>18);
@@ -370,8 +371,10 @@ sub actfmenu {
     $amountowing,$borrower,$odues);
     Cdk::refreshCdkScreen();
   } elsif ($funct == 3 ) {
-    actscroll1 ($env,$entryBox,$loanlength,$scroll1,$scroll2);
+    C4::Circulation::Borrissues::printallissues ($env,$borrower);
   } elsif ($funct == 4 ) {
+    actscroll1 ($env,$entryBox,$loanlength,$scroll1,$scroll2);
+  } elsif ($funct == 5 ) {
     actscroll2 ($env,$entryBox,$loanlength,$scroll1,$scroll2);
   }
 }  

@@ -115,7 +115,7 @@ sub processitems {
      if ($datedue ne "") {
        my $line = formatitem($env,$item,$datedue,$charge);
        $items2->[$it2p] = $line;
-       $item->{'datedue'} = $datedue;
+       $item->{'date_due'} = $datedue;
        $item->{'charge'} = $charge;
        $itemsdet->[$it2p] = $item;
        $it2p++;
@@ -200,11 +200,13 @@ sub issueitem{
      }
      #check if item is on issue already
      if ($canissue == 1) {
-       my ($currbor,$issuestat) = &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
+       my ($currbor,$issuestat,$newdate) = 
+         &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
        if ($issuestat eq "N") { 
          $canissue = 0;
        } elsif ($issuestat eq "R") {
          $canissue = -1;
+	 $datedue = $newdate;
        }  
      } 
      if ($canissue == 1) {
@@ -257,7 +259,7 @@ sub issueitem{
      }
      if ($canissue == 1) {
        #now mark as issued
-       $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);        
+       $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
        #debug_msg("","date $datedue");
        &UpdateStats($env,$env->{'branchcode'},'issue',$charge);
        if ($charge > 0) {

@@ -107,7 +107,9 @@ sub pastitems{
   my @items2;
   while (my $data1=$sth->fetchrow_hashref) {
     my $data = itemnodata($env,$dbh,$data1->{'itemnumber'}); #C4::Search
-    my $line = C4::Circulation::Issues::formatitem($env,$data,$data1->{'date_due'},"");
+    my @date = split("-",$data1->{'date_due'});
+    my $odate = (@date[2]+0)."-".(@date[1]+0)."-".@date[0];
+    my $line = C4::Circulation::Issues::formatitem($env,$data,$odate,"");
     $items[$i]=$line;
     $i++;
   }
@@ -141,13 +143,14 @@ sub previousissue {
   my $borrower=$sth->fetchrow_hashref;
   my $canissue = "Y";
   $sth->finish;
+  my $newdate;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
       my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
       my $resp = &msg_yn($env,"Book is issued to this borrower", "Renew?");
       if ($resp eq "Y") {
-        &renewbook($env,$dbh,$bornum,$itemnum);
+        $newdate = &renewbook($env,$dbh,$bornum,$itemnum);
 	$canissue = "R";
       } else {
         $canissue = "N"
@@ -162,7 +165,7 @@ sub previousissue {
       }
     }
   } 
-  return($borrower->{'borrowernumber'},$canissue);
+  return($borrower->{'borrowernumber'},$canissue,$newdate);
 }
 
 

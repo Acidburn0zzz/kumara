@@ -77,7 +77,7 @@ sub remoteprint {
     print PRINTER "$itemdata->{'title'}\r\n";
     print PRINTER "$itemdata->{'barcode'}";
     print PRINTER " "x15;
-    print PRINTER "$itemdata->{'datedue'}\r\n";
+    print PRINTER "$itemdata->{'date_due'}\r\n";
     $i++;
   }
   print PRINTER "\r\n\r\n\r\n\r\n\r\n\r\n\r\n";

@@ -62,8 +62,8 @@ my $priv_func = sub {
 
 sub findborrower  {
   my ($env,$dbh) = @_;
-  helptext('');
-  clearscreen();
+  C4::InterfaceCDK::helptext('');
+  C4::InterfaceCDK::clearscreen();
   my $bornum = "";
   my $sth = "";
   my $borcode = "";
@@ -72,7 +72,7 @@ sub findborrower  {
   my $book;
   while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
-    my $title = titlepanel($env,$env->{'sysarea'},"Borrower Entry");
+    my $title = C4::InterfaceCDK::titlepanel($env,$env->{'sysarea'},"Borrower Entry");
     if ($env->{'newborrower'} eq "") {
       ($borcode,$reason,$book)=&C4::Circulation::Main::scanborrower($env); 
     } else { 
@@ -166,8 +166,7 @@ sub findoneborrower {
       $borrower =$sth->fetchrow_hashref;
       $sth->finish;
       $bornum=$borrower->{'borrowernumber'};
-       	   
-      clearscreen;
+      #C4::InterfaceCDK::clearscreen();
       if ($bornum eq '') {
         error_msg($env,"Borrower not found");
       }
@@ -259,7 +258,6 @@ sub process_traps {
   }
   return ($issuesallowed,$traps_done);
 } # end of process_traps
-
 
 sub Borenq {
   my ($env)=@_;
