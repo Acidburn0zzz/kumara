@@ -126,8 +126,6 @@ $i++;
       $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}";
 #      print $results[$i];
       $i++;   
-
-
     }
     $sth2->finish;
   }    
@@ -146,7 +144,8 @@ $i++;
   }
   $i2=0;
   my @res2;
-  while ($i2 < $num){
+  $count=@res;
+  while ($i2 < $num && $i2 < $count){
     $res2[$i2]=$res[$i2+$offset];
 #    print $res2[$i2];
     $i2++;
