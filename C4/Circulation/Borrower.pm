@@ -98,17 +98,17 @@ sub findborrower  {
       }
     } 
   } 
-  my $issuesallowed;
+  my ($issuesallowed,$owing);
   if ($reason eq "") {
     $env->{'bornum'} = $bornum;
     $env->{'bcard'} = $borrower->{'cardnumber'};
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
     my $odues;
-    ($issuesallowed,$odues) = &checktraps($env,$dbh,$bornum,$borrower);
-    #debug_msg ($env,"issuesallowed1 =  $env->{'IssuesAllowed'}");
+    ($issuesallowed,$odues,$owing) = &checktraps($env,$dbh,$bornum,$borrower);
+    debug_msg ($env,"owing =  $owing");
   }
-  #debug_msg ($env,"issuesallowed2 =  $env->{'IssuesAllowed'}");
-  return ($bornum, $issuesallowed,$borrower,$reason);
+  #debug_msg ($env,"2 =  $env->{'IssuesAllowed'}");
+  return ($bornum, $issuesallowed,$borrower,$reason,$owing);
 };
 
 
@@ -174,10 +174,11 @@ sub checktraps {
   #check amountowing
   my $traps_done; 
   my $odues;
+  my $amount;
   while ($traps_done ne "DONE") {
     my @traps_set;
     #debug_msg($env,"entering traps");
-    my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
+    $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     if ($amount > 0) { push (@traps_set,"FINES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
     #check if member has a card reported as lost
@@ -199,7 +200,7 @@ sub checktraps {
     }   
   }
   #debug_msg($env,"returning issuesallowed $env->{'IssuesAllowed'}");
-  return ($issuesallowed, $odues);
+  return ($issuesallowed, $odues,$amount);
 }
 
 sub process_traps {

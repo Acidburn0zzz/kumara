@@ -70,7 +70,7 @@ sub Issue  {
     $env->{'sysarea'} = "Issues";
     $done = "Issues";
     while ($done eq "Issues") {
-      my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);      
+      my ($bornum,$issuesallowed,$borrower,$reason,$amountdue) = &findborrower($env,$dbh);      
       #C4::Circulation::Borrowers
       $env->{'loanlength'}="";
       
@@ -89,7 +89,7 @@ sub Issue  {
         $done = "No";
         my $it2p=0;
         while ($done eq 'No'){
-          ($done,$items2,$it2p) =
+          ($done,$items2,$it2p,$amountdue) =
              &processitems($env,$bornum,$borrower,$items,
 	     $items2,$it2p,$amountdue);
         }
@@ -104,9 +104,8 @@ sub Issue  {
 
 sub processitems {
   #process a users items
-   my ($env,$bornum,$borrower,$items,$items2,$it2p,$amountdue)=@_;
+   my ($env,$bornum,$borrower,$items,$items2,$it2p,$amountdue,$odues)=@_;
    my $dbh=&C4Connect;  
-#  my $amountdue = 0;  
    my ($itemnum,$reason) = 
      issuewindow($env,'Issues',$dbh,$items,$items2,$borrower,fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
@@ -123,15 +122,18 @@ sub processitems {
    #check to see if more books to process for this user
    my @done;
    if ($reason eq 'Finished user'){
-      remoteprint($env,$items2,$borrower);
-      @done = ("Issues");
+     remoteprint($env,$items2,$borrower);
+     if ($amountdue > 0) {
+        &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
+     } 	 
+     @done = ("Issues");
    } elsif ($reason eq "Print"){
       remoteprint($env,$items2,$borrower);
       @done = ("No",$items2,$it2p);
    } else {
       if ($reason ne 'Finished issues'){
          #return No to let them know that we wish to process more Items for borrower
-         @done = ("No",$items2,$it2p);
+         @done = ("No",$items2,$it2p,$amountdue);
       } else  {
          @done = ("Circ");
       }
@@ -213,6 +215,9 @@ sub issueitem{
        $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);        
        #debug_msg("","date $datedue");
        &UpdateStats($env,$env->{'branchcode'},'issue');
+       if ($charge > 0) {
+          createcharge($env,$dbh,$item->{'itemnumber'},$bornum,$charge);
+       }	  
      } elsif ($canissue == 0) {
        debug_msg($env,"can't issue");
      }  
@@ -223,6 +228,20 @@ sub issueitem{
    debug_msg($env,"date $datedue");
    return($item,$charge,$datedue);
 }
+
+sub createcharge {
+  my ($env,$dbh,$itemno,$bornum,$charge) = @_;
+  my $nextaccntno = getnextacctno($env,$bornum,$dbh);
+  my $query = "insert into accountlines
+     (borrowernumber,itemnumber,accountno,date,amount,
+     description,accounttype,amountoutstanding)
+     values ($bornum,$itemno,$nextaccntno,now(),$charge,'Rental','Rent',$charge)";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+}
+
+
 
 sub updateissues{
   # issue the book

@@ -82,18 +82,20 @@ sub checkaccount  {
 sub reconcileaccount {
   #print put money owing give person opportunity to pay it off
   my ($env,$dbh,$bornumber,$total)=@_;
+  debug_msg($env,$dbh);
   #get borrower record
   my $sth=$dbh->prepare("select * from borrowers
     where borrowernumber=$bornumber");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
+  $sth->finish();
   #get borrower information
   $sth=$dbh->prepare("Select * from accountlines where 
   borrowernumber=$bornumber and amountoutstanding<>0 order by date");   
   $sth->execute;     
   #display account information
   &clearscreen();
-  &helptext('F11 quits');
+  #&helptext('F11 quits');
   output(20,0,"Accounts");
   my @accountlines;
   my $row=4;

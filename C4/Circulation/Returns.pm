@@ -132,6 +132,7 @@ sub checkissue {
        $reason = "Returned";    
      } else {
        $sth->finish;
+       updatelastseen($env,$dbh,$itemrec->{'itemnumber'});
        $reason = "Item not issued";
      }
      my ($resfound,$issrec) = find_reserves($env,$dbh,$itemrec->{'itemnumber'});
@@ -159,18 +160,19 @@ sub returnrecord {
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;
+  updatelastseen($env,$dbh,$itemno);
   # check for overdue fine
   my $oduecharge;
   my $query = "select * from accountlines
     where (borrowernumber = '$bornum')
     and (itemnumber = '$itemno')
-    and (accounttype = 'F')";
+    and (accounttype = 'FU')";
   my $sth = $dbh->prepare($query);
     $sth->execute;
     if (my $data = $sth->fetchrow_hashref) {
        # alter fine to show that the book has been returned.
        my $uquery = "update accountlines
-         set accounttype = 'FR'
+         set accounttype = 'F'
          where (borrowernumber = '$bornum')
          and (itemnumber = '$itemno')
          and (accountno = '$data->{'accountno'}') ";
@@ -235,6 +237,17 @@ sub calc_odues {
   return($amt_owing);
 }  
 
+sub updatelastseen {
+  my ($env,$dbh,$itemnumber)= @_;
+  my $br = $env->{'branchcode'};
+  my $query = "update items 
+    set datelastseen = now(), holdingbranch = '$br'
+    where (itemnumber = '$itemnumber')";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+     
+}
 sub find_reserves {
   my ($env,$dbh,$itemno) = @_;
   my $itemdata = itemnodata($env,$dbh,$itemno);
