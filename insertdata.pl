@@ -24,3 +24,22 @@ my $env;
 foreach my $key (@names){
   $data{$key}=$input->param($key);
 }
+my $dbh=C4Connect;
+my $query="Select * from borrowers where borrowernumber=$data{'borrowernumber'}";
+my $sth=$dbh->prepare($query);
+$sth->execute;
+if (my $data=$sth->fetchrow_hashref){
+  $query="update borrowers set title='$data{'title'}',expiry='$data{'expiry'}',
+  cardnumber='$data{'cardnumber'}',sex='$data{'sex'}',ethnicnotes='$data{'ethnicnotes'}',
+  address='$data{'address'},faxnumber='$data{'faxnumber'},firstname='$data{'firstname'}',
+  altnotes='$data{'altnotes'}',dateofbirth='$data{'dateofbirth'}'
+  where borrowernumber=$data{'borrowernumber'}";
+  print $query;
+  my $sth2=$dbh->prepare($query);
+  $sth2->execute;
+  $sth2->finish;
+}else{
+}
+
+$sth->finish;
+$dbh->disconnect;

@@ -28,10 +28,10 @@ if ($type ne 'Add'){
 my $data=borrdata('',$member);
 print <<printend
 <form action=/cgi-bin/koha/newmember.pl method=post>
-<input type=hidden name=joining value="$data->{'>
-<input type=hidden name=expiry
+<input type=hidden name=joining value="$data->{'dateenrolled'}">
+<input type=hidden name=expiry value="$data->{'expiry'}">
 <input type=hidden name=type value="borrowers">
-<input type=hidden name=borrowernumber="$member">
+<input type=hidden name=borrowernumber value="$member">
 printend
 ;
 if ($type eq 'Add'){
