@@ -5,7 +5,7 @@ package C4::InterfaceCDK; #asummes C4/InterfaceCDK
 use C4::Format;
 use strict;
 use Cdk;
-#use Date::Manip;
+use Date::Manip;
 use C4::Accounts;
 use C4::Circulation::Borrissues;
 use C4::Circulation::Renewals;

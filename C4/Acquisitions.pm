@@ -609,6 +609,10 @@ sub makeitems {
   }
   $dbh->disconnect;
 }
+
+sub moditem {
+  my ($itemnum,$bibitemnum)
+
 END { }       # module clean-up code here (global destructor)
   
     
