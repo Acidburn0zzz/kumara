@@ -96,7 +96,14 @@ sub findborrower  {
 	if ($cntbor == 1)  {
            $bornum = $bornums[0];
 	} elsif ($cntbor > 0) {
-	   ($bornum,$borrower) = selborrower($env,$dbh,@borrows,@bornums);
+	   my ($cardnum) = selborrower($env,$dbh,@borrows,@bornums);
+	    my $query = "select * from borrowers where cardnumber = '$cardnum'";                                
+#	    debug_msg("",$query);
+            $sth = $dbh->prepare($query);                          
+            $sth->execute;                          
+            $borrower =$sth->fetchrow_hashref;
+	    $sth->finish;
+	    $bornum=$borrower->{'borrowernumber'};
         }   	   
         if ($bornum eq '') {
           output(1,1,"Borrower not found, please rescan or re-enter borrower code");
