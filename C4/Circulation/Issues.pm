@@ -107,7 +107,7 @@ sub processitems {
    if ($itemnum ne ""){
       my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($datedue ne "") {
-         my $line = formatline($env,$item,$datedue,$charge);
+         my $line = formatitem($env,$item,$datedue,$charge);
 	 #$datedue." ".$item->{'title'}.", ".$item->{'author'};
 	 #my $iclass =  $item->{'itemtype'};
 	 #if ($item->{'dewey'} > 0) {

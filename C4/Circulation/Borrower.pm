@@ -213,6 +213,7 @@ sub process_traps {
   debug_msg($env,"In traps");
   while (@$traps_set[$x] ne "") {
     $traps{'@$traps_set[$x]'} = 1; 
+    $x++;
   }
   my $trapact;
   while ($trapact ne "NONE") {
