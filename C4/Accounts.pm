@@ -102,8 +102,8 @@ sub reconcileaccount {
   my ($data,$reason)=&dialog("Amount to pay");
   &recordpayment($bornumber,$dbh,$data);
   #Check if the boorower still owes
-  pause();
-  $total=&checkaccount($bornumber,$dbh);
+#  pause();
+#  $total=&checkaccount($bornumber,$dbh);
   
   return($total);
 
