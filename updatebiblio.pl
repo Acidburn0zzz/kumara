@@ -4,6 +4,7 @@ use C4::Database;
 use CGI;
 use strict;
 use C4::Acquisitions;
+use C4::Output;
 
 my $input= new CGI;
 #print $input->header;
@@ -61,12 +62,29 @@ my $addauthor=checkinp($input->param('Additional'));
 modaddauthor($bibnum,$addauthor);
 
 #print $input->header;
-my $error=modsubject($bibnum,@sub);
+my $force=$input->param('Force');
+my $error=modsubject($bibnum,$force,@sub);
 
 if ($error ne ''){
   print $input->header;
-#  print $input->dump;
+  print startpage();
+  print startmenu();
   print $error;
+  my @subs=split(' ',$error);
+  print "<p> Click submit to force the subject";
+  my @names=$input->param;
+  my %data;
+  my $count=@names;
+  for (my $i=0;$i<$count;$i++){
+    if ($names[$i] ne 'Force'){
+      my $value=$input->param("$names[$i]");
+      $data{$names[$i]}="hidden\t$value\t$i";
+    }
+  }
+  $data{"Force"}="hidden\t$subs[0]\t$count";
+  print mkform3('updatebiblio.pl',%data);
+  print endmenu();
+  print endpage();
 } else {
   print $input->redirect("detail.pl?type=intra&bib=$bibnum");
 }

@@ -327,7 +327,7 @@ sub modaddauthor {
 } 
 
 sub modsubject {
-  my ($bibnum,@subject)=@_;
+  my ($bibnum,$force,@subject)=@_;
   my $dbh=C4Connect;
   my $count=@subject;
   my $error;
@@ -339,20 +339,29 @@ sub modsubject {
     if (my $data=$sth->fetchrow_hashref){
       
     } else {
-      $error="$subject[$i] does not exist in the subject authority file";
-
-      $query= "Select * from catalogueentry where
-      entrytype='s' and (catalogueentry like '$subject[$i] %' or 
-      catalogueentry like '% $subject[$i] %' or catalogueentry like
-      '% $subject[$i]')";
-      my $sth2=$dbh->prepare($query);
-#      print $query;
-      $sth2->execute;
-      while (my $data=$sth2->fetchrow_hashref){
-        $error=$error."<br>$data->{'catalogueentry'}";
-      }
-      $sth2->finish;
-#      $error=$error."<br>$query";
+      if ($force eq $subject[$i]){
+         #subject not in aut, chosen to force anway
+	 #so insert into cataloguentry so its in auth file
+	 $query="Insert into catalogueentry (entrytype,catalogueentry)
+	 values ('s','$force')";
+	 my $sth2=$dbh->prepare($query);
+	 $sth2->execute;
+	 $sth2->finish;
+      } else {      
+        $error="$subject[$i] does not exist in the subject authority file";
+        $query= "Select * from catalogueentry where
+        entrytype='s' and (catalogueentry like '$subject[$i] %' or 
+        catalogueentry like '% $subject[$i] %' or catalogueentry like
+        '% $subject[$i]')";
+        my $sth2=$dbh->prepare($query);
+#        print $query;
+        $sth2->execute;
+        while (my $data=$sth2->fetchrow_hashref){
+          $error=$error."<br>$data->{'catalogueentry'}";
+        }
+        $sth2->finish;
+#       $error=$error."<br>$query";
+     }
    }
     $sth->finish;
   }
