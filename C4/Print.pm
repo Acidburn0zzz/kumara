@@ -48,17 +48,18 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub remoteprint {
-  my ($env,$items)=@_;
+  my ($env,$items,$borrower)=@_;
   debug_msg("","In print");
   my $file=time;
   open (FILE,">/tmp/$file");
   my $i=0;
+  print FILE "$borrower->{'cardnumber'}\n$borrower->{'firstname'} $borrower->{'surname'}\n";
   while ($items->[$i]){
-    print FILE "$items->[0]\n";
+    print FILE "$items->[$i]\n";
     $i++;
   }
   close FILE;
-  eval("lpr /tmp/$file");
+  system("lpr /tmp/$file");
 }
 
 END { }       # module clean-up code here (global destructor)

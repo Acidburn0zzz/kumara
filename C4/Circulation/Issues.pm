@@ -110,15 +110,19 @@ sub processitems {
 #  my $count=$$items;
    my $i=0;
    my $amountdue = 0;
+#   my @date;
    my ($itemnum,$reason) = issuewindow($env,'Issues',$items,$items2,$borrower,
       fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
-      my ($item,$charge) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
+      my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($item) {
+        debug_msg("","date $datedue");
+        
         $items2->[$it2p] = 
-    	(fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")); 	
+    	(fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")." ".$datedue); 	
         $row2++;	     
 	$it2p++;
+	$i++;
      	$amountdue += $charge;
      }  
    }
@@ -147,6 +151,7 @@ sub issueitem{
       (items.biblionumber=biblio.biblionumber)";
    my $item;
    my $charge;
+   my $datedue;
    my $sth=$dbh->prepare($query);  
    $sth->execute;
    if ($item=$sth->fetchrow_hashref) {
@@ -173,13 +178,15 @@ sub issueitem{
      }
      if ($canissue == 1) {
        #now mark as issued
-       &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum)
+       $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);        
+       #debug_msg("","date $datedue");
        &UpdateStats($env,$env->{'branchcode'},'issue');
      }
    } else {
      error_msg($env,"$itemnum not found - rescan");
    }  
-   return($item,$charge);
+#   debug_msg("","date $datedue");
+   return($item,$charge,$datedue);
 }
 
 sub updateissues{
@@ -203,6 +210,10 @@ sub updateissues{
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
+  #debug_msg("","date $datedue");
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($datedue);
+  $datedue="$mday-$mon-$year";
+  return($datedue);
 }
 
 sub calc_charges {
