@@ -74,7 +74,7 @@ print <<printend
 <b>Classification:</b> $data->{'classification'}$dewey$data->{'subclass'}<br>
 <b>ISBN:</b> $data->{'isbn'}<br>
 <b>Publisher:</b> $data->{'publishercode'} <br>
-<b>Place:</b><br>
+<b>Place:</b> $data->{'place'}<br>
 <b>Date:</b> $data->{'publicationyear'}<br>
 <b>Volume:</b> $data->{'volumeddesc'}<br>
 <b>Pages:</b> $data->{'pages'}<br>

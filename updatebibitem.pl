@@ -46,7 +46,7 @@ my $pages=checkinp($input->param('Pages'));
 my $volumeddesc=checkinp($input->param('Volume'));
 my $notes=checkinp($input->param('Notes'));
 my $size=checkinp($input->param('Size'));
-
+my $place=checkinp($input->param('Place'));
 my (@items)=itemissues($bibitemnum);
 #print @items;           
 my $count=@items;
@@ -82,7 +82,7 @@ if ($existing eq 'YES'){
    my $loan;
    if ($flag eq 'notall' && $flag2 eq 'leastone'){
       $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
-      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size);
+      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size,$place);
       if ($itemtype =~ /REF/){
         $loan=1;
       } else {
@@ -95,7 +95,7 @@ if ($existing eq 'YES'){
       }
       
    } elsif ($flag2 eq 'leastone') {
-      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size);
+      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size,$place);
       if ($itemtype =~ /REF/){
         $loan=1;
       } else {
