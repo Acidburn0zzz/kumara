@@ -57,7 +57,7 @@ Alternative Contact:$data->{'contactname'}<BR>
 Phone: $data->{'altphone'}<BR>
 Relationship: $data->{'altrelationship'}<BR>
 Notes: $data->{'altnotes'}<P>
-Guarantees: <A HREF="sam.html">Guarantor goes here</a><P>
+Guarantees: <A HREF=""></a><P>
 
 General Notes: <A HREF="popbox.html" onclick="messenger(200,250,'Form that lets you add to and delete notes.'); return false">
 $data->{'borrowernotes'}</a>
@@ -157,10 +157,15 @@ for (my $i=0;$i<$count;$i++){
   } else {
     print "<td> &nbsp; </td>";
   }
-  print "<TD><input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=y>Y
-  <input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=n>N</td>
-  </tr>
-";
+  #check item is not reserved
+  my ($rescount,$reserves)=FindReserves($issue->[$i]{'biblionumber'},'');
+  if ($rescount >0){
+  } else{
+    print "<TD><input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=y>Y
+    <input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=n>N</td>
+    </tr>
+    ";
+  }
 }
 print <<printend
 

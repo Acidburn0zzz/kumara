@@ -44,7 +44,8 @@ print <<printend
 <a href=/cgi-bin/koha/request.pl?bib=$bib><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>
 <FONT SIZE=6><em>$data->{'title'} ($data->{'author'})</em></FONT><P>
 <p>
-<form >
+<form action=/cgi-bin/koha/modbib.pl>
+<input type=hidden name=bibitem value=$bi>
 <!-------------------BIBLIO ITEM------------>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left>
 <TR VALIGN=TOP>

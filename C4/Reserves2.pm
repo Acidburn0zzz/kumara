@@ -57,9 +57,15 @@ sub FindReserves {
   my $query="Select *,reserves.branchcode
   from reserves,borrowers,biblio ";
   if ($bib ne ''){
-    $query=$query." where reserves.biblionumber=$bib and
-    reserves.borrowernumber=borrowers.borrowernumber and
-biblio.biblionumber=$bib and cancellationdate is NULL";
+    if ($bor ne ''){
+       $query=$query." where reserves.biblionumber=$bib and
+       reserves.borrowernumber=borrowers.borrowernumber and
+       biblio.biblionumber=$bib and cancellationdate is NULL";
+    } else {
+       $query=$query." where reserves.borrowernumber=borrowers.borrowernumber
+       and biblio.biblionumber=$bib and reserves.biblionumber=$bib
+       and cancellationdate is NULL";
+    }
   } else {
     $query=$query." where borrowers.borrowernumber=$bor and
     reserves.borrowernumber=borrowers.borrowernumber and reserves.biblionumber

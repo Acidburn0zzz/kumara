@@ -12,8 +12,8 @@ use C4::Output;
 
 my $input = new CGI;
 print $input->header;
-my $title=$input->param('title');
-my $data=bibdata($title);
+my $bibitemnum=$input->param('bibitem');
+my $data=bibitemdata($bibitemnum);
 
 
 print startpage();
@@ -22,18 +22,25 @@ my %inputs;
 
 #hash is set up with input name being the key then
 #the value is a tab separated list, the first item being the input type
-
-$inputs{'title'}="text\t$data->{'title'}";
-$inputs{'unititle'}="text\t$data->{'unititle'}";
-$inputs{'notes'}="textarea\t$data->{'notes'}";
-#$inputs{'dateaccessioned'}="text\t$data->{'dateaccessioned'}";
-#$inputs{'dewey'}="text\t$data->{'dewey'}";
-#$inputs{'classification'}="text\t$data->{'classification'}";
-#$inputs{'subclass'}="text\t$data->{'subclass'}";
-#$inputs{'itemtype'}="text\t$data->{'itemtype'}";
-
 $inputs{'Author'}="text\t$data->{'author'}";
+$inputs{'Title'}="text\t$data->{'title'}";
+$inputs{'Unititle'}="text\t$data->{'unititle'}";
+$inputs{'Notes'}="textarea\t$data->{'notes'}";
+$inputs{'Serial'}="text\t$data->{'serial'}";
 $inputs{'Series Title'}="text\t$data->{'seriestitle'}";
+$inputs{'Copyright'}="text\t$data->{'copyrightdate'}";
+#$inputs{'Volume'}="text\t$data->{'volume'}";
+#$inputs{'Number'}="text\t$data->{'number'}";
+$inputs{'Classification'}="text\t$data->{'classification'}";
+$inputs{'Item Type'}="text\t$data->{'itemtype'}";
+$inputs{'ISBN'}="text\t$data->{'isbn'}";
+$inputs{'Dewey'}="text\t$data->{'dewey'}";
+$inputs{'Sub Class'}="text\t$data->{'subclass'}";
+$inputs{'Publication Year'}="text\t$data->{'publicationyear'}";
+$inputs{'Volume'}="text\t$data->{'volumedesc'}";
+$inputs{'Illustrations'}="text\t$data->{'illustration'}";
+$inputs{'Pages'}="text\t$data->{'pages'}";
+
 print mkform('wah',%inputs);
 #print mktablehdr();
 #print mktableft();
