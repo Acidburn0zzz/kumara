@@ -19,7 +19,7 @@ $VERSION = 0.01;
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
 &getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle
-&addauthor &bibitems &barcodes &findguarantees); 
+&addauthor &bibitems &barcodes &findguarantees &allissues); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -908,6 +908,28 @@ sub borrissues {
   $query="Select * from issues,biblio,items where borrowernumber='$bornum' and
 items.itemnumber=issues.itemnumber and
 items.biblionumber=biblio.biblionumber and issues.returndate is NULL order
+by date_due";
+  #print $query;
+  my $sth=$dbh->prepare($query);
+    $sth->execute;
+  my @result;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $result[$i]=$data;;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@result);
+}
+
+sub allissues {
+  my ($bornum)=@_;
+  my $dbh=C4Connect;
+  my $query;
+  $query="Select * from issues,biblio,items where borrowernumber='$bornum' and
+items.itemnumber=issues.itemnumber and
+items.biblionumber=biblio.biblionumber order
 by date_due";
   #print $query;
   my $sth=$dbh->prepare($query);
