@@ -9,7 +9,6 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::InterfaceCDK;
-use C4::Circulation::Renewals;
 use C4::Scan;
 use C4::Stats;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -18,7 +17,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&renewstatus $renewbook);
+@EXPORT = qw(&renewstatus &renewbook);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -84,9 +83,11 @@ sub renewstatus {
      if ($renews > $data1->{'renewals'}) {
        $renewokay = 1;
      }
+      $sth2->finish;
   }   
-    
-  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
+  $sth1->finish;
+ 
+#  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   return($renewokay);    
 }
 

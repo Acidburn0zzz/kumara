@@ -260,7 +260,7 @@ sub calc_charges {
      $charge = $data1->{'rentalcharge'};
      my $q2 = "select rentaldiscount from borrowers,categoryitem 
         where (borrowers.borrowernumber = '$bornum') 
-        and (borrowers.categorycode = categories.categorycode)
+        and (borrowers.categorycode = categoryitem.categorycode)
         and (categoryitem.itemtype = '$item_type')";
      my $sth2=$dbh->prepare($q2);
      $sth2->execute;
