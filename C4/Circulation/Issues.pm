@@ -77,7 +77,6 @@ sub Issue  {
      $env->{'loanlength'}="";
      if ($reason ne "") {
        $done = $reason;
-     #} elsif ($issuesallowed eq "0") {
      } elsif ($env->{'IssuesAllowed'} eq '0') {
        error_msg($env,"No Issues Allowed =$env->{'IssuesAllowed'}");
      } else {
@@ -209,6 +208,11 @@ sub issueitem{
        } elsif ($issuestat eq "R") {
          $canissue = -1;
 	 $datedue = $newdate;
+         $charge = calc_charges($env,$dbh,$item->{'itemnumber'},$bornum);
+         if ($charge > 0) {
+           createcharge($env,$dbh,$item->{'itemnumber'},$bornum,$charge);
+	 }
+	 &UpdateStats($env,$env->{'branchcode'},'renew',$charge);
        }  
      } 
      if ($canissue == 1) {
@@ -231,15 +235,15 @@ sub issueitem{
 	 my $btsh = $dbh->prepare($bquery);
 	 $btsh->execute;
 	 my $resborrower = $btsh->fetchrow_hashref;
-	 my $msgtxt = "Res for $resborrower->{'cardnumber'},";
+	 my $msgtxt = chr(7)."Res for $resborrower->{'cardnumber'},";
          $msgtxt = $msgtxt." $resborrower->{'initials'} $resborrower->{'surname'}";
-         my $ans = msg_yn($env,$msgtxt,"Allow issue?");
+         my $ans = msg_ny($env,$msgtxt,"Allow issue?");
 	 if ($ans eq "N") {
 	    # print a docket;
 	    printreserve($env,$resrec,$resborrower,$item);
 	    $canissue = 0;
 	 } else {
-	   my $ans = msg_yn($env,"Cancel reserve?");
+	   my $ans = msg_ny($env,"Cancel reserve?");
 	   if ($ans eq "Y") {
 	     my $rquery = "update reserves 
 	       set found = 'F'
@@ -268,7 +272,7 @@ sub issueitem{
          createcharge($env,$dbh,$item->{'itemnumber'},$bornum,$charge);
        }	  
      } elsif ($canissue == 0) {
-       debug_msg($env,"can't issue");
+       info_msg($env,"Can't issue $item->{'cardnumber'}");
      }  
    } else {
      my $valid = checkdigit($env,$itemnum);

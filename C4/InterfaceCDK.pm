@@ -20,8 +20,8 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
-&selborrower &returnwindow &logondialog &borrowerwindow &titlepanel
+&textbox &menu &issuewindow &msg_yn &msg_ny &borrower_dialog &debug_msg &error_msg
+&info_msg &selborrower &returnwindow &logondialog &borrowerwindow &titlepanel
 &borrbind &borrfill &preeborr &borrowerbox &brmenu &prmenu);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
@@ -141,7 +141,6 @@ sub titlepanel{
 
 sub msg_yn {
   my ($env,$text1,$text2)=@_;
-  # Cdk::init();
   # Create the dialog buttons.
   my @buttons = ("Yes", "No");
   my @mesg = ("<C>$text1", "<C>$text2");
@@ -151,6 +150,22 @@ sub msg_yn {
   my $response = "Y";
   if ($resp == 1) {
     $response = "N";
+  }
+  undef $dialog;
+  return $response;
+}
+sub msg_ny {
+  my ($env,$text1,$text2)=@_;
+  # Cdk::init();
+  # Create the dialog buttons.
+  my @buttons = ("No", "Yes");
+  my @mesg = ("<C>$text1", "<C>$text2");
+  # Create the dialog object.
+  my $dialog = new Cdk::Dialog ('Message' => \@mesg, 'Buttons' => \@buttons);
+  my $resp = $dialog->activate();
+  my $response = "N";
+  if ($resp == 1) {
+    $response = "Y";
   }
   undef $dialog;
   return $response;
@@ -169,6 +184,12 @@ sub debug_msg {
 sub error_msg {
   my ($env,$text)=@_;
   popupLabel (["<C>Error </R>$text"]);
+  return();
+}
+
+sub info_msg {
+  my ($env,$text)=@_;
+  popupLabel ([$text]);
   return();
 }
 
@@ -360,7 +381,6 @@ sub actfmenu {
     #debug_msg($env,"");
     C4::Circulation::Renewals::bulkrenew($env,$dbh,
       $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
-    Cdk::refreshCdkScreen();
   } elsif ($funct == 2 ) {
     $entryBox->erase();
     $scroll1->erase();
@@ -369,7 +389,6 @@ sub actfmenu {
     $funcmenu->erase();
     C4::Accounts::reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},
     $amountowing,$borrower,$odues);
-    Cdk::refreshCdkScreen();
   } elsif ($funct == 3 ) {
     C4::Circulation::Borrissues::printallissues ($env,$borrower);
   } elsif ($funct == 4 ) {
@@ -377,6 +396,10 @@ sub actfmenu {
   } elsif ($funct == 5 ) {
     actscroll2 ($env,$entryBox,$loanlength,$scroll1,$scroll2);
   }
+  Cdk::refreshCdkScreen();
+  $entryBox->unregister();
+  $entryBox->register();
+  return
 }  
 sub actscroll1 {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
