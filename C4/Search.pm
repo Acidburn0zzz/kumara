@@ -343,14 +343,20 @@ sub CatSearch  {
         my @key=split(' ',$search->{'author'});
 	my $count=@key;
 	my $i=1;
-        $query="select count(*) from
-         biblio,biblioitems
+        $query="select *,biblio.author,biblio.biblionumber from
+         biblioitems,biblio
+	 left join additionalauthors
+	 on additionalauthors.biblionumber =biblio.biblionumber
          where biblioitems.biblionumber=biblio.biblionumber 
 	 and
-         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%'
+         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%' or
+	 additionalauthors.author like '$key[0]%' or additionalauthors.author 
+	 like '% $key[0]%'
 	 	 )";    
 	 while ($i < $count){ 
-           $query=$query." and (biblio.author like '$key[$i]%' or biblio.author like '% $key[$i]%'
+           $query=$query." and (
+	   biblio.author like '$key[$i]%' or biblio.author like '% $key[$i]%' or
+	   additionalauthors.author like '$key[$i]%' or additionalauthors.author like '% $key[$i]%'
 	   )";
            $i++;       
 	 }   
@@ -375,7 +381,7 @@ sub CatSearch  {
       } else {
           if ($search->{'title'} ne ''){
 	   if ($search->{'ttype'} eq 'exact'){
-	     $query="select count(*) from biblio
+	     $query="select * from biblio
 	     where                            
 	     (biblio.title='$search->{'title'}' or (biblio.unititle = '$search->{'title'}'
 	     or biblio.unititle like '$search->{'title'} |%' or 
@@ -390,7 +396,7 @@ sub CatSearch  {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
-            $query="select count(*) from biblio,bibliosubtitle,biblioitems
+            $query="select * from biblio,bibliosubtitle,biblioitems
 	    where
             (biblio.biblionumber=bibliosubtitle.biblionumber and
             biblioitems.biblionumber=biblio.biblionumber) and
@@ -426,7 +432,7 @@ sub CatSearch  {
 	    }
 	   }
 	  } elsif ($search->{'class'} ne ''){
-	     $query="select count(*) from biblioitems,biblio where biblio.biblionumber=biblioitems.biblionumber";
+	     $query="select * from biblioitems,biblio where biblio.biblionumber=biblioitems.biblionumber";
 	     my @temp=split(/\|/,$search->{'class'});
 	      my $count=@temp;
 	      $query.= " and ( itemtype='$temp[0]'";
@@ -435,7 +441,7 @@ sub CatSearch  {
 	      }
 	      $query.=")";
 	  } elsif ($search->{'dewey'} ne ''){
-	     $query="select count(*) from biblioitems,biblio 
+	     $query="select * from biblioitems,biblio 
 	     where biblio.biblionumber=biblioitems.biblionumber
 	     and biblioitems.dewey like '$search->{'dewey'}%'";
 	  }
@@ -465,7 +471,7 @@ sub CatSearch  {
     }  
   }
   if ($type eq 'precise'){
-      $query="select count(*) from items,biblio ";
+      $query="select * from items,biblio ";
       if ($search->{'item'} ne ''){
         my $search2=uc $search->{'item'};
         $query=$query." where 
@@ -494,66 +500,42 @@ sub CatSearch  {
       }
   }
 #print $query;
-
-
-  my $sth=$dbh->prepare($query);
-  
-#  if ($search->{'isbn'} eq ''){
-    $sth->execute;
-#  } else {
-  my $count=0;
-#  if ($search->{'title'} || $search->{'author'}){
-#    $query=$query." group by biblio.biblionumber";
-#    $query=~ s/count\(\*\)/count\(biblio.biblionumber\)/;
-#  } 
-#  if ($type eq 'subject'){ 
-    while (my $data=$sth->fetchrow_arrayref){
-      $count++;
-    }
-#  } else {
-#    my $data=$sth->fetchrow_arrayref;
-#    $count=$data->[0];
-#  }
-  $sth->finish;
-#  print $query;
-  $query=~ s/count\(\*\)/\*/g;
-  if ($type ne 'precise' && $type ne 'subject'){
-    if ($search->{'author'} ne ''){
-      $query=$query." order by biblio.author,title limit $offset,$num";
-    } else {
-      $query=$query." order by title limit $offset,$num";
-     }
+if ($type ne 'precise' && $type ne 'subject'){
+  if ($search->{'author'} ne ''){   
+      $query=$query." order by biblio.author,title";
   } else {
-    if ($type eq 'subject'){
-      $query=$query." order by subject limit $offset,$num";
-    }
+      $query=$query." order by title";
   }
-  $sth=$dbh->prepare($query);
-  $sth->execute;
-#  print $query;
-  my $i=0;
-  my $i2=0;
-  my $limit=$num+$offset;
-  while (my $data=$sth->fetchrow_hashref){
-  if ($type ne 'subject' && $type ne 'precise'){
-     $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
-  } elsif ($search->{'isbn'} ne '' || $search->{'item'} ne ''){
-     $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
-  } else {  
-   $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
-     }
-     $i++;
-    }
-#  }
-  $sth->finish;
-#    print "$query\n";
-  #only update stats if search is from opac
-#  updatesearchstats($dbh,$query);
-  $dbh->disconnect;
-  if ($search->{'isbn'} ne ''){
-    $count=1;
+} else {
+  if ($type eq 'subject'){
+      $query=$query." order by subject";
   }
-  return($count,@results);
+}
+#print $query;
+my $sth=$dbh->prepare($query);
+$sth->execute;
+my $count=1;
+my $i=0;
+my $limit= $num+$offset;
+while (my $data=$sth->fetchrow_hashref){
+  if ($count > $offset && $count <= $limit){
+    if ($type ne 'subject' && $type ne 'precise'){
+       $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+    } elsif ($search->{'isbn'} ne '' || $search->{'item'} ne ''){
+       $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+    } else {  
+     $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+    }
+    $i++;
+  }
+  $count++;
+}
+$sth->finish;
+#if ($type ne 'precise'){
+  $count--;
+#}
+#$count--;
+return($count,@results);
 }
 
 sub updatesearchstats{
