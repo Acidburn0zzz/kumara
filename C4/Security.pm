@@ -52,8 +52,8 @@ my $priv_func = sub {
  
 sub Login {
   my ($env)=@_;
-  $env{usercode} = "test";
-  $env{branchcode} = "test";
+  $env->{usercode} = "test";
+  $env->{branchcode} = "test";
   }
 sub CheckAccess {
   my ($env)=@_;

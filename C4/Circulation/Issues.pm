@@ -56,7 +56,7 @@ my $priv_func = sub {
 
 
 sub Issue  {
-  my (%env) = @_;
+  my ($env) = @_;
   my $dbh=&C4Connect;
   #clear help
   helptext('');
@@ -103,30 +103,30 @@ sub Issue  {
     }
     #check if borrower has overdue items
     #call overdue checker
-    &checkoverdues(\%env,$bornum,$dbh);
+    &checkoverdues($env,$bornum,$dbh);
     #check amountowing
-    my $amount=checkaccount(\%env,$bornum,$dbh);    #from C4::Accounts
+    my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     #check if borrower has any items waiting
     &checkwaiting;
     #deal with any money still owing
 #    output(30,1,$amount);
     if ($amount > 0){
-      &reconcileaccount(\%env,$dbh,$bornum,$amount);
+      &reconcileaccount($env,$dbh,$bornum,$amount);
     }
     #deal with alternative loans
     #now check items 
     clearscreen();
-    my $items=pastitems(\%env,$bornum,$dbh);
+    my $items=pastitems($env,$bornum,$dbh);
     my $items2;
     my $done;
     my $row2=5;
-    ($done,$items2,$row2)=&processitems(\%env,$bornum,$borrower,$items,$items2,$row2);
+    ($done,$items2,$row2)=&processitems($env,$bornum,$borrower,$items,$items2,$row2);
     while ($done eq 'No'){
-      ($done,$items2,$row2)=&processitems(\%env,$bornum,$borrower,$items,$items2,$row2);
+      ($done,$items2,$row2)=&processitems($env,$bornum,$borrower,$items,$items2,$row2);
     }    
     $dbh->disconnect;  
     if ($done ne 'Circ'){
-      Issue(\%env);
+      Issue($env);
     }
     if ($done ne 'Quit'){
       return($done);
@@ -138,7 +138,7 @@ sub processitems {
 #  clearscreen();
 #  output(1,1,"Processing Items");
   helptext("F11 Ends processing for current borrower  F10 ends issues");
-  my (%env,$bornum,$borrower,$items,$items2,$row2)=@_;
+  my ($env,$bornum,$borrower,$items,$items2,$row2)=@_;
   my $dbh=&C4Connect;  
   my $row=5;
 #  my $count=$$items;
@@ -148,7 +148,7 @@ sub processitems {
     $i++;
     $row++;
   }
-  #my ($itemnum,$reason)=issuewindow(\%env,'Issues',$items,$items2,$borrower,"Borrower barcode");
+  #my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
 #  $itemnum=uc $itemnum;
   my ($itemnum,$reason)=&scanbook();
   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
@@ -168,14 +168,14 @@ sub processitems {
     # }
   } else {
     #check if item is on issue already
-    my $currbor = &previousissue(\%env,$item->{'itemnumber'},$dbh,$bornum);
+    my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
     #check reserve
     &checkreserve;
     #if charge deal with it
     #now mark as issued
-    &updateissues(%env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
+    &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
     my $branch;
-    &UpdateStats(%env,$branch,'issue');
+    &UpdateStats($env,$branch,'issue');
     output(40,$row2,$item->{'title'});
     $row2++;
   }
@@ -195,7 +195,7 @@ sub processitems {
 
 sub updateissues{
   # issue the book
-   my (%env,$itemno,$bitno,$dbh,$bornum)=@_;
+   my ($env,$itemno,$bitno,$dbh,$bornum)=@_;
    my $loanlength=21;
    my $query="Select loanlength from biblioitems,itemtypes
    where (biblioitems.biblioitemnumber='$bitno') 
