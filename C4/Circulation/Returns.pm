@@ -306,7 +306,7 @@ sub find_reserves {
       my $itbr = $resrec->{'branchcode'};
       if ($resrec->{'branchcode'} ne $env->{'branchcode'}) {
          my $updquery = "update items
-          set holdingbranch = 'T'
+          set holdingbranch = 'TR'
 	  where itemnumber = $itemno";
         my $updsth = $dbh->prepare($updquery);
         $updsth->execute;
