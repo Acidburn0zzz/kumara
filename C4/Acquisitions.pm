@@ -137,6 +137,7 @@ sub ordersearch {
      my $data2=$sth2->fetchrow_hashref;
      $sth2->finish;
      $data->{'author'}=$data2->{'author'};
+     $data->{'seriestitle'}=$data2->{'seriestitle'};
      $sth2=$dbh->prepare("Select * from aqorderbreakdown where
     ordernumber=$data->{'ordernumber'}");
     $sth2->execute;
