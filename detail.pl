@@ -24,10 +24,13 @@ my $count=@items;
 my $i=0;
 print center();
 print mktablehdr;
-print mktablerow(3,'white','Title','Itemnumber','DateDue'); 
+print mktablerow(4,'#cccc99','Title','Item Number','DateDue','Location'); 
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
+  if ($results[2] eq ''){
+    $results[2]='Available';
+  }
   if ($colour == 1){                                                                          
     print mktablerow(4,'#ffffcc',@results);                                        
     $colour=0;                                                                                

@@ -213,10 +213,11 @@ sub subsearch {
 sub ItemInfo {
   my ($env,$biblionumber)=@_;
   my $dbh = &C4Connect;
-  my $query="Select * from items,biblio,biblioitems 
+  my $query="Select * from items,biblio,biblioitems,branches 
   where (items.biblioitemnumber = biblioitems.biblioitemnumber)
   and biblioitems.biblionumber=biblio.biblionumber
-  and biblio.biblionumber='$biblionumber'";
+  and biblio.biblionumber='$biblionumber' and branches.branchcode=
+  items.holdingbranch";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
@@ -233,7 +234,7 @@ sub ItemInfo {
     }
     $isth->finish;
 
-$results[$i]="$data->{'title'}\t$data->{'itemnumber'}\t$datedue\t$data->{'isbn'}";
+$results[$i]="$data->{'title'}\t$data->{'itemnumber'}\t$datedue\t$data->{'branchname'}";
      $i++;
   }
   $sth->finish;
