@@ -187,7 +187,7 @@ sub checktraps {
     my @traps_set;
     #debug_msg($env,"entering traps");
     $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
-    if ($amount > 0) { push (@traps_set,"FINES");}  
+    if ($amount > 0) { push (@traps_set,"CHARGES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
     #check if member has a card reported as lost
     if ($borrower->{'lost'} ==1){push (@traps_set,"LOST");}
@@ -228,7 +228,7 @@ sub process_traps {
   my $trapact;
   while ($trapact ne "NONE") {
      $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
-     if ($trapact eq "FINES") {
+     if ($trapact eq "CHARGES") {
        &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
      } elsif ($trapact eq "WAITING") {
        reserveslist($env,$borrower,$amount,$odues,$waiting);
@@ -251,14 +251,12 @@ sub process_traps {
     $issuesallowed=0;
     $env->{'IssuesAllowed'} = 0;
   }
-  if ($traps{'FINES'} eq 1) {
+  if ($traps{'CHARGES'} eq 1) {
     if ($amount > 5) {
-      #debug_msg($env,"fines2 $amount");
-    $env->{'IssuesAllowed'} = 0;
-    $issuesallowed=0;
+      $env->{'IssuesAllowed'} = 0;
+      $issuesallowed=0;
     }
   }
-  #debug_msg($env,"ia $env->{'IssuesAllowed'}");
   return ($issuesallowed,$traps_done);
 } # end of process_traps
 
@@ -277,16 +275,14 @@ sub Borenq {
     ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
     if ($reason eq "") {
       my ($data,$reason)=&borrowerwindow($env,$borrower);
-    if ($reason eq 'Modify'){
-      modifyuser($env,$borrower);
-      $reason = "";
-    } elsif ($reason eq 'New'){
-      $reason = "";
+      if ($reason eq 'Modify'){
+        modifyuser($env,$borrower);
+        $reason = "";
+      } elsif ($reason eq 'New'){
+        $reason = "";
+       }
     }
-  }
   $dbh->disconnect;
-#  debug_msg("",$reason);
-#  debug_msg("",$data);
   }
   return $reason;
 }  
@@ -304,7 +300,6 @@ sub reserveslist {
   my $x=0;
   while (@$waiting[$x] ne "") {
     my $resrec = @$waiting[$x];
-    debug_msg($env,$resrec->{'itemnumber'});
     my $itemdata = itemnodata($env,$dbh,$resrec->{'itemnumber'});
     push @items,$itemdata;
     $x++;
