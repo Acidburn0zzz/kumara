@@ -54,10 +54,24 @@ my $priv_func = sub {
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
-  my $query ="Select count(*) from biblio where author like
-'%$search->{'keyword'}%' or
-  title like '%$search->{'keyword'}%'";
-
+  my @key=split(' ',$search->{'keyword'});
+  my $count=@key;
+  my $i=1;
+  my $query ="Select count(*) from biblio where 
+  (author like
+  '%$key[0]%' ";
+   while ($i < $count){ 
+     $query=$query." and author like '%$key[$i]%'";   
+     $i++;       
+   }   
+   $i=1;
+  $query=$query.") or
+  (title like '%$key[0]%'";
+  while ($i < $count){
+    $query=$query." and title like '%$key[$i]%'";
+    $i++;
+  }
+  $query=$query.")";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count2=$sth->fetchrow_arrayref;
@@ -66,7 +80,11 @@ sub KeywordSearch {
   my $count=$count2->[0];
   my @results;
   $query=~ s/count\(\*\)/\*/;
-  $query=$query." order by title limit $offset,$num";
+  if ($type ne 'intra'){
+    $query=$query." order by title limit $offset,$num";
+  } else {
+    $query=$query." order by author limit $offset,$num";
+  }
   $sth=$dbh->prepare($query);
 #      print $query;
   $sth->execute;
