@@ -203,7 +203,8 @@ sub Getpaidbranch{
 sub unfilledreserves {
   my $dbh=C4Connect;
   my $query="select *,biblio.title from reserves,reserveconstraints,biblio,borrowers,biblioitems where found <> 'F' and cancellationdate
-is NULL and biblio.biblionumber=reserves.biblionumber 
+is NULL and biblio.biblionumber=reserves.biblionumber and
+reserves.constrainttype='o'
 and (reserves.biblionumber=reserveconstraints.biblionumber
 and reserves.borrowernumber=reserveconstraints.borrowernumber)
 and
@@ -216,6 +217,18 @@ biblio.title,reserves.reservedate";
   my @results;
   while (my $data=$sth->fetchrow_hashref){
     $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $query="select *,biblio.title from reserves,biblio,borrowers where found <> 'F' and cancellationdate
+is NULL and biblio.biblionumber=reserves.biblionumber and reserves.constrainttype='a' and
+reserves.borrowernumber=borrowers.borrowernumber
+order by
+biblio.title,reserves.reservedate";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    @results[$i];
     $i++;
   }
   $sth->finish;
