@@ -13,7 +13,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&UpdateStats &statsreport);
+@EXPORT = qw(&UpdateStats &statsreport &Count);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -52,7 +52,7 @@ my $priv_func = sub {
 
 sub UpdateStats {
   #module to insert stats data into stats table
-  my ($branch,$type,$amount)=@_;
+  my ($env,$branch,$type,$amount)=@_;
   my $dbh=C4Connect();
   my $sth=$dbh->prepare("Insert into statistics (datetime,branch,type) values
   (datetime('now'::abstime),'$branch','$type')");
@@ -64,7 +64,57 @@ sub UpdateStats {
 sub statsreport {
   #module to return a list of stats for a given day,time,branch type
   #or to return search stats
-  
+  my ($type,$time)=@_;
+  my @data;
+#  print "here";
+  if ($type eq 'issue'){
+    @data=issuesrep($time);
+  }
+  return(@data);
+}
+
+sub issuesrep {
+  my ($time)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from statistics";
+  if ($time eq 'today'){
+    $query=$query." where type='issue' and datetime
+    >=datetime('yesterday'::date)";
+  }
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $i=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]="$data->{'datetime'}\t$data->{'branch'}";
+    $i++;
+  }
+  $sth->finish;
+#  print $query;
+  $dbh->disconnect;
+  return(@results);
+
+}
+
+sub Count {
+  my ($type,$time)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from statistics where type='$type'";
+  if ($time eq 'today'){
+    $query=$query." and datetime
+    >=datetime('yesterday'::date)";
+  }
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $i++;
+  }
+  $sth->finish;
+#  print $query;
+  $dbh->disconnect;
+  return($i);
+
 }
 
 END { }       # module clean-up code here (global destructor)

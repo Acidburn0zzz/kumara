@@ -55,17 +55,27 @@ sub startpage{
 }
 
 sub startmenu{
-  open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
+  my ($type)=@_;
+  if ($type eq 'issue'){
+      open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc');
+  } else {
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
+  }
   my @string=<FILE>;
   close FILE;
   my $count=@string;
-  $string[$count]="<BLOCKQUOTE>";
+#  $string[$count]="<BLOCKQUOTE>";
   return @string;
   
 }
 
 sub endmenu{
+  my ($type)=@_;
+  if ($type eq 'issue'){
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc');
+  } else {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc');
+  }
   my @string=<FILE>;
   close FILE;
   return @string;

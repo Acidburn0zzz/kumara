@@ -12,12 +12,17 @@ my $input = new CGI;
 print $input->header;
 my $type=$input->param('type');
 print startpage();
-print startmenu();
+print startmenu('issue');
+my @data;
 if ($type eq 'search'){
- my $data=updatestats('search','something');  
+ @data=statsreport('search','something');  
 }
-if ($type eq
+if ($type eq 'issue'){
+ @data=statsreport('issue','today');
+}
 
+print mkheadr(1,"$type reports");
+print @data;
 
-print endmenu();
+print endmenu('issue');
 print endpage();
