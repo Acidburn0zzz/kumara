@@ -62,14 +62,14 @@ sub returnrecord {
   my @datearr = localtime(time);
   my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
   debug_msg($env,"before return");
-  my $query = "update issues 
-  set returndate = '$dateret', branchcode = '$env->{'branchcode'}'
-  where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
+  my $query = "update issues set returndate = '$dateret', branchcode ='$env->{'branchcode'}' where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
   and (returndate is null)";  
-  print $query;
+  #output(1,10,$query);
   my $sth = $dbh->prepare($query);
   $sth->execute;
-
+  $sth->finish;
+  UpdateStats($env,'branch','return','0');
+  #pause();
   return($amt_owing);
 }
 

@@ -112,14 +112,15 @@ sub checkoverdues{
 
 sub previousissue {
   my ($env,$itemnum,$dbh,$bornum)=@_;
-  my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber,cardnumber
+  my $sth=$dbh->prepare("Select
+  firstname,surname,issues.borrowernumber,cardnumber,returndate
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
   issues.borrowernumber=borrowers.borrowernumber");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
   $sth->finish;
-  if ($borrower->{'borrowernumber'} ne ''){
+  if ($borrower->{'borrowernumber'} ne '' && $borrower->{'returndate'} eq ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
       my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
