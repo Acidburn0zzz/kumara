@@ -65,7 +65,7 @@ sub Issue  {
   #check first GNA trap (no address this is the 22nd item in the table)
   if ($borrower[21] == 1){
     #got to membership update and update member info
-    print "Whoop whoop no address\n";
+     &resultsout('console',"Whoop whoop no address");
   }
   #check if member has a card reported as lost
   if ($borrower[22] ==1){

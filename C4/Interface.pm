@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&userdialog);
+@EXPORT = qw(&userdialog &resultout);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -65,10 +65,33 @@ sub userdialog{
    init_colours();
    main_win($mwh);
    $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
-   dialog($text,'red',$dwh,$mwh);
    grab_key($mwh);
-   my @input=&input($mwh,$text);
- }
+   my $input=&input($mwh,$text);
+   endwin();
+   return($input);
+  }
+ 
+}
+
+sub resultout{
+  #outputsome results
+  my ($type,$results)=@_;
+  if ($type eq 'console'){
+   my ($mwh, $dwh); 
+   my ($colours); 
+   $mwh = new Curses; 
+   $colours = has_colors(); 
+   noecho(); 
+   cbreak(); 
+   halfdelay(10); 
+   $mwh->keypad(1);
+   init_colours();
+   main_win($mwh);
+   $dwh = $mwh->subwin(8, $COLS - 2, 1, 1);
+   dialog($results,'red',$dwh,$mwh);
+   grab_key($mwh); 
+   endwin();
+  }
 }
 
 sub main_win {
@@ -127,81 +150,4 @@ sub grab_key {
 }  
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			
 END { }       # module clean-up code here (global destructor)
