@@ -56,11 +56,11 @@ sub KeywordSearch {
   my $dbh = &C4Connect;
   my $query="(Select * from biblio,catalogueentry
   where (catalogueentry.catalogueentry=biblio.author and
-  catalogueentry.entrytype='a' and catalogueentry.catalogueentry like
-  '$search->{'keyword'}%') union select * from biblio,catalogueentry where 
+  catalogueentry.entrytype='a' and catalogueentry.catalogueentry ~*
+  '$search->{'keyword'}') union select * from biblio,catalogueentry where 
   (catalogueentry.catalogueentry=biblio.title and 
-  catalogueentry.entrytype='t' and catalogueentry.catalogueentry like
-  '%$search->{'keyword'}%')) order by biblio.title"; 
+  catalogueentry.entrytype='t' and catalogueentry.catalogueentry ~*
+  '$search->{'keyword'}')) order by biblio.title"; 
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
@@ -98,13 +98,11 @@ sub CatSearch  {
       if ($search->{'author'} ne ''){
         $query="select biblio.biblionumber,title,author from
          biblio,catalogueentry
-         where ((catalogueentry.catalogueentry = biblio.author)
-         and (catalogueentry.catalogueentry like '$search->{'author'}%') 
-         and (entrytype = 'a')) union
+         where (catalogueentry.entrytype='a' and 
+	 (catalogueentry.catalogueentry = biblio.author)	 
+         and (catalogueentry.catalogueentry ~* '$search->{'author'}')) union
 	 select biblio.biblionumber,title,author from biblio,biblioanalysis
-         where
-
-	 biblioanalysis.analyticalauthor like '$search->{'author'}%'
+         where	 biblioanalysis.analyticalauthor ~* '$search->{'author'}'
 	 and biblioanalysis.biblionumber=
 	 biblio.biblionumber";
 #         if ($search->{'title'} ne ''){
@@ -112,13 +110,14 @@ sub CatSearch  {
       } else {
           if ($search->{'title'} ne ''){
     	   $query="select biblio.biblionumber,title,author from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
-           and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
+           and (catalogueentry.catalogueentry ~* '^$search->{'title'}') 
            and (entrytype = 't')) union select
            biblio.biblionumber,title,author from
-	   biblioanalysis,biblio where analyticaltitle like
-           '%$search->{'title'}%' and biblio.biblionumber=biblioanalysis.biblionumber
+	   biblioanalysis,biblio where analyticaltitle ~*
+           '^$search->{'title'}' and
+biblio.biblionumber=biblioanalysis.biblionumber
            union select biblio.biblionumber,title,author from
-           biblio,bibliosubtitle where subtitle like '%$search->{'title'}%' and
+           biblio,bibliosubtitle where subtitle ~* '^$search->{'title'}' and
            biblio.biblionumber=bibliosubtitle.biblionumber";
 	 }
       }
