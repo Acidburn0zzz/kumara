@@ -435,7 +435,7 @@ sub borrowerbox {
   $borrinfo[0]=$line;
   $line = "$borrower->{'streetaddress'}, $borrower->{'city'}";
   $borrinfo[1]=$line;
-  $line = "";  
+  $line = "$borrower->{'categorycode'}";
   if ($borrower->{'gonenoaddress'} == 1) {
     $line = $line." </R>GNA<!R>";
   }
