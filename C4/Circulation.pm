@@ -91,7 +91,7 @@ sub checkoverdues{
   my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio where
   borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
-  items.biblionumber=biblio.biblionumber");
+   items.biblionumber=biblio.biblionumber");
   $sth->execute;
   my $row=1;
   my $col=40;
@@ -103,7 +103,7 @@ sub checkoverdues{
 }
 
 sub previousissue {
-  my $env,$itemnum,$dbh,$bornum)=@_;
+  my ($env,$itemnum,$dbh,$bornum)=@_;
   my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
