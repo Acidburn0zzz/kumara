@@ -51,72 +51,66 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub CatSearch  {
-  my ($env,$searchstring,$type,$num,$offset)=@_;
+  my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
   my $query = '';
-  SWITCH: {
-    if ($type eq 'aa') {
-      $query="Select * from biblio,catalogueentry,biblioanalysis
-      where (catalogueentry.catalogueentry = biblioanalysis.analyticalauthor)
-      and (biblioanalysis.biblionumber = biblio.biblionumber)
-      and (catalogueentry.catalogueentry like '%$searchstring%') 
-      and (entrytype like '$type%')";
-      last SWITCH;
-    };
-    if ($type eq 'st') {
-      $query="Select * from biblio,catalogueentry,bibliosubtitle
-      where (catalogueentry.catalogueentry = bibliosubtitle.subtitle)
-      and (bibliosubtitle.biblionumber = biblio.biblionumber)
-      and (catalogueentry.catalogueentry like '%$searchstring%') 
-      and (entrytype like '$type%')";
-      last SWITCH;
-    };
-    if ($type eq 'at') {
-      $query="Select * from biblio,catalogueentry,biblioanalysis
-      where (catalogueentry.catalogueentry = biblioanalysis.analyticaltitle)
-      and (biblioanalysis.biblionumber = biblio.biblionumber)
-      and (catalogueentry.catalogueentry like '%$searchstring%') 
-      and (entrytype like '$type%')";
-      last SWITCH;
-    };
-    if ($type eq 'a') {
-      $query="Select count(*) from biblio,catalogueentry 
-      where (catalogueentry.catalogueentry = biblio.author)
-      and (catalogueentry.catalogueentry like '%$searchstring%') 
-      and (entrytype like '$type%')";
-      last SWITCH;
-    };
-    if ($type eq 't') {
-      $query="Select count(*) from biblio,catalogueentry
-      where (catalogueentry.catalogueentry = biblio.title)
-      and (catalogueentry.catalogueentry like '%$searchstring%')
-      and (entrytype like '$type%')";
-      last SWITCH;
-    };
-    if ($type eq 's') {
-      $query="Select * from biblio,catalogueentry,bibliosubject
-      where (catalogueentry.catalogueentry = bibliosubject.subject)
-      and (bibliosubject.biblionumber = biblio.biblionumber)
-#     and (catalogueentry.catalogueentry like '%$searchstring%')
-      and (catalogueentry.catalogueentry *~ '%$searchstring%')
-      and (entrytype like '$type%')";
-      last SWITCH;
-    };
-    $query="Select * from catalogueentry where catalogueentry like
-    '%$searchstring%' and entrytype like '%$type%'";
-    last SWITCH;
-  }
-
+  if ($type eq 'loose') {
+      $query="Select count(*) from biblio,catalogueentry"; 
+      if ($search->{'author'} ne ''){
+        $query=$query." where (catalogueentry.catalogueentry = biblio.author)
+         and (catalogueentry.catalogueentry like '$search->{'author'}%') 
+         and (entrytype = 'a')";
+      }
+      if ($search->{'title'} ne ''){
+         if ($query =~ /where/){
+	    $query=$query." and ";
+	 } else {
+   	    $query=$query." where ";
+	 }
+	 $query=$query."((catalogueentry.catalogueentry = biblio.title)
+         and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
+         and (entrytype = 't'))";
+      }
+  } 
+  if ($type eq 'subject'){
+      if ($search->{'subject'} ne ''){
+         if ($query =~ /where/){
+	    $query=$query." and ";
+	 } else {
+   	    $query=$query." where ";
+	 }
+	 $search->{'subject'}=uc $search->{'subject'};
+	 $query=~ s/biblio,catalogueentry/biblio,catalogueentry,bibliosubject/;
+	 $query=$query." ((catalogueentry.catalogueentry = bibliosubject.subject)
+         and (bibliosubject.biblionumber = biblio.biblionumber)                 
+	 and (catalogueentry.catalogueentry like '$search->{'subject'}%') 
+	 and (entrytype like 's%'))"; 
+      }
+   }
+   if ($type eq 'precise'){
+      $query="select count(*) from items,biblio ";
+      if ($search->{'item'} ne ''){
+        my $search2=uc $search->{'item'};
+        $query=$query." where barcode='$search2' and
+        items.biblionumber=biblio.biblionumber ";
+      }
+      if ($search->{'isbn'} ne ''){
+        my $search2=uc $search->{'isbn'};
+        $query=$query." where isbn='$search2' and
+        items.biblionumber=biblio.biblionumber ";
+      }
+    }
 #  print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count=$sth->fetchrow_hashref;
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
-  $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
+  if ($type ne 'precise'){
+    $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
+  }
   $sth=$dbh->prepare($query);
   $sth->execute;
-
   my $i=0;
   my @results;
   while (my $data=$sth->fetchrow_hashref){
@@ -127,14 +121,13 @@ sub CatSearch  {
     $data->{'author'}";
     $i++;
   }
-  $sth->execute;
   $sth->finish;
   $dbh->disconnect;
   return($count->{'count'},@results);
 }
 
 sub ItemInfo {
-  my ($env,$biblionumber)=@_;
+  my ($env,$biblionumber,$title)=@_;
   my $dbh = &C4Connect;
   my $query="Select * from items 
   where (biblionumber = '$biblionumber')";
@@ -152,13 +145,10 @@ sub ItemInfo {
     if (my $idata=$isth->fetchrow_hashref){
       $datedue = $idata->{'date_due'};
     }
-    $isth->execute;
     $isth->finish;
-#    print "$data->{'itemnumber'} $datedue\n";
-     $results[$i]="$data->{'itemnumber'}\t$datedue";
+     $results[$i]="$title\t$data->{'itemnumber'}\t$datedue";
      $i++;
   }
-  $sth->execute;
   $sth->finish;
   $dbh->disconnect;
   return(@results);

@@ -58,7 +58,10 @@ sub startmenu{
   open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
   my @string=<FILE>;
   close FILE;
+  my $count=@string;
+  $string[$count]="<BLOCKQUOTE>";
   return @string;
+  
 }
 
 sub endmenu{
@@ -69,9 +72,10 @@ sub endmenu{
 }
 
 sub mktablehdr {
-  my $string="<table border=0>\n";
+  my $string="<table border=0 cellspacing=0 cellpadding=5>\n";
   return($string);
 }
+
 
 sub mktablerow {
   my ($cols,$colour,@data)=@_;
