@@ -6,6 +6,7 @@
 use C4::Output;
 use C4::Acquisitions;
 use CGI;
+use C4::Search;
 
 my $input=new CGI;
 #print $input->header;
@@ -19,6 +20,16 @@ my $cost=$input->param('cost');
 my $invoiceno=$input->param('invoice');
 my $id=$input->param('id');
 my $bibitemno=$input->param('biblioitemnum');
+my $data=bibitemdata($bibitemno);
+my $publisher=$data->{'publishercode'};
+my $pubdate=$data->{'publicationdate'};
+my $class=$data->{'classification'};
+my $dewey=$data->{'dewey'};
+my $subclass=$data->{'subclass'};
+my $notes=$data->{'notes'};
+my $size=$data->{'size'};
+my $illus=$data->{'illus'};
+my $pages=$data->{'pages'};
 my $replacement=$input->param('rrp');
 my $branch=$input->param('branch');
 my $bookfund=$input->param('bookfund');
@@ -42,7 +53,8 @@ my $loan=0;
 if ($itemtype =~ /REF/){
   $loan=1;
 }
-if ($volinf ne ''){
+
+if ($itemtype =~ /PER/){
 #  print "$bibitemno";
   $class="Periodical";
   $bibitemno=newbiblioitem($biblio,$itemtype,$isbn,$volinf,$class);
@@ -50,7 +62,7 @@ if ($volinf ne ''){
 }
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
 modbiblio($biblio,$title,$author,$copyright,$series);
-modbibitem($bibitemno,$itemtype,$isbn,'','',$class,'','','','',$volinf,'','');
+modbibitem($bibitemno,$itemtype,$isbn,$publisher,$pubdate,$class,$dewey,$subclass,$illus,$pages,$volinf,$notes,$size);
 my $barcode=$input->param('barcode');
 my @barcodes;
 if ($barcode =~ /\,/){
