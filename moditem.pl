@@ -124,7 +124,10 @@ print <<printend
 <input type=hidden name=bibnum value="$data->{'biblionumber'}">	
 <input type=hidden name=bibitemnum value="$data->{'biblioitemnumber'}">
 <input type=hidden name=itemnumber value="$itemnum">
-<tr valign=top bgcolor=white><td><input type=submit></td></tr>
+<tr valign=top bgcolor=white><td></td><td>
+
+<input type=image  name=submit src=/images/save-changes.gif border=0 width=187 
+height=42></td></tr>
 </table>
 </form></td></tr>
 </table>
