@@ -7,6 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
+use C4::Reserves2;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -492,6 +493,12 @@ sub ItemInfo {
     if ($data->{'wthdrawn'} eq '1'){
       $datedue="Cancelled";
     }
+    if ($datedue eq ''){
+       my ($rescount,$reserves)=FindReserves($biblionumber,'');   
+       if ($rescount >0){                                
+          $datedue='Request';
+       }
+    }
     $isth->finish;
     my $class = $data->{'classification'};
     my $dewey = $data->{'dewey'};
@@ -664,7 +671,7 @@ sub subtitle {
 
 
 sub itemissues {
-  my ($bibitem)=@_;
+  my ($bibitem,$biblio)=@_;
   my $dbh=C4Connect;
   my $query="Select * from items where 
   items.biblioitemnumber=$bibitem";
@@ -685,7 +692,12 @@ sub itemissues {
       if ($data->{'wthdrawn'} eq '1'){
         $data->{'date_due'}='Cancelled';
       } else {
-        $data->{'date_due'}='Available';
+#         my ($rescount,$reserves)=FindReserves($biblio,'');   
+#         if ($rescount >0){#
+#	   $data->{'date_due'}='Request';
+#	 } else {
+          $data->{'date_due'}='Available';
+#	}
       }
     }
     $sth2->finish;

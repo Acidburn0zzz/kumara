@@ -235,6 +235,11 @@ if ($offset < $count){
       $keyword=~ s/ /%20/g;
       $search=$search."&keyword=$keyword";
     }
+    if ($class ne ''){
+      $keyword=~ s/ /%20/g;
+      $search=$search."&class=$class";
+    }
+    
     
     my $stuff=mklink("/cgi-bin/koha/search.pl?$search",'Next');
     print $stuff;
