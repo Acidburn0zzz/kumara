@@ -6,7 +6,9 @@ package C4::Accounts; #asummes C4/Accounts
 use strict;
 require Exporter;
 use DBI;
+use C4::Format;
 use C4::Interface;
+use C4::Interface::Accounts;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -79,14 +81,20 @@ sub checkaccount  {
 sub reconcileaccount {
   #print put money owing give person opportunity to pay it off
   my ($env,$dbh,$bornumber,$total)=@_;
+  #get borrower record
+  my $sth=$dbh->prepare("select * from borrowers
+    where borrowernumber=$bornumber");
+  $sth->execute;
+  my $borrower=$sth->fetchrow_hashref;
   #get borrower information
-  my $sth=$dbh->prepare("Select * from accountlines where 
+  $sth=$dbh->prepare("Select * from accountlines where 
   borrowernumber=$bornumber and amountoutstanding<>0 order by date");   
   $sth->execute;     
   #display account information
   &clearscreen();
   &helptext('F11 quits');
   output(20,0,"Accounts");
+  my @accountlines;
   my $row=4;
   my $i=0;
   my $text;
@@ -95,15 +103,19 @@ sub reconcileaccount {
   while (my $data=$sth->fetchrow_hashref){
     my $line=$i+1;
     my $amount=0+$data->{'amountoutstanding'};
-    $text="$line\t$data->{'date'}\t$amount\t$data->{'description'}";
-    output (1,$row,$text);
-    $row++;
+    $line=$data->{'date'}." ".fmtdec($env,$amount,"52");
+    push @accountlines,$line;
+#    $text="$line\t$data->{'date'}\t$amount\t$data->{'description'}";
+#    output (1,$row,$text);
+#    $row++;
     $i++;
   }
-  $text="Borrower owes \$$total";
-  output (1,$row,$text);
+#  $text="Borrower owes \$$total";
+#  output (1,$row,$text);
   #get amount paid and update database
-  my ($data,$reason)=&dialog("Amount to pay");
+#  my ($data,$reason)=&dialog("Amount to pay");
+  my ($data,$reason)=
+    &accountsdialog($env,"Payment Entry",$borrower,\@accountlines,$total); 
   if ($data>0) {
     &recordpayment($env,$bornumber,$dbh,$data);
   #Check if the borrower still owes
