@@ -54,7 +54,8 @@ my $priv_func = sub {
 sub FindReserves {
   my ($bib,$bor)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from reserves,borrowers,biblio ";
+  my $query="Select *,reserves.branchcode
+  from reserves,borrowers,biblio ";
   if ($bib ne ''){
     $query=$query." where reserves.biblionumber=$bib and
     reserves.borrowernumber=borrowers.borrowernumber and
@@ -72,7 +73,7 @@ biblio.biblionumber=$bib";
     $results[$i]=$data;
     $i++;
   }
-#  print $query;
+  print $query;
   $sth->finish;
   $dbh->disconnect;
   return($i,\@results);
@@ -97,11 +98,14 @@ sub CreateReserve {
     $usth->execute;             
     $usth->finish;                        
   }                     
-  my $query="insert into reserves
-  (borrowernumber,biblionumber,reservedate,branchcode,constrainttype,priority)           
-  values ('$borrnum','$biblionumber','$resdate','$branch','$const','$priority')";   
-  my $sth = $dbh->prepare($query);                        
-  $sth->execute();                
+  #if ($const eq 'a'){
+    my $query="insert into reserves
+    (borrowernumber,biblionumber,reservedate,branchcode,constrainttype,priority)           
+    values ('$borrnum','$biblionumber','$resdate','$branch','$const','$priority')";   
+    my $sth = $dbh->prepare($query);                        
+    $sth->execute();                
+    $sth->finish;
+  #}
   if (($const eq "o") || ($const eq "e")) {     
     my $numitems = @$bibitems;             
     my $i = 0;                                        
