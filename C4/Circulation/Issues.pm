@@ -17,7 +17,6 @@ use C4::Print;
 use C4::Format;
 use C4::Input;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-use Newt qw();
   
 # set the version for version checking
 $VERSION = 0.01;
