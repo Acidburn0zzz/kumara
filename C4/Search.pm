@@ -16,7 +16,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
-&OpacSearch); 
+&OpacSearch &borrdata2); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -428,15 +428,16 @@ sub itemnodata {
   return($data);	       
 }
 
+#used by member enquiries from the intranet
+#called by member.pl
 sub BornameSearch  {
   my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
-  $searchstring = lc $searchstring;
   my $query="Select * from borrowers 
-  where lower(surname) like '%$searchstring%' 
-  or lower(firstname)  like '%$searchstring%' 
-  or lower(othernames) like '%$searchstring%'
-  order by lower(surname),lower(firstname)";
+  where surname like '%$searchstring%' 
+  or firstname  like '%$searchstring%' 
+  or othernames like '%$searchstring%'
+  order by surname,firstname";
   #print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -446,7 +447,7 @@ sub BornameSearch  {
     push(@results,$data);
     $cnt ++;
   }
-  $sth->execute;
+#  $sth->execute;
   $sth->finish;
   $dbh->disconnect;
   return ($cnt,\@results);
@@ -464,6 +465,25 @@ sub borrdata {
   $sth->finish;
   $dbh->disconnect;
   return($data);
+}
+
+sub borrdata2 {
+  my ($env,$bornum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select count(*) from issues where borrowernumber='$bornum' and
+returndate is NULL";
+#  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $sth=$dbh->prepare("Select count(*) from issues where
+borrowernumber='$bornum' and date_due < now() and returndate is NULL");
+  $sth->execute;
+  my $data2=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data2->{'count(*)'},$data->{'count(*)'});
 }
 		  
 sub getacctlist {
