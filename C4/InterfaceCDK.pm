@@ -486,7 +486,8 @@ sub returnwindow {
      'Xpos'=>"2",'Ypos'=>"3",'Title'=>"Item Barcode",
      'Type'=>"UMIXED");
   $bookentry->preProcess ('Function' =>sub{preretbook(@_,$env,$dbh,
-     $funcmenu,$bookentry,$borrower,$amountowing,$odues);});
+     $funcmenu,$bookentry,$borrower,$amountowing,
+     $odues,$titlepanel,$borrbox,$returnlist);});
   my $barcode = $bookentry->activate();
   my $reason;
   if (!defined $barcode) {
@@ -495,6 +496,7 @@ sub returnwindow {
     $bookentry->erase();
     $funcmenu->erase();
     if ($borrbox ne "") {$borrbox->erase();}
+    $returnlist->erase();
   } else {
     $reason="";
   }
@@ -502,30 +504,53 @@ sub returnwindow {
   }
 
 sub preretbook {
-  my ($input,$env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues)= @_;
+  my ($input,$env,$dbh,$funcmenu,$bookentry,$borrower,
+  $amountowing,$odues,$titlepanel,$borrbox,$returnlist)=@_;
   if ($input eq $key_tab) {
-    actrfmenu ($env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues);
+    actrfmenu($env,$dbh,$funcmenu,$bookentry,$borrower,
+    $amountowing,$odues,$titlepanel,$borrbox,$returnlist);
     return 0;
   }
   return 1;
   }
 
 sub actrfmenu {
-  my ($env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues) = @_;
+  my ($env,$dbh,$funcmenu,$bookentry,$borrower,
+    $amountowing,$odues,$titlepanel,$borrbox,$returnlist)= @_;
   my $funct =  $funcmenu->activate();
   #debug_msg($env,"funtion $funct");
   if (!defined $funct) {
   } elsif ($funct == 1 ) {
     if ($borrower->{'borrowernumber'} ne "") {
+       $funcmenu->erase();
+       $bookentry->erase();
+       $titlepanel->erase();
+       $borrbox->erase();
+       $returnlist->erase();
        C4::Circulation::Renewals::bulkrenew($env,$dbh,
        $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
        Cdk::refreshCdkScreen();
+       $funcmenu->draw();
+       $bookentry->draw();
+       $titlepanel->draw();
+       $borrbox->draw();
+       $returnlist->draw();
     }
   } elsif ($funct == 0 ) {
     if ($borrower->{'borrowernumber'} ne "") {
+       $funcmenu->erase();
+       $bookentry->erase();
+       $titlepanel->erase();
+       $borrbox->erase();
+       $returnlist->erase();
        C4::Accounts::reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},
        $amountowing,$borrower,$odues);
-       Cdk::refreshCdkScreen();
+       $funcmenu->draw();
+       $bookentry->draw();
+       $titlepanel->draw();
+       $borrbox->draw();
+       $returnlist->draw();
+       #Cdk::refreshCdkScreen();
     }
   } 
 }

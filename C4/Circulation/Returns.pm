@@ -82,17 +82,28 @@ sub Returns {
     #if (($reason ne "Circ") && ($reason ne "Quit")) {
     if ($reason eq "")  {
       my $resp;
-      ($resp,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
-      ($issues,$odues,$amt_owing) = borrdata2($env,$bornum);
+      ($resp,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = 
+         checkissue($env,$dbh,$item);
+      if ($bornum ne "") {
+         ($issues,$odues,$amt_owing) = borrdata2($env,$bornum);
+      } else {
+        $issues = "";
+	$odues = "";
+	$amt_owing = "";
+      }	
       if ($resp ne "") {
-        if ($resp eq "Returned") {
-	  my $item = itemnodata($env,$dbh,$itemno);
-	  #my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
-      	  my $fmtitem = C4::Circulation::Issues::formatitem($env,$item,"",$amt_owing);
-	  unshift @items,$fmtitem;     	  
-  	} elsif ($resp ne "") {
+        #if ($resp eq "Returned") {
+	my $item = itemnodata($env,$dbh,$itemno);
+	my $fmtitem = C4::Circulation::Issues::formatitem($env,$item,"",$amt_owing);
+        unshift @items,$fmtitem;
+  	#} elsif ($resp ne "") {
+	#  error_msg($env,"$resp");
+	#}
+	if ($resp ne "Returned") {
 	  error_msg($env,"$resp");
+	  $bornum = ""; 
 	}
+	
       }
     }
   }

@@ -7,6 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
+use C4::Format;
 use C4::Accounts;
 use C4::InterfaceCDK;
 use C4::Interface::RenewalsCDK;
@@ -76,20 +77,18 @@ sub renewstatus {
        where (items.itemnumber = '$itemno')
        and (items.biblioitemnumber = biblioitems.biblioitemnumber) 
        and (biblioitems.itemtype = itemtypes.itemtype)";
-     my $sth2 = $dbh->prepare($q2);
-     $sth2->execute;
-       
-     if (my $data2=$sth2->fetchrow_hashref) {
-       $renews = $data2->{'renewalsallowed'};
-     }
-     if ($renews > $data1->{'renewals'}) {
-       $renewokay = 1;
-     }
-      $sth2->finish;
+    my $sth2 = $dbh->prepare($q2);
+    $sth2->execute;     
+    if (my $data2=$sth2->fetchrow_hashref) {
+      $renews = $data2->{'renewalsallowed'};
+    }
+    if ($renews > $data1->{'renewals'}) {
+      $renewokay = 1;
+    }
+    $sth2->finish;
   }   
   $sth1->finish;
- 
-#  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
+  #  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   return($renewokay);    
 }
 
@@ -98,22 +97,23 @@ sub renewbook {
   # mark book as renewed
   my ($env,$dbh,$bornum,$itemno,$datedue)=@_;
   if ($datedue eq "" ) {    
-     #debug_msg($env, "getting date");
-     my $loanlength=21;
-     my $query= "Select * from biblioitems,items,itemtypes
+    #debug_msg($env, "getting date");
+    my $loanlength=21;
+    my $query= "Select * from biblioitems,items,itemtypes
        where (items.itemnumber = '$itemno')
        and (biblioitems.biblioitemnumber = items.biblioitemnumber)
        and (biblioitems.itemtype = itemtypes.itemtype)";
-     my $sth=$dbh->prepare($query);
-     $sth->execute;
-     if (my $data=$sth->fetchrow_hashref) {
-       $loanlength = $data->{'loanlength'}
-     }
-     $sth->finish;
-     my $ti = time;
-     my $datedu = time + ($loanlength * 86400);
-     my @datearr = localtime($datedu);
-     $datedue = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
+    my $sth=$dbh->prepare($query);
+    $sth->execute;
+    if (my $data=$sth->fetchrow_hashref) {
+      $loanlength = $data->{'loanlength'}
+    }
+    #C4::InterfaceCDK::debug_msg($env,$loanlength);
+    $sth->finish;
+    my $ti = time;
+    my $datedu = time + ($loanlength * 86400);
+    my @datearr = localtime($datedu);
+    $datedue = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   }
   my $issquery = "select * from issues where borrowernumber='$bornum' and
     itemnumber='$itemno' and returndate is null";
@@ -143,13 +143,16 @@ sub bulkrenew {
   my @issues;
   my @renewdef;
   my $x;
+  my @barcodes;
   while (my $issrec = $sth->fetchrow_hashref) {
      my $itemdata = C4::Search::itemnodata($env,$dbh,$issrec->{'itemnumber'});
-     my $line = $issrec->{'date_due'}." ".$issrec->{'renewals'}." ";
+     my $line = $issrec->{'date_due'}." ";
+     my $line = $line.fmtdec($env,$issrec->{'renewals'},"20")." ";
      my $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
      $items[$x] = $line;
      #debug_msg($env,$line);
      $issues[$x] = $issrec;
+     $barcodes[$x] = $itemdata->{'barcode'};
      my $rdef = 1;
      if ($issrec->{'renewals'} > 0) {
        $rdef = 0;
@@ -164,13 +167,26 @@ sub bulkrenew {
   my $renews = C4::Interface::RenewalsCDK::renew_window($env,\@items,$borrower,$amount,$odues);
   my $isscnt = $x;
   $x =0;
+  my $y = 0;
+  my @renew_errors = "";
   while ($x < $isscnt) {
-     if (@$renews[$x] == 1) {
-        my $issrec = $issues[$x];
-	renewbook($env,$dbh,$issrec->{'borrowernumber'},$issrec->{'itemnumber'},"");
-     }	
-     $x++;
+    
+    if (@$renews[$x] == 1) {
+      my $issrec = $issues[$x];
+      renewbook($env,$dbh,$issrec->{'borrowernumber'},$issrec->{'itemnumber'},"");
+    }  
+    $x++;
   }
   $sth->finish();
+  #if ($barcodes[0] ne "") {
+  #  my $errmsg = join(@barcodes,",");
+  #  if ($barcodes[1] eq "") {
+  #    $errmsg = $errmsg." has";
+  #  } else {
+  #    $errmsg = $errmsg." have";
+  #  }
+  #  $errmsg = $errmsg." been renewed before";
+  #  C4::InterfaceCDK::error_msg($env,$errmsg);
+  #}
 }
 END { }       # module clean-up code here (global destructor)
