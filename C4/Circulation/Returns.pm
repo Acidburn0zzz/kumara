@@ -269,7 +269,11 @@ sub find_reserves {
   my $resfound = "n";
   my $resrec;
   while (($resrec=$sth->fetchrow_hashref) && ($resfound eq "n")) {
-    if ($resrec->{'constrainttype'} eq "a") {
+    if ($resrec->{'found'} eq "W") {
+      if ($resrec->{'itemnumber'} eq $itemno) {
+        $resfound = "y";
+      }
+    } elsif ($resrec->{'constrainttype'} eq "a") {
       $resfound = "y";
     } else {
       my $conquery = "select * from reserveconstraints
@@ -291,13 +295,23 @@ sub find_reserves {
       $consth->finish;
     }
     if ($resfound = "y") {
-      my $updquery = "update reserves set found = 'W'
+      my $updquery = "update reserves 
+        set found = 'W',itemnumber='$itemno'
         where borrowernumber = $resrec->{'borrowernumber'}
         and reservedate = '$resrec->{'reservedate'}'
         and biblionumber = $resrec->{'biblionumber'}";
       my $updsth = $dbh->prepare($updquery);
       $updsth->execute;
       $updsth->finish;
+      my $itbr = $resrec->{'branchcode'};
+      if ($resrec->{'branchcode'} ne $env->{'branchcode'}) {
+         my $updquery = "update items
+          set holdingbranch = 'T'
+	  where itemnumber = $itemno";
+        my $updsth = $dbh->prepare($updquery);
+        $updsth->execute;
+        $updsth->finish;
+      }	
     }
   }
   $sth->finish;

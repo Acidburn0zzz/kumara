@@ -150,7 +150,10 @@ sub checkreserve{
   my $query = "select * from reserves,items 
     where (items.itemnumber = '$itemnum')
     and (items.biblionumber = reserves.biblionumber)
-    and (reserves.found <> 'F') order by priority";
+    and ((reserves.found = 'W' 
+      and items.itemnumber = reserves.itemnumber)
+      or (reserves.found = '')) 
+    order by priority";
   my $sth = $dbh->prepare($query);
   $sth->execute();
   my $resrec;

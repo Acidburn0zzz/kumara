@@ -106,9 +106,9 @@ sub Start_circ{
     } elsif ($data eq 'Quit') { 
       $donext = $data;
     }
-    debug_msg($env,"donext -  $donext");
+    #debug_msg($env,"donext -  $donext");
   }
-  #&endint($env)  
+  &endint($env)  
 }
 
 

@@ -181,9 +181,9 @@ sub issueitem{
      } elsif ($item->{'wthdrawn'} == 1) {
        error_msg($env,"Item Withdrawn");
        $canissue = 0;
-     } elsif ($item->{'itemlost'} == 1) {
-       error_msg($env,"Item Lost");      
-       $canissue = 0;
+#     } elsif ($item->{'itemlost'} == 1) {
+#       error_msg($env,"Item Lost");      
+#       $canissue = 0;
      } elsif ($item->{'restricted'} == 1 ){
        error_msg($env,"Restricted Item");
        #check borrowers status to take out restricted items
@@ -206,7 +206,16 @@ sub issueitem{
        #check reserve
        my ($resbor,$resrec) = 
          &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
-       if ($resbor ne "") {
+       if ($resbor=$bornum) { 
+         my $rquery = "update reserves 
+	   set found = 'F'
+	   where reservedate = '$resrec->{'reservedate'}'
+	   and borrowernumber = '$resrec->{'borrowernumber'}'
+	   and biblionumber = '$resrec->{'biblionumber'}'";
+	 my $rsth = $dbh->prepare($rquery);
+	 $rsth->execute;
+	 $rsth->finish;
+       } elsif ($resbor ne "") {
          my $bquery = "select * from borrowers 
 	    where borrowernumber = '$resbor'";
 	 my $btsh = $dbh->prepare($bquery);
@@ -219,6 +228,18 @@ sub issueitem{
 	    # print a docket;
 	    printreserve($env,$resrec,$resborrower,$item);
 	    $canissue = 0;
+	 } else {
+	   my $ans = msg_yn($env,"Cancel reserve?");
+	   if ($ans eq "Y") {
+	     my $rquery = "update reserves 
+	       set found = 'F'
+	       where reservedate = '$resrec->{'reservedate'}
+	       and borrowernumber = '$resrec->{'borrowernumber'}
+	       and biblionumber = '$resrec->{'biblionumber'}";
+             my $rsth = $dbh->prepare($rquery);
+	     $rsth->execute;
+             $rsth->finish;
+	   }
 	 }
 	 $btsh->finish();
        };
@@ -234,7 +255,7 @@ sub issueitem{
        #debug_msg("","date $datedue");
        &UpdateStats($env,$env->{'branchcode'},'issue',$charge);
        if ($charge > 0) {
-          createcharge($env,$dbh,$item->{'itemnumber'},$bornum,$charge);
+         createcharge($env,$dbh,$item->{'itemnumber'},$bornum,$charge);
        }	  
      } elsif ($canissue == 0) {
        debug_msg($env,"can't issue");
