@@ -225,8 +225,9 @@ if ($type ne 'opac'){
  print mktablerow(6,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp; ','','');
 }
 print mktableft();
+my $search;
 if ($offset < $count){
-    my $search="num=$num&offset=$offset&type=$type";
+    $search="num=$num&offset=$offset&type=$type";
     if ($subject ne ''){
       $subject=~ s/ /%20/g;
       $search=$search."&subject=$subject";
@@ -252,7 +253,17 @@ if ($offset < $count){
     my $stuff=mklink("/cgi-bin/koha/search.pl?$search",'Next');
     print $stuff;
 }
-
+print "<br>";
+my $pages=$count/10;
+$pages++;
+for (my $i=1;$i<$pages;$i++){
+  my $temp=$i*10;
+  $temp=$temp-10;
+  $search=~ s/offset=[0-9]+/offset=$temp/;
+  my $stuff=mklink("/cgi-bin/koha/search.pl?$search",$i);
+  print "$stuff ";
+}
+  
 print endcenter();
 print endmenu($type);
 print endpage();
