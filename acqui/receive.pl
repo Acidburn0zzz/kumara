@@ -43,7 +43,7 @@ $date
 
 <table border=0 cellspacing=0 cellpadding=5>
 <tr valign=top bgcolor=#99cc33>
-<td background="/images/background-mem.gif"><b>BARCODE</b></td>
+<td background="/images/background-mem.gif"><b>BASKET</b></td>
 <td background="/images/background-mem.gif"><b>ISBN</b></td>
 <td background="/images/background-mem.gif"><b>TITLE</b></td>
 <td background="/images/background-mem.gif"><b>AUTHOR</b></td>
@@ -55,6 +55,9 @@ $date
 EOP
 ;
 my ($count,@results)=invoice($invoice);
+if ($invoice eq ''){
+  ($count,@results)=getallorders($id);
+}
 print $count;
 my $totalprice=0;
 my $totalfreight=0;
@@ -65,7 +68,7 @@ for (my$i=0;$i<$count;$i++){
  $total=($results[$i]->{'unitprice'} + $results[$i]->{'freight'}) * $results[$i]->{'quantityreceived'};
  print <<EOP
 <tr valign=top bgcolor=#ffffcc>
-<td></td>
+<td>$results[$i]->{'basketno'}</td>
 <td>$results[$i]->{'isbn'}</td>
 <td><a href="acquire.pl?recieve=$results[$i]->{'ordernumber'}&biblio=$results[$i]->{'biblionumber'}&invoice=$invoice&gst=$gst&freight=$freight">$results[$i]->{'title'}</a></td>
 <td>$results[$i]->{'author'}</td>
