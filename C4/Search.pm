@@ -243,9 +243,7 @@ sub ItemInfo {
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
-
-$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class";
-  
+    $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class"; 
     $i++;
   }
   $sth->finish;
@@ -267,8 +265,10 @@ sub GetItems {
    my @results;
    while (my $data=$sth->fetchrow_hashref) {
       debug_msg($env,$data->{'biblioitemnumber'});
+      my $dewey = $data->{'dewey'};
+      $dewey =~ s/0+$//; 
       my $line = $data->{'biblioitemnumber'}."\t".$data->{'itemtype'};
-      $line = $line."\t$data->{'classification'}\t$data->{'dewey'}";
+      $line = $line."\t$data->{'classification'}\t$dewey";
       $line = $line."\t$data->{'subclass'}\t$data->{isbn}";
       $line = $line."\t$data->{'volume'}\t$data->{number}";
       my $isth= $dbh->prepare("select * from items where biblioitemnumber = $data->{'biblioitemnumber'}");
