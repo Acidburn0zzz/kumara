@@ -90,13 +90,16 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
       $stuff[2]=mklink($url,$stuff[2]);
-      my ($count,$lcount,$nacount)=itemcount($env,$stuff[0]);
+      my ($count,$lcount,$nacount,$fcount)=itemcount($env,$stuff[0]);
       $stuff[3]=$count;
       if ($nacount > 0){
         $stuff[4]=$stuff[4]."N/A=$nacount";
       }
       if ($lcount > 0){
         $stuff[4]=$stuff[4]."L=$lcount";
+      }
+      if ($fcount > 0){
+        $stuff[4]=$stuff[4]."F=$fcount";
       }
     } else {
       my $word=$stuff[1];
