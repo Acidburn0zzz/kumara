@@ -76,9 +76,13 @@ if ($insert eq ''){
    print mktablerow(2,'white',bold('Membership Category'),$data{'category'});
    print mktablerow(2,'white',bold('Area'),$data{'area'});
    print mktablerow(2,'white',bold('Fee'),$data{'fee'});
-   $data{'joining'}=ParseDate('today');
+   if ($data{'joining'} eq ''){
+     $data{'joining'}=ParseDate('today');
+   }
    print mktablerow(2,'white',bold('Joining Date'),$data{'joining'});
-   $data{'expiry'}=ParseDate('in 1 year');
+   if ($data{'expiry'} eq ''){
+     $data{'expiry'}=ParseDate('in 1 year');
+   }
    print mktablerow(2,'white',bold('Expiry Date'),$data{'expiry'});
    print mktablerow(2,'white',bold('Joining Branch'),$data{'joinbranch'});
    print mktablerow(2,$main,bold('PERSONAL DETAILS'),"",$image);
