@@ -24,7 +24,7 @@ if ($type eq 'opac'){
   $main='#99cccc';    
   $secondary='#efe5ef';
 } else {                                                                                                       
-  $main='#99cc33';                                                                                             
+  $main='#cccc99';                                                                                             
   $secondary='#ffffcc';                                                                                        
 }       
 
