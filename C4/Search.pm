@@ -325,7 +325,7 @@ sub CatSearch  {
             $query="select count(*) from biblio,bibliosubtitle
 	    where
             (biblio.biblionumber=bibliosubtitle.biblionumber) and 
-	    (((title like '$key[0]%' or title like '% $key[0] %' or title like '% $key[0]')";
+	    (((title like '$key[0] %' or title like '% $key[0] %' or title like '% $key[0]')";
 	    while ($i<$count){
 	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i] %' or title '% $key[$i]')";
 	      $i++;
