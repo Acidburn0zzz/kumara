@@ -10,6 +10,7 @@ use C4::Circulation::Issues;
 use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
 use C4::Interface;
+use C4::Security;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -62,13 +63,15 @@ sub Start_circ{
   while ($donext eq 'Circ') {
     my ($reason,$data) = menu('console','Circulation', 
     ('Issues','Returns','Borrower Enquiries','Log In'));
+
     if ($data eq 'Issues') {  
       $donext=Issue($env);
     } elsif ($data eq 'Returns') {
       $donext=Returns($env);
     } elsif ($data eq 'Log In') {
+    debug_msg("","New user"); 
       &endint($env);
-      &login($env);
+      &Login($env);
       &startint($env,'Circulation');
     } elsif ($data eq 'Quit') { 
       $donext = $data;

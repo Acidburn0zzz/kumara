@@ -91,10 +91,11 @@ sub menu2 {
   my $b1 = Newt::Button(fmtstr("",@items[1],"C30"));
   my $b2 = Newt::Button(fmtstr("",@items[2],"C30"));
   my $b3 = Newt::Button(fmtstr("",@items[3],"C30"));
-   $b0->Tag(@items[0]);
+  $b0->Tag(@items[0]);
   $b1->Tag(@items[1]);
   $b2->Tag(@items[2]);
-       
+  $b3->Tag(@items[3]);
+ 
   $panel->Add(0,0,$b0);
   $panel->Add(0,1,$b1);
   $panel->Add(0,2,$b2);
