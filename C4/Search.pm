@@ -221,7 +221,9 @@ sub KeywordSearch {
     or subtitle like '% nz %' or subtitle like '% nz' or author like 'nz %' 
     or author like '% nz %' or author like '% nz')"
   }
-  if ($search->{'keyword'} =~ /nz/i){
+  if ($search->{'keyword'} eq  'nz' || $search->{'keyword'} eq 'NZ' ||
+  $search->{'keyword'} =~ /nz /i || $search->{'keyword'} =~ / nz /i ||
+  $search->{'keyword'} =~ / nz/i){
     $query.= "or (title like 'new zealand%' or title like '% new zealand %'
     or title like '% new zealand' or subtitle like 'new zealand%' or
     subtitle like '% new zealand %'
