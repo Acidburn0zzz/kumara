@@ -198,6 +198,8 @@ sub checktraps {
     if ($odues > 0) {push (@traps_set,"ODUES");}  
     #check if borrower has any items waiting
     my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
+    my $nowaiting = @$itemswaiting;
+    if ($nowaiting > 0) { push (@traps_set,"WAITING");} 
     if (@traps_set[0] ne "" ) {
        $issuesallowed,$traps_done = 
          process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set); 
