@@ -48,8 +48,10 @@ modbiblio($biblio,$title,$author,$copyright);
 modbibitem($bibitemno,$itemtype,$isbn);
 my $barcode=$input->param('barcode');
 my @barcodes;
-if ($quantrec > 1){
+if ($barcode =~ /\,/){
   @barcodes=split(',',$barcode);
+}elsif ($barcode =~ /\|/){
+  @barcodes=split('|',$barcode);
 } else {
   $barcodes[0]=$barcode;
 }
