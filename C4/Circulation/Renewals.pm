@@ -1,7 +1,7 @@
-package C4::Circulation; #assumes C4/Circulation/Returns
+package C4::Circulation; #assumes C4/Circulation/Renewals
 
-#package to deal with Returns
-#written 3/11/99 by olwen@katipo.co.nz
+#package to deal with Renewals
+#written 7/11/99 by olwen@katipo.co.nz
 
 use strict;
 require Exporter;
@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&returnrecord);
+@EXPORT = qw(&renewstatus $renewbook);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -59,19 +59,16 @@ sub Return  {
   
 }    
 
-sub returnrecord {
-  # mark items as returned
+sub renewstatus {
+  # check renewal status
   my ($env,$dbh,$bornum,$itemno)=@_;
-  my @datearr = localtime(time);
-  my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
-  my $query = "update issues 
-  set returndate = $dateret, branchcode = $env->{'branchcode'}
-  where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
-  and (returndate is null)";  
-  my $sth = $dbh->prepare($query);
-  $sth->execute;
   return();
 }
 
+sub renewbook {
+  # mark book as renewed
+  my ($env,$dbh,$bornum,$itemno)=@_;
+  return();
+}
 
 END { }       # module clean-up code here (global destructor)

@@ -7,6 +7,8 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Circulation::Issues;
+use C4::Circulation::Returns;
+use C4::Circulation::Renewals;
 use C4::Interface;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -74,10 +76,10 @@ sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio
-  where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
-  and items.biblionumber=biblio.biblionumber
-  and returndate is null
-  order by date_due");
+    where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
+    and items.biblionumber=biblio.biblionumber
+    and returndate is null
+    order by date_due");
   $sth->execute;
   my $i=0;
   my @items;
@@ -119,12 +121,22 @@ sub previousissue {
   $sth->finish;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
-      # output(1,24,"Book is marked as issue to current borrower");       
+      # no need to issue
+      my ($renewstatus) = &renewcheck($env,$dbh,$bornum,$itemnum);
       my $resp = &msg_yn("Book is issued to this borrower", "Renew?");
+      if ($resp == "y") {
+        &renewbook($env,$dbh,$bornum,$itemnum);
+      }	 
+      
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
-      # output(1,24,$text);
-      my $resp = &msg_yn($text,"Return?");
+      my $resp = &msg_yn($text,"Mark as returned?");
+      if ($resp == "y") {
+        &returnrecord($env,$dbh,$bornum,$itemnum);
+	# can issue
+      } else {
+        # can't issue
+      }	
     }
   } 
   return($borrower->{'borrowernumber'});
@@ -140,7 +152,6 @@ sub checkreserve{
   where (items.itemnumber = '$itemnum')
   and (items.biblionumber = reserves.biblionumber)
   and (reserves.found is null) order by priority";
-#  print $query;
   my $sth = $dbh->prepare($query);
   $sth->execute();
   if (my $data=$sth->fetchrow_hashref) {
@@ -170,7 +181,6 @@ sub checkwaiting{
 sub scanbook {
   my ($env,$interface)=@_;
   #scan barcode
-#  my $number='L01781778';  
   my ($number,$reason)=dialog("Book Barcode:");
   $number=uc $number;
   return ($number,$reason);
@@ -179,7 +189,6 @@ sub scanbook {
 sub scanborrower {
   my ($env,$interface)=@_;
   #scan barcode
-# my $number='V00126643';  
   my ($number,$reason,$book)=&borrower_dialog($env);
   $number=uc $number;
   return ($number,$reason,$book);

@@ -121,7 +121,7 @@ sub list {
 #    }
 #  }
   my @stuff=$li->Get();
-    $data=$stuff[0];
+  $data=$stuff[0];
   return($reason,$data);
 }
 
@@ -133,11 +133,8 @@ sub issuewindow {
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
   my $l3  = Newt::Label("Borrower Info");
- # my $li1 = Newt::Listbox(10,
- #   NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
   my $li1 = Newt::Listbox(10,NEWT_FLAG_SCROLL);
-  my $li2 = Newt::Listbox(10,
-    NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
+  my $li2 = Newt::Listbox(10,NEWT_FLAG_SCROLL);
   my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $i = 0;
   while ($items1->[$i]) {
@@ -260,10 +257,8 @@ sub msg_yn {
   $panel1->Add(0,1,$label2,NEWT_ANCHOR_TOP);
   $panel1->Add(0,2,$bpanel,NEWT_ANCHOR_TOP);
   my ($reason,$data) =$panel1->Run();
-  debug_msg("","Ybut $ybutt->get()");
-  debug_msg("","Nbut $nbutt->get()");
-    
-  return($reason);
+  my $ans = $data->Tag();
+  return($ans);
 }
 
 

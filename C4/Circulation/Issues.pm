@@ -94,23 +94,13 @@ sub processitems {
    my $row=5;
 #  my $count=$$items;
    my $i=0;
-   #  while ($items->[$i]){
-   #    output (1,$row,$items->[$i]);
-   #    $i++;
-   #    $row++;
-   #  }
    my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
    if ($itemnum ne ""){
-      debug_msg($env,"borrower $bornum item $itemnum");
       my $item = &issueitem($env,$dbh,$itemnum,$bornum,$items);
-      output(40,$row2,$item->{'title'});
-      debug_msg($env,"$it2p - $item->{'title'}");
-      #unshift $items2,substr(($item->{'title'}.(" "x30)),0,30);
       $items2->[$it2p]=substr(($item->{'title'}.(" "x30)),0,30); 
       $row2++;	     
       $it2p++;
    }  
-          
    $dbh->disconnect;
    #check to see if more books to process for this user
    if ($reason eq 'Finished user'){
@@ -129,20 +119,18 @@ sub issueitem{
    my ($env,$dbh,$itemnum,$bornum,$items)=@_;
    $itemnum=uc $itemnum;
    my $canissue = 1;
- ##  my ($itemnum,$reason)=&scanbook();
+   ##  my ($itemnum,$reason)=&scanbook();
    my $query="Select * from items,biblio where (barcode='$itemnum') and
        (items.biblionumber=biblio.biblionumber)";
    my $item;
    my $sth=$dbh->prepare($query);  
    $sth->execute;
    if ($item=$sth->fetchrow_hashref) {
-     debug_msg($env,$item->{'title'});
-     #$items2=(substr($item.(" "x30),0,30));
-     #$items2->Append(substr($item.(" "x30),0,30));
      $sth->finish;
      #check if item is restricted
      if ($item->{'restricted'} == 1 ){
-       output(20,1,"whoop whoop restricted");
+      error_msg($env,"Restricted Item");
+      #output(20,1,"whoop whoop restricted");
       #check borrowers status to take out restricted items
       # if borrower allowed {
       #  $canissue = 1
@@ -158,12 +146,11 @@ sub issueitem{
      }   
      if ($canissue == 1) {
        #now mark as issued
-       &debug_msg($env,"Issueing $item->{'itemnumber'} $item->{'biblioitemnumber'} $bornum");
        &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum)
        &UpdateStats($env,$env->{'branchcode'},'issue');
      }
    } else {
-     error_msg($env,"$itemnum not found");
+     error_msg($env,"$itemnum not found - rescan");
    }  
    return($item);
 }
@@ -184,10 +171,6 @@ sub updateissues{
   my $datedue = time + $loanlength;
   my @datearr = localtime($datedue);
   my $dateduef = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
-  # this ought to also insert the branch, but doen't do so yet.
-  # $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
-  # values
-  # ($bornum,$itemno,datetime('now'::abstime) + $loanlength,$env->{'branchcode'})";
   $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
   values
   ($bornum,$itemno,'$dateduef','$env->{'branchcode'}')";
