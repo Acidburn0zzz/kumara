@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&userdialog &output &startint &endint &getinput);
+@EXPORT = qw(&userdialog &output &heading &startint &endint &getinput &alert);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -51,7 +51,7 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub startint {
-  my ($type,$area,$menu,$functions)=@_;
+  my ($type,$area,$menu,$functions,$msg)=@_;
   if ($type eq 'console'){
     my $sl=Term::Slang->new;
     $sl->init_smg;
@@ -66,19 +66,21 @@ sub startint {
     );
     my $num_colors = scalar @colors;		    
     init_colors($sl,$num_colors,@colors);
-#    $sl->smg_set_color(0);
-#
-#    $sl->smg_write_string($colors[11]);
-#    $sl->smg_set_color(12);                                     
-#    $sl->smg_erase_eol;
+    heading('console',$sl,$msg);      
+    menu_loop($sl,$menu,$functions);
+    quit($sl);
 
-   my $msg = 'Circulation';                     
+  } 
+}
+
+sub heading {
+  my ($type,$sl,$msg)=@_;
+   $sl->smg_cls;	
    my $color;            
    my $dr = 5;                    
    my $dc = 16;         
    my $r  = 0; 
    my $c  = 20;                                           
-   
    $sl->smg_set_color(4);  
    $sl->SLsmg_set_char_set(1);          
    $sl->SLsmg_fill_region($r + 1, $c + 1, $dr - 2, $dc - 2, 'a');          
@@ -88,13 +90,6 @@ sub startint {
    $sl->smg_write_string($msg);      
    $sl->smg_draw_box($r, $c, $dr, $dc);
    $sl->smg_refresh; 
-    if ($sl ne ''){
-    menu_loop($sl,$menu,$functions);
-    quit($sl);
-    } else {
-     print "weird";
-    }
-  } 
 }
 
 sub quit {
@@ -105,8 +100,8 @@ sub quit {
 }
 
 sub print_menu {
+  #prints a menu, takes list of items in menu as parameter
         my ($sl,$names)=@_;
-	if ($sl ne ''){
 	$sl->SLsig_block_signals;
 	#$sl->smg_cls;	
 	my $row = 6;
@@ -123,9 +118,7 @@ sub print_menu {
 	
 	$sl->smg_refresh;
 	$sl->SLsig_unblock_signals;
-	} else {
-	 print "ehehe";
-	}
+
 }
 
 sub output {
@@ -135,15 +128,25 @@ sub output {
     $interface->smg_gotorc($row, 1);
     $interface->smg_write_string("$string");
     $interface->smg_refresh;
-    
     $interface->SLsig_unblock_signals;
+  }
+}
+
+sub alert {
+  my ($type,$string,$interface)=@_;
+  my $row=23;
+  if ($type eq 'console'){
+    $interface->smg_set_color(4);
+    $interface->smg_gotorc($row, 25);
+    $interface->smg_write_string("$string");
+    $interface->smg_refresh;
+    $interface->SLsig_unblock_signals;
+    $interface->smg_set_color(0);
   }
 }
 
 sub menu_loop {
         my ($sl,$names,$functions)=@_;
-#	my @names1=$$names;
-#	my @functions1=$$functions;
 	if ($sl eq ''){
 	  print "eh";
 	} else {
@@ -157,6 +160,7 @@ sub menu_loop {
 	  } else {
 	    $sl->SLtt_beep;
 	  }
+	  $sl->smg_cls;	
 	  print_menu($sl,$names);
         }
 	}
@@ -172,13 +176,13 @@ sub getinput {
   my ($sl,$row)=@_;
   $sl->smg_gotorc($row, 1);
   my $input;
-  my $ch = chr $sl->SLang_getkey;
+  my $ch = chr $sl->SLkp_getkey;
   while ($ch !~ /\r/){
      $sl->smg_write_string("$ch");  
      $sl->smg_refresh;                
      $sl->SLsig_unblock_signals;
      $input=$input.$ch;
-     $ch = chr $sl->SLang_getkey;
+     $ch = chr $sl->SLkp_getkey;
   }
   return($input);
 }

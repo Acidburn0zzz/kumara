@@ -56,62 +56,66 @@ sub Start_circ{
   #start interface
   my @menu=('Issues','Quit');
   my @functions=('',\&Issue,\&quit);
-  &startint('console','Circ',\@menu,\@functions); 
+  &startint('console','Circ',\@menu,\@functions,'Circulations'); 
   &endint();
 }
 
 sub Issue  {
+   my ($interface)=@_;
+   heading('Console',$interface,'Issues');
     my $dbh=&C4Connect;  
 #  my ($dbh)=@_;
-   my ($interface)=@_;
+   
+
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower($interface);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
   $sth->execute;
   my @borrower=$sth->fetchrow_array;
   my $bornum=$borrower[0];
-
+  $sth->finish;
   if ($bornum eq ''){
     #borrower not found
-    &output('console',"Borrower not found",$interface);
-#    print "notfound";
+    &output('console',"Borrower not found",$interface,12);
+  } else {  
+    my $borrowers=join(' ',($borrower[5],$borrower[3],$borrower[2]));
+      &output('console',$borrowers,$interface,14);
+    #process borrower traps (could be function)
+    #check first GNA trap (no address this is the 22nd item in the table)
+    if ($borrower[21] == 1){
+      #got to membership update and update member info
+      &output('console',"Whoop whoop no address",$interface,12);
+    }
+    #check if member has a card reported as lost
+    if ($borrower[22] ==1){
+      #updae member info
+#      &output('console',"Whoop whoop lost card");
+    }
+    #check the notes field if notes exist display them
+    if ($borrower[26] ne ''){
+      #display notes
+      #deal with notes as issue_process.doc
+#      &resultout('console',"$borrower[26]",$interface);
+    }
+    #check if borrower has overdue items
+    #call overdue checker
+    &checkoverdues($bornum);
+    #check amountowing
+    my $amount=checkaccount($bornum,$dbh,$interface);    #from C4::Accounts
+    #check if borrower has any items waiting
+    &checkwaiting;
+    #deal with any money still owing
+    if ($amount > 0){
+      &reconcileaccount($bornum,$dbh);
+    }
+    #deal with alternative loans
+    #now check items 
+    &processitems($bornum,$interface);
+    &getinput($interface,24);       
+   
+    $dbh->disconnect;
   }
-  $sth->finish;
-  #process borrower traps (could be function)
-  #check first GNA trap (no address this is the 22nd item in the table)
-  if ($borrower[21] == 1){
-    #got to membership update and update member info
-     &resultout('console',"Whoop whoop no address",$interface);
-  }
-  #check if member has a card reported as lost
-  if ($borrower[22] ==1){
-    #updae member info
-#    &resultout('console',"Whoop whoop lost card");
-  }
-  #check the notes field if notes exist display them
-  if ($borrower[26] ne ''){
-    #display notes
-    #deal with notes as issue_process.doc
-#    &resultout('console',"$borrower[26]",$interface);
-  }
-  #check if borrower has overdue items
-  #call overdue checker
-  &checkoverdues($bornum);
-  #check amountowing
-  my $amount=checkaccount($bornum,$dbh,$interface);    #from C4::Accounts
-  #check if borrower has any items waiting
-  &checkwaiting;
-  #deal with any money still owing
-  if ($amount > 0){
-    &reconcileaccount($bornum,$dbh);
-  }
-  #deal with alternative loans
-  #now check items 
-  &processitems($bornum,$interface);
-  my $borrowers=join(' ',@borrower);
-  &output('console',$borrowers,$interface);
-  $dbh->disconnect;
-  return (@borrower);
+#    return (@borrower);
  
 }    
 
@@ -167,7 +171,7 @@ sub previousissue {
   $sth->finish;
   if ($borrower[0] ne ''){
     my $text="book is issued to borrower $borrower[0] $borrower[1] borrowernumber  $borrower[2]";
-#    &resultout('console',$text,$interface);
+    &alert('console',$text,$interface);
     return("out");
   } 
 }
@@ -181,8 +185,10 @@ sub checkwaiting{
 sub scanbook {
   my ($interface)=@_;
   #scan barcode
-  my $number='L01781778';  
-#  my $number=&userdialog('console','Please enter a book barcode',$interface);
+#  my $number='L01781778';  
+  output('console','Please enter a book barcode',$interface,10);
+  output('console','',$interface,11);
+  my $number=getinput($interface,11);
   return ($number);
 }
 
@@ -190,7 +196,7 @@ sub scanborrower {
   my ($interface)=@_;
   #scan barcode
 #  my $number='V00126643';  
-  output('console','Please enter the Borrower number',$interface,8);
+  output('console','Please enter the Borrowers barcode',$interface,8);
     output('console','',$interface,9);
   my $number=&getinput($interface,9);
   return ($number);

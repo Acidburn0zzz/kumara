@@ -64,7 +64,7 @@ sub checkaccount  {
   }
   $sth->finish;
   if ($total > 0){
-    &output('console',"borrower owes $total",$interface);
+    &alert('console',"borrower owes $total",$interface);
     if ($total > 5){
       reconcileaccount();
     }
