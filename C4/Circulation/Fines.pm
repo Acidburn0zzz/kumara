@@ -152,7 +152,7 @@ and (accounttype='FU' or accounttype='O');";
 sub BorType {
   my ($borrowernumber)=@_;
   my $dbh=C4Connect;
-  my $query="Select borrowers.categorycode,description from borrowers,categories where 
+  my $query="Select * from borrowers,categories where 
   borrowernumber=$borrowernumber and
 borrowers.categorycode=categories.categorycode";
   my $sth=$dbh->prepare($query);
