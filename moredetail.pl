@@ -74,6 +74,7 @@ print <<printend
 <b>Publisher:</b> $data->{'publishercode'} <br>
 <b>Place:</b><br>
 <b>Date:</b> $data->{'publicationdate'}<br>
+<b>Volume:</b> $data->{'volumeddesc'}<br>
 <b>Pages:</b> $data->{'pages'}<br>
 <b>Illus:</b> $data->{'illus'}<br>
 <b>No. of Items:</b> $count

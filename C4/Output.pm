@@ -209,7 +209,7 @@ sub mkform3{
         $text="<input type=$data[0] name=$keys[$i2] value=\"$data[1]\" size=40>";
       }
       if ($data[0] eq 'textarea') {
-        $text="<textarea name=$keys[$i2] wrap=physical cols=40 rows=4>$data[1]</textarea>";
+        $text="<textarea name=$keys[$i2] cols=40 rows=4>$data[1]</textarea>";
       }
       if ($data[0] eq 'select') {
         $text="<select name=$keys[$i2]>";
