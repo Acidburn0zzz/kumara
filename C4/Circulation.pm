@@ -85,10 +85,10 @@ sub pastitems{
   my @items;
   my @items2;
   $items[0]=" "x40;
-  $items2[0]=" "x30;
+  $items2[0]=" "x35;
   while (my $data=$sth->fetchrow_hashref){
-     my $line = "$data->{'date_due'} $data->{'title'}".(" "x30);
-     $items[$i]=substr($line,0,40);
+     my $line = "$data->{'date_due'} $data->{'title'}";
+     $items[$i]=fmtstr($env,$line,"L40");
      $i++;
   }
   return(\@items,\@items2);
@@ -122,7 +122,7 @@ sub previousissue {
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
-      my ($renewstatus) = &renewcheck($env,$dbh,$bornum,$itemnum);
+      my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
       my $resp = &msg_yn("Book is issued to this borrower", "Renew?");
       if ($resp == "y") {
         &renewbook($env,$dbh,$bornum,$itemnum);

@@ -94,13 +94,21 @@ sub processitems {
    my $row=5;
 #  my $count=$$items;
    my $i=0;
-   my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
+   my $amountdue = 0;
+   my ($itemnum,$reason) = issuewindow($env,'Issues',$items,$items2,$borrower,
+      fmtdec($env,$amountdue,"$32"));
    if ($itemnum ne ""){
-      my $item = &issueitem($env,$dbh,$itemnum,$bornum,$items);
-      $items2->[$it2p]=substr(($item->{'title'}.(" "x30)),0,30); 
-      $row2++;	     
-      $it2p++;
-   }  
+      my ($item,$charge) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
+      if ($item) {
+        debug_msg($env,$item->{'title'});
+        debug_msg($env,fmtstr($env,$item->{'title'},"L30"));
+        $items2->[$it2p] = 
+    	(fmtstr($env,$item->{'title'},"L30")." ".fmtdec($env,$charge,"22")); 	
+        $row2++;	     
+	$it2p++;
+	$amountdue += $charge;
+      }  
+   }
    $dbh->disconnect;
    #check to see if more books to process for this user
    if ($reason eq 'Finished user'){
@@ -123,6 +131,7 @@ sub issueitem{
    my $query="Select * from items,biblio where (barcode='$itemnum') and
       (items.biblionumber=biblio.biblionumber)";
    my $item;
+   my $charge;
    my $sth=$dbh->prepare($query);  
    $sth->execute;
    if ($item=$sth->fetchrow_hashref) {
@@ -145,7 +154,7 @@ sub issueitem{
        #if charge deal with it
      }   
      if ($canissue == 1) {
-       my $charge = calc_charges($env,$dbh,$itemnum,$bornum);
+       $charge = calc_charges($env,$dbh,$itemnum,$bornum);
      }
      if ($canissue == 1) {
        #now mark as issued
@@ -155,7 +164,7 @@ sub issueitem{
    } else {
      error_msg($env,"$itemnum not found - rescan");
    }  
-   return($item);
+   return($item,$charge);
 }
 
 sub updateissues{

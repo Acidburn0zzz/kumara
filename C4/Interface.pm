@@ -19,7 +19,8 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg);
+&textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
+&fmtstr &fmtdec);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -146,40 +147,47 @@ sub list {
 }
 
 sub issuewindow {
-  my ($env,$title,$items1,$items2,$borrower,$name)=@_;
+  my ($env,$title,$items1,$items2,$borrower,$amountowing)=@_;
   my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label("Book");
   my $panel = Newt::Panel(50,25, $title,5,5);
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
   my $l3  = Newt::Label("Borrower Info");
-  my $li1 = Newt::Listbox(10,NEWT_FLAG_SCROLL);
-  my $li2 = Newt::Listbox(10,NEWT_FLAG_SCROLL);
-  my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  my $l4  = Newt::Label("Total Due");
+  my $amt = Newt::Label($amountowing);
+  my $b1  = Newt::Label("$borrower->{title} $borrower->{'firstname'}");
+  my $b2  = Newt::Label("$borrower->{'streetaddres'}");
+  my $b3  = Newt::Label("$borrower->{'city'}");
+  my $li1 = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
+  my $li2 = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
+  #my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $i = 0;
   while ($items1->[$i]) {
     $li1->Add($items1->[$i]);
     $i++;
   }
-  # $li2->Add($items2->{'title'});
   $i = 0;
   while ($items2->[$i]) {
     $li2->Add($items2->[$i]); 
     $i++;
   }  
-  $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
-  "$borrower->{'city'}");
+ # $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
+ # "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
   $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,45);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,2,$li3,NEWT_ANCHOR_LEFT);  
-  $panel->Add(0,3,$l1,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,4,$li1,NEWT_ANCHOR_LEFT);  
-  $panel->Add(1,3,$l2,NEWT_ANCHOR_RIGHT);
-  $panel->Add(1,4,$li2,NEWT_ANCHOR_RIGHT);  
- 
+  $panel->Add(1,1,$l3,NEWT_ANCHOR_RIGHT);
+  $panel->Add(0,2,$b1,NEWT_ANCHOR_LEFT);
+  $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);
+  $panel->Add(0,3,$b2,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,4,$b3,NEWT_ANCHOR_LEFT);  
+  $panel->Add(0,5,$l1,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,6,$li1,NEWT_ANCHOR_LEFT);  
+  $panel->Add(1,5,$l2,NEWT_ANCHOR_RIGHT);
+  $panel->Add(1,6,$li2,NEWT_ANCHOR_RIGHT);  
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
@@ -303,6 +311,80 @@ sub error_msg {
   my ($reason,$data) =$panel1->Run();
   return();
 }
+
+sub fmtstr {
+  # format (space pad) a string
+  # $fmt is Ln.. or Rn.. where n is the length
+  my ($env,$strg,$fmt)=@_;
+  my $align = substr($fmt,0,1);
+  my $lenst = substr($fmt,1,length($fmt)-1);
+  if ($align eq"R" ) {
+     $strg = substr((" "x$lenst).$strg,0-$lenst,$lenst);
+  } else {
+     $strg = substr($strg.(" "x$lenst),0,$lenst);
+  } 
+  return ($strg);
+}
+
+sub fmtdec {
+  # format a decimal
+  # $fmt is [$][,]n[m]
+  my ($env,$numb,$fmt)=@_;
+  my $curr = substr($fmt,0,1);
+  if ($curr eq "\$") {
+    $fmt = substr($fmt,1,length($fmt)-1);
+  };
+  my $comma = substr($fmt,0,1);
+  if ($comma eq ",") {
+    $fmt = substr($fmt,1,length($fmt)-1);
+  };
+  my $right;
+  my $left = substr($fmt,0,1);
+  if (length($fmt) == 1) {
+    $right = 0;
+  } else {
+    $right = substr($fmt,1,1);
+  }
+  my $fnumb = "";
+  my $tempint = "";
+  my $tempdec = "";
+  if (index($numb,".") == 0 ){
+     $tempint = 0;
+     $tempdec = substr($numb,1,length($numb)-1); 
+  } else {
+     if (index($numb,".") > 0) {
+       my $decpl = index($numb,".");
+       $tempint = substr($numb,0,$decpl);
+       $tempdec = substr($numb,$decpl+1,length($numb)-1-$decpl);
+     } else {
+       $tempint = $numb;
+       $tempdec = 0;
+     }
+     if ($comma eq ",") {
+        while (length($tempdec) > 3) {
+           $fnumb = ",".substr($tempint,-3,3).$fnumb;
+	   substr($tempint,-3,3) = "";
+	}
+	$fnumb = substr($tempint,-3,3).$fnumb;
+     }
+  }
+  if ($curr eq "\$") {
+     $fnumb = fmtstr($env,$curr.$fnumb,"R".$left+1);
+  } else {
+     if ($left==0) {
+        $fnumb = "";
+     } else {
+        $fnumb = fmtstr($env,$fnumb,"R".$left);
+     }
+  }   
+  if ($right > 0) {
+     $tempdec = $tempdec.("0"x$right);
+     $tempdec = substr($tempdec,0,$right);
+     $fnumb = $fnumb.".".$tempdec;
+  }
+  return ($fnumb);
+}
+ 
 
 sub endint {
   Newt::Finished();
