@@ -160,8 +160,11 @@ for (my $i=0;$i<$count;$i++){
   #check item is not reserved
   my ($rescount,$reserves)=FindReserves($issue->[$i]{'biblionumber'},'');
   if ($rescount >0){
-  } else{
-    print "<TD><input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=y>Y
+    print "<TD>Reserved";
+  } else {
+    print "<TD>";
+  }
+    print "<input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=y>Y
     <input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=n>N</td>
     </tr>
     ";
