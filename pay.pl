@@ -30,6 +30,13 @@ for (my $i=0;$i<@names;$i++){
     $inp{$names[$i]}=$temp;
     $check=1;
   }
+  if ($temp eq 'yes'){
+    my $amount=$input->param($names[$i+4]);
+    my $bornum=$input->param($names[$i+5]);
+    my $accountno=$input->param($names[$i+6]);
+    makepayment($bornum,$accountno,$amount);
+    $check=2;
+  }
 }
 my %env;
 my $total=$input->param('total');
@@ -66,7 +73,8 @@ print <<printend
 <input type=hidden name=itemnumber$i value=$accts->[$i]{'itemnumber'}>
 <input type=hidden name=accounttype$i value=$accts->[$i]{'accounttype'}>
 <input type=hidden name=amount$i value=$accts->[$i]{'amount'}>
-<input type=hidden name=bornum value=$bornum>
+<input type=hidden name=out$i value=$accts->[$i]{'amountoutstanding'}>
+<input type=hidden name=bornum$i value=$bornum>
 <input type=hidden name=accountno$i value=$accts->[$i]{'accountno'}>
 </td>
 <TD>$accts->[$i]{'description'} $accts->[$i]{'title'}</td>

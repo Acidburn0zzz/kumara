@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&recordpayment &fixaccounts);
+@EXPORT = qw(&recordpayment &fixaccounts &makepayment);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -101,6 +101,39 @@ sub recordpayment{
   $usth->execute;
   $usth->finish;
   UpdateStats($env,'branch','payment',$data);
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub makepayment{
+  #here we update both the accountoffsets and the account lines
+  my ($bornumber,$accountno,$amount)=@_;
+  my $env;
+  my $dbh=C4Connect;
+  # begin transaction
+  my $nextaccntno = getnextacctno($env,$bornumber,$dbh);
+  my $newamtos=0;
+  my $updquery="Update accountlines set amountoutstanding=0 where
+  borrowernumber=$bornumber and accountno=$accountno";
+  my $sth=$dbh->prepare($updquery);
+  $sth->execute;
+  $sth->finish;
+#  print $updquery;
+  $updquery = "insert into accountoffsets 
+  (borrowernumber, accountno, offsetaccount,  offsetamount)
+  values ($bornumber,$accountno,$nextaccntno,$newamtos)";
+  my $usth = $dbh->prepare($updquery);
+  $usth->execute;
+  $usth->finish;  
+  # create new line
+  my $payment=0-$amount;
+  $updquery = "insert into accountlines 
+  (borrowernumber, accountno,date,amount,description,accounttype,amountoutstanding)  
+  values ($bornumber,$nextaccntno,now(),$payment,'Payment,thanks', 'Pay',0)";
+  my $usth = $dbh->prepare($updquery);
+  $usth->execute;
+  $usth->finish;
+  UpdateStats($env,'branch','payment',$amount);
   $sth->finish;
   $dbh->disconnect;
 }

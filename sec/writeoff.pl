@@ -22,10 +22,11 @@ for (my $i=0;$i<@name;$i++){
     $inp{$name[$i]}=$temp;
   }
 }
-my $bornum=$input->param('bornum');
+my $bornum;
 while ( my ($key, $value) = each %inp){
 #  print $key,$value;
   my $accounttype=$input->param("accounttype$value");
+  $bornum=$input->param("bornum$value");
   my $itemno=$input->param("itemnumber$value");
   my $amount=$input->param("amount$value");
   if ($accounttype eq 'Res'){

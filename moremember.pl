@@ -101,27 +101,28 @@ printend
 my %bor;
 $bor{'borrowernumber'}=$bornum;
 my ($numaccts,$accts,$total)=getboracctrecord('',\%bor);
-if ($numaccts > 10){
-  $numaccts=10;
-}
+#if ($numaccts > 10){
+#  $numaccts=10;
+#}
 for (my$i=0;$i<$numaccts;$i++){
 #if ($accts->[$i]{'accounttype'} ne 'Pay'){
   my $amount= $accts->[$i]{'amount'} + 0.00;
     my $amount2= $accts->[$i]{'amountoutstanding'} + 0.00;
-  print "<tr VALIGN=TOP  >";
-  my $item=" &nbsp; ";
-  @temp=split('-',$accts->[$i]{'date'});
-  $accts->[$i]{'date'}="$temp[2]/$temp[1]/$temp[0]";
-  if ($accts->[$i]{'accounttype'} ne 'Res'){
+  if ($amount2 > 0){
+    print "<tr VALIGN=TOP  >";
+    my $item=" &nbsp; ";
+    @temp=split('-',$accts->[$i]{'date'});
+    $accts->[$i]{'date'}="$temp[2]/$temp[1]/$temp[0]";
+    if ($accts->[$i]{'accounttype'} ne 'Res'){
     #get item data
     #$item=
-  }
-  print "<td>$accts->[$i]{'date'}</td>";
+    }
+    print "<td>$accts->[$i]{'date'}</td>";
 #  print "<TD>$accts->[$i]{'accounttype'}</td>";
-  print "<TD>$accts->[$i]{'description'} $accts->[$i]{'title'}</td>
-  <TD>$amount</td><td>$amount2</td>
-  </tr>";
-#}
+    print "<TD>$accts->[$i]{'description'} $accts->[$i]{'title'}</td>
+    <TD>$amount</td><td>$amount2</td>
+    </tr>";
+  }
 }
 print <<printend
 
