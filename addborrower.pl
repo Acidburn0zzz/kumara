@@ -42,7 +42,7 @@ if ($action eq 'S') {
   my $i = 0;
   print center;
   print mktablehdr;
-  print mktablerow(5,'#cccc99','<b>CARDNUMBER</b>','<b>NAME</b>','<b>CATEGORY</b>','<b>ADDRESS</B>','<b>PHONE</B>');
+  print mktablerow(5,'#cccc99','<b>CARDNO</b>','<b>NAME</b>','<b>CAT</b>','<b>ADDRESS</B>','<b>PHONE</B>');
   my $colour = 1;
   while ($i < $bcnt) {
     # create a search list
