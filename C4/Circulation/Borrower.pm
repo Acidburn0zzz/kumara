@@ -1,4 +1,4 @@
-package C4::Circulation; #asummes C4/Circulation/Issues
+package C4::Circulation::Borrower; #asummes C4/Circulation/Borrower
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&findborrower &Borenq);
+@EXPORT = qw(&findborrower &Borenq &findoneborrower);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -65,60 +65,15 @@ sub findborrower  {
   my $borrower = "";
   my $sth = "";
   my $borcode = "";
+  my $borrower;
   my $reason = "";
   my $book;
   while (($bornum eq '') && ($reason ne "Finished issues")) {
     #get borrowerbarcode from scanner
     ($borcode,$reason,$book)=&scanborrower(); #C4::Circulation
     if ($borcode ne '') {
-      #  output(1,1,$borcode);
-      my $ucborcode = uc $borcode;
-      $sth=$dbh->prepare("Select * from borrowers 
-        where cardnumber='$ucborcode'");
-      $sth->execute;
-      if ($borrower=$sth->fetchrow_hashref) {
-        $bornum=$borrower->{'borrowernumber'};
-        $sth->finish;
-      } else {
-        $sth->finish;
-	my $borquery = "Select * from borrowers 
-	  where surname ~* '$borcode'
-	  order by surname";
-	my $sthb =$dbh->prepare($borquery);
-	$sthb->execute;
-	my $cntbor = 0;
-	my @borrows;
-        my @bornums;
-        while ($borrower= $sthb->fetchrow_hashref) {
-	   my $line = $borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
-	      ', '.$borrower->{'othernames'};
-	   debug_msg($env,
-	     "$cntbor $borrower->{'cardnumber'} $borrower->{'borrowernumber'}");   
-	   $borrows[$cntbor] = fmtstr($env,$line,"L50");
-	   $bornums[$cntbor] =$borrower->{'borrowernumber'};
-           $cntbor++;
-       	}
-	if ($cntbor == 1)  {
-           $bornum = $bornums[0];       
-	   my $query = "select * from borrowers where borrowernumber = '$bornum'";	   
-           $sth = $dbh->prepare($query);
-	   $sth->execute;
-	   $borrower =$sth->fetchrow_hashref;
-	   $sth->finish;					         
-	} elsif ($cntbor > 0) {
-	   my ($cardnum) = selborrower($env,$dbh,\@borrows,\@bornums);
-           my $query = "select * from borrowers where cardnumber = '$cardnum'";   
-	   $sth = $dbh->prepare($query);                          
-           $sth->execute;                          
-           $borrower =$sth->fetchrow_hashref;
-	   $sth->finish;
-           $bornum=$borrower->{'borrowernumber'};
-        }   	   
-	clearscreen;
-        if ($bornum eq '') {
-          error_msg($env,"Borrower not found");
-        }
-      }
+      debug_msg($env,"a");
+      ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
     } elsif ($book ne "") {
       my $query = "select * from issues,items where (barcode = '$book') 
         and (items.itemnumber = issues.itemnumber) 
@@ -147,6 +102,57 @@ sub findborrower  {
   return ($bornum, $issuesallowed,$borrower,$reason);
 }  
 
+sub findoneborrower {
+  #  output(1,1,$borcode);
+  my ($env,$dbh,$borcode)=@_;
+  my $bornum;
+  my $borrower;
+  my $ucborcode = uc $borcode;
+  my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$ucborcode'");
+  $sth->execute;
+  if ($borrower=$sth->fetchrow_hashref) {
+    $bornum=$borrower->{'borrowernumber'};
+    $sth->finish;
+  } else {
+    $sth->finish;
+    my $borquery = "Select * from borrowers 
+      where surname ~* '$borcode' order by surname";
+    my $sthb =$dbh->prepare($borquery);
+    $sthb->execute;
+    my $cntbor = 0;
+    my @borrows;
+    my @bornums;
+    while ($borrower= $sthb->fetchrow_hashref) {
+      my $line = $borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
+        ', '.$borrower->{'othernames'};
+      $borrows[$cntbor] = fmtstr($env,$line,"L50");
+      $bornums[$cntbor] =$borrower->{'borrowernumber'};
+      $cntbor++;
+    }
+    if ($cntbor == 1)  {
+      $bornum = $bornums[0];       
+      my $query = "select * from borrowers where borrowernumber = '$bornum'";	   
+      $sth = $dbh->prepare($query);
+      $sth->execute;
+      $borrower =$sth->fetchrow_hashref;
+      $sth->finish;					         
+    } elsif ($cntbor > 0) {
+      my ($cardnum) = selborrower($env,$dbh,\@borrows,\@bornums);
+      my $query = "select * from borrowers where cardnumber = '$cardnum'";   
+      $sth = $dbh->prepare($query);                          
+      $sth->execute;                          
+      $borrower =$sth->fetchrow_hashref;
+      $sth->finish;
+      $bornum=$borrower->{'borrowernumber'};
+       	   
+      clearscreen;
+      if ($bornum eq '') {
+        error_msg($env,"Borrower not found");
+      }
+    }  
+  }
+  return ($bornum,$borrower); 
+}
 sub checktraps {
   my ($env,$dbh,$bornum,$borrower) = @_;
   my $issuesallowed = "1";

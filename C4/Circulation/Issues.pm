@@ -207,7 +207,7 @@ sub updateissues{
   my $datedue = time + ($loanlength * 86400) ;
   
   my @datearr = localtime($datedue);
-  my $dateduef = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
+  my $dateduef = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
   values ($bornum,$itemno,'$dateduef','$env->{'branchcode'}')";
   my $sth=$dbh->prepare($query);

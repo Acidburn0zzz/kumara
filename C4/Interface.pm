@@ -12,7 +12,7 @@ NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F6
 NEWT_KEY_F7 NEWT_KEY_F8 NEWT_KEY_F9
 NEWT_KEY_F10 NEWT_KEY_F11 NEWT_KEY_F12
 NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE 
-NEWT_ANCHOR_TOP NEWT_ANCHOR_RIGHT NEWT_FLAG_BORDER );
+NEWT_FLAG_HIDDEN NEWT_ANCHOR_TOP NEWT_ANCHOR_RIGHT NEWT_FLAG_BORDER );
 #use C4::Circulation;
 
 require Exporter;
@@ -104,7 +104,7 @@ sub menu2 {
   $panel->AddHotKey(NEWT_KEY_F12);
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
-    debug_msg("","hot ");
+    #debug_msg("","hot ");
     if ($data eq NEWT_KEY_F11) {
        $stuff="Quit";
     } elsif ($data eq NEWT_KEY_F2) {
@@ -181,7 +181,7 @@ sub selborrower {
   $panel->AddHotKey(NEWT_KEY_F11);
   my ($reason,$data)=$panel->Run();
   my @stuff=$li->Get();
-  debug_msg("",@stuff[0]);
+  #debug_msg("",@stuff[0]);
   my $data=(0,9,$stuff[0]);
   my $borrnum = substr($data,0,9);
   return($borrnum);
@@ -379,7 +379,7 @@ sub logondialog {
    my $entry1=Newt::Entry(10,NEWT_FLAG_SCROLL  | NEWT_FLAG_RETURNEXIT);
    my $label1=Newt::Label("User Name");  
    my $label2=Newt::Label("Password");
-   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT );       
+   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_HIDDEN);       
    my $panel1=Newt::Panel(2,1,$title);
    my $panel2=Newt::Panel(1,5,''); 
    my $listbx=Newt::Listbox(12, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_BORDER );

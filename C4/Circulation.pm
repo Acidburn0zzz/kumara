@@ -66,10 +66,10 @@ sub Start_circ{
     clearscreen();
     my ($reason,$data) = menu('console','Circulation', 
     ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-    debug_msg($env,"data = $data");
+    #debug_msg($env,"data = $data");
     if ($data eq 'Issues') {  
       $donext=Issue($env); #C4::Circulation::Issues
-      debug_msg("","do next $donext");
+      #debug_msg("","do next $donext");
     } elsif ($data eq 'Returns') {
       $donext=Returns($env); #C4::Circulation::Returns
     } elsif ($data eq 'Borrower Enquiries'){
@@ -83,7 +83,7 @@ sub Start_circ{
     } elsif ($data eq 'Quit') { 
       $donext = $data;
     }
-    debug_msg($env,"donext -  $donext");
+    #debug_msg($env,"donext -  $donext");
   }
   &endint($env)  
 }
@@ -187,9 +187,6 @@ sub checkwaiting{
   my $query = "select * from reserves
   where (borrowernumber = '$bornum')
   and (reserves.found='W')";
-  if ($env->{'debug'} > 4) {
-    output(1,20,$query);
-  }
   my $sth = $dbh->prepare($query);
   $sth->execute();
   if (my $data=$sth->fetchrow_hashref) {
@@ -212,7 +209,6 @@ sub scanborrower {
   my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
   $number= $number;
   $book=uc $book;
-#  debug_msg("",$reason);
   return ($number,$reason,$book);
 }
 

@@ -1,6 +1,3 @@
-
-
-
 package C4::Reserves; #asummes C4/Reserves
 
 #requires DBI.pm to be installed
@@ -13,6 +10,7 @@ use C4::Database;
 use C4::Format;
 use C4::Interface;
 use C4::Interface::Reserveentry;
+use C4::Circulation::Borrower;
 use C4::Search;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -69,10 +67,6 @@ sub EnterReserves{
     $donext = $reason;
   } else {  
     my %search;
-    #debug_msg($env,"ti $title");
-    #debug_msg($env,"key $keyword");
-    #debug_msg($env,"au $author");
-    #debug_msg($env,"su $subject");
     $search{'title'}= $title;
     $search{'keyword'}=$keyword;
     $search{'author'}=$author;
@@ -133,20 +127,42 @@ sub EnterReserves{
       if ($biblionumber ne "") {
         my @items = GetItems($env,$biblionumber);
         my $cnt_it = @items;
-        error_msg($env,"$cnt_it items found");
 	my $dbh = &C4Connect;
         my $query = "Select * from biblio where biblionumber = $biblionumber";
 	my $sth = $dbh->prepare($query);
 	$sth->execute;
 	my $data=$sth->fetchrow_hashref;
 	$sth->finish;
-	titlepanel($env,"Reserves","Create Reserve");
-	my ($reason,$borrnum,$branch,$constraint,$bibitems) = MakeReserveScreen($env, $data, \@items);
-	$borrnum="102";
-	if ($borrnum ne "") {
-          CreateReserve($env,$dbh,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
-	  $dbh->disconnect;
+        my @branches;
+        my $query = "select * from branches order by branchname";
+        my $sth=$dbh->prepare($query);
+        $sth->execute;
+        while (my $branchrec=$sth->fetchrow_hashref) {
+          my $branchdet =
+            fmtstr($env,$branchrec->{'branchcode'},"L2")." ".$branchrec->{'branchname'};
+          push @branches,$branchdet;
         }
+	$sth->finish;
+        $donext = "";
+	while ($donext eq "") {
+	  clearscreen();
+          debug_msg($env,"after clear");
+          titlepanel($env,"Reserves","Create Reserve");
+       	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
+            MakeReserveScreen($env, $data, \@items, \@branches);
+	  debug_msg($env,$reason);  
+      	  my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
+          $dbh->disconnect;
+      	  if ($reason eq "") { 
+       	    if ($borrnum ne "") {
+              CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
+            $donext = "Circ"
+            }
+          } else {
+            $dbh->disconnect;
+      	    $donext = $reason;
+	  }  
+	} 
       } else {
         error_msg($env,"No items found"); 
       }
@@ -154,15 +170,36 @@ sub EnterReserves{
   }
   return ($donext);  
 }
-  sub CreateReserve {
+
+
+sub CreateReserve {
   my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
   my $dbh = &C4Connect;
-  
   $dbh->{RaiseError} = 1;
-  $dbh->{AutoCommit} = 0;
-  eval {	   
+  $dbh->{AutoCommit} = 0;	   
+  my $const = lc substr($constraint,0,1);
+  my @datearr = localtime(time);
+  my $resdate = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
+  eval {     
+    my $resdate;
     # updates take place here
-    #my $sth=
+    my $query="insert into reserves 
+      (borrowernumber,biblionumber,reservedate,branch,constrainttype) 
+      values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
+    my $sth = $dbh->prepare($query);
+    $sth->execute();
+    if ($const ne "a") {
+      my $numitems = @$bibitems;
+      my $i = 0;
+      while ($i < $numitems) {
+        my $biblioitem = @$bibitems[$i];
+	my $query = "insert into reserveconstraints
+	   (borrowernumber,reservedate,biblionumber,biblioitemnumber)
+	   values ('$borrnum','$biblionumber','$resdate','$biblioitem')";
+	my $sth = $dbh->prepare($query);
+	$sth->execute();
+      }
+    }
     $dbh->commit();
   };
   if (@_) {

@@ -13,7 +13,7 @@ NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F6
 NEWT_KEY_F7 NEWT_KEY_F8 NEWT_KEY_F9
 NEWT_KEY_F10 NEWT_KEY_F11 NEWT_KEY_F12
 NEWT_EXIT_HOTKEY 
-NEWT_FLAG_RETURNEXIT NEWT_FLAG_WRAP 
+NEWT_FLAG_RETURNEXIT NEWT_FLAG_WRAP  NEWT_ENTRY_SCROLL 
 NEWT_FLAG_MULTIPLE NEWT_FLAG_BORDER NEWT_FLAG_SCROLL
 NEWT_ANCHOR_TOP NEWT_ANCHOR_LEFT NEWT_ANCHOR_RIGHT);
 #use C4::Circulation;
@@ -106,7 +106,7 @@ sub FindBiblioScreen {
       $responses[$i] =$entries[$i]->Get();
       $i++;
     }
-  }  
+  } 
   debug_msg($env,"r $reason");
   clearscreen;
   return($reason,@responses);
@@ -153,17 +153,20 @@ sub SelectBiblio {
 }
 
 sub MakeReserveScreen {
-  my ($env,$bibliorec,$bitems) = @_;
-  my $panel    = Newt::Panel(2,2);
+  my ($env,$bibliorec,$bitems,$branches) = @_;
+  debug_msg($env,"make reserv");
+  my $panel    = Newt::Panel(1,4);
   my $itemlist = Newt::Listbox(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  my $brlist   = Newt::Listbox(6,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT |
+NEWT_FLAG_MULTIPLE);
   my $book = fmtstr($env,$bibliorec->{'title'},"L60");
   my $auth = substr($bibliorec->{'author'},0,20);
   substr($book,(60-length($auth)-2),length($auth)+2) = "  ".$auth;
   my $i = 0;
   my %bitx;
+  my @answers;
   my $numbit   = @$bitems;
-  debug_msg($env,$numbit);
-    
+   debug_msg($env,"items = $numbit");
   while ($i < $numbit) {   
     my $bitline = @$bitems[$i];
     my @blarr = split("\t",$bitline);
@@ -177,16 +180,35 @@ sub MakeReserveScreen {
     $itemlist->Add($line);
     $i++;
   }
-  my $panel2   = Newt::Panel(5,5);
-  my $panel3   = Newt::Panel(2,2); 
-  my $panel4   = Newt::Panel(3,3);
-  $panel2->Add(0,0,Newt::Label($book));
-  my $constraint = Newt::VRadiogroup('Any   ', 'Only  ', 'Except');
-  $panel4->Add(0,1,$constraint,NEWT_ANCHOR_TOP);
+  my $numbrch  = @$branches;
+  $i = 0;
+   debug_msg($env,"items = $numbrch");
+     
+  while ($i < $numbrch) {
+    $brlist->Add(@$branches[$i]);
+    $i++;
+  }
+  my $panel2   = Newt::Panel(1,10);
+  my $panel3   = Newt::Panel(2,1); 
+  my $panel4   = Newt::Panel(1,10);
+  my $panel5   = Newt::Panel(1,5);
+  my $bentry   = Newt::Entry(10, NEWT_ANCHOR_LEFT);
+  my $constraint = Newt::HRadiogroup('Any   ', 'Only  ', 'Except');
   $panel->Add(0,0,$panel2);
-  $panel->Add(0,1,$panel3);
-  $panel3->Add(0,0,$panel4,NEWT_ANCHOR_LEFT);
-  $panel3->Add(1,0,$itemlist,NEWT_ANCHOR_RIGHT);
+  $panel->Add(0,1,Newt::Label(" "));
+  $panel->Add(0,2,$panel3);
+  $panel2->Add(0,0,Newt::Label($book));
+  $panel3->Add(0,0,$panel4,NEWT_ANCHOR_TOP);
+  $panel3->Add(1,0,$panel5,NEWT_ANCHOR_RIGHT);
+  $panel4->Add(0,0,Newt::Label("Borrower"),NEWT_ANCHOR_LEFT);
+  $panel4->Add(0,1,$bentry, NEWT_ANCHOR_LEFT);
+  $panel4->Add(0,2,Newt::Label(" "),NEWT_ANCHOR_LEFT);
+  $panel4->Add(0,3,Newt::Label("Collect at "), NEWT_ANCHOR_LEFT);
+  $panel4->Add(0,4,$brlist,NEWT_ANCHOR_LEFT);
+  $panel5->Add(0,0,Newt::Label("Constraints"), NEWT_ANCHOR_RIGHT);
+  $panel5->Add(0,1,$constraint,NEWT_ANCHOR_RIGHT);
+  $panel5->Add(0,2,Newt::Label(" "));
+  $panel5->Add(0,3,$itemlist,NEWT_ANCHOR_RIGHT);
   Newt::PushHelpLine('F11 Menu:  F2 Issues:  F3 Returns:  F4 Reserves');
   $panel->AddHotKey(NEWT_KEY_F2);
   $panel->AddHotKey(NEWT_KEY_F3);
@@ -209,6 +231,14 @@ sub MakeReserveScreen {
     debug_msg($env,$stuff);
     $reason = $stuff;
   } else {
+    $reason = "";
+    @answers[0] = $bentry->Get();
+    my @brline = split(" ",$brlist->Get());
+    @answers[1] = @brline[0];
+    @answers[2] = $constraint->Get();
+    @answers[3] = $bitx{$itemlist->Get()};
+    debug_msg($env,"$answers[0] $answers[1] $answers[2] $answers[3]");
   }
+  return ($stuff,@answers);
 }
 END { }       # module clean-up code here (global destructor)
