@@ -122,30 +122,19 @@ sub EnterReserves{
 	  $donext = $results;	    
 	}
       }
-      #debug_msg($env,"Do Next $donext");
-      #debug_msg($env,"Biblio $biblionumber ");           
-
-
-
+      
       if ($biblionumber eq "") {
         error_msg($env,"No items found");   
       } else {
-        #debug_msg($env,"getting items $biblionumber");	
         my @items = GetItems($env,$biblionumber);
-        #debug_msg($env,"got items ");
-	 
-	my $cnt_it = @items;
+      	my $cnt_it = @items;
 	my $dbh = &C4Connect;
-	#debug_msg($env,"select biblio $biblionumber ");
-	    
         my $query = "Select * from biblio where biblionumber = $biblionumber";
 	my $sth = $dbh->prepare($query);
 	$sth->execute;
 	my $data=$sth->fetchrow_hashref;
 	$sth->finish;
         my @branches;
-	#debug_msg($env,"select branches ");
-	    
         my $query = "select * from branches where issuing=1 order by branchname";
         my $sth=$dbh->prepare($query);
         $sth->execute;
@@ -158,16 +147,15 @@ sub EnterReserves{
         $donext = "";
 	while ($donext eq "") {
           my $title = titlepanel($env,"Reserves","Create Reserve");
-       	  #debug_msg($env,"make reserves");
-	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
+       	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
             MakeReserveScreen($env, $data, \@items, \@branches);
       	  if ($borcode ne "") { 
    	    my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
        	    if ($reason eq "") { 
        	      if ($borrnum ne "") {
-	        my ($fee,$amtowing) =
+	        my $fee =
                   CalcReserveFee($env,$borrnum,$biblionumber,$constraint,$bibitems);
-                CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
+                  CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems,$fee);
                 $donext = "Circ"
               }
 	      
@@ -196,19 +184,20 @@ sub CalcReserveFee {
   my $data = $sth->fetchrow_hashref;
   $sth->finish();
   my $fee = $data->{'reservefee'};
-  my $cntitems = @$bibitems;
+  my $cntitems = @->$bibitems;
   if ($fee > 0) {
     # check for items on issue
     # first find biblioitem records
     my @biblioitems;
     my $query1 = "select * from biblio,biblioitems 
-       where biblionunmber = '$biblionumber'";
+       where (biblio.biblionumber = '$biblionumber')
+       and (biblio.biblionumber = biblioitems.biblionumber)";
     my $sth1 = $dbh->prepare($query1);
     $sth1->execute();
     while (my $data1=$sth1->fetchrow_hashref) {
       if ($const eq "a") {
-        push @biblioitems,$data;
-      } else {
+        push @biblioitems,$data1;
+     } else {
         my $found = 0;
         my $x = 0;
 	while ($x < $cntitems) {
@@ -217,43 +206,42 @@ sub CalcReserveFee {
 	  }
 	  $x++;
         } 
-	if ($const eq 'o') { 
-	  if ($found == 1) {
-	    push @biblioitems,$data;
-	  }
-	} else {
-	  if ($found == 0) {
-	    push @biblioitems,$data;
-	  }
-	}
+	if ($const eq 'o') {if ($found == 1) {push @biblioitems,$data;}
+	} else {if ($found == 0) {push @biblioitems,$data;} }
       }
     }
     $sth1->finish;
-    my $cntitemsallowed = @biblioitems;
+    my $cntitemsfound = @biblioitems;
     my $issues = 0;
     my $x = 0;
     my $allissued = 1;
-    while ($x < $cntitemsallowed) {
+    while ($x < $cntitemsfound) {
       my $bitdata = @biblioitems[$x]; 
       my $query2 = "select * from items 
         where biblioitemnumber = '$bitdata->{'biblioitemnumber'}'"; 
       my $sth2 = $dbh->prepare($query2);
-      $sth->execute;
+      $sth2->execute;
       while (my $itdata=$sth2->fetchrow_hashref) { 
         my $query3 = "select * from issues 
-           where itemnumber = '$itdata->{'itemnumber'}";
+           where itemnumber = '$itdata->{'itemnumber'}' and returndate is null";
         my $sth3 = $dbh->prepare($query3);
 	$sth3->execute();
-	if (my $isdata=$sth3->fetchrow_hashref) {
-	  } else { $allissued = 0; }
-	}
+	if (my $isdata=$sth3->fetchrow_hashref) { } else {$allissued = 0; }
+      }
       $x++;
     }
-    if ($allissued == 0) { $fee = 0;}
+    if ($allissued == 0) {
+      my $rquery = "select * from reserves
+        where biblionumber = '$biblionumber'";
+      my $rsth = $dbh->prepare($rquery);
+      $rsth->execute();
+      if (my $rdata = $rsth->fetchrow_hashref) { } else {
+        $fee = 0;
+      }	
+    }
   }
   $dbh->disconnect();
   return $fee;
-  
 }
 
 sub CreateReserve {
@@ -262,7 +250,6 @@ sub CreateReserve {
   #$dbh->{RaiseError} = 1;
   #$dbh->{AutoCommit} = 0;
   my $const = lc substr($constraint,0,1);
-  debug_msg($env,"constraint $constraint $const");
   my @datearr = localtime(time);
   my $resdate = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   #eval {     
@@ -271,8 +258,7 @@ sub CreateReserve {
       my $nextacctno = &getnextacctno($env,$borrnum,$dbh);
       my $updquery = "insert into accountlines
          (borrowernumber,accountno,date,amount,description,accounttype,amountoutstanding)
-          values ($borrnum,$nextacctno,now(),$fee,'Reserve Charge',
-          'Res',$fee";
+          values ($borrnum,$nextacctno,now(),$fee,'Reserve Charge','Res',$fee)";
       my $usth = $dbh->prepare($updquery);
       $usth->execute;
       $usth->finish;
@@ -280,7 +266,6 @@ sub CreateReserve {
     my $query="insert into reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype) values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
     my $sth = $dbh->prepare($query);
     $sth->execute();
-    debug_msg($env,"const = $const"); 
     if (($const eq "o") || ($const eq "e")) {
       my $numitems = @$bibitems;
       my $i = 0;
