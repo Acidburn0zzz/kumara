@@ -569,7 +569,7 @@ sub itemdata {
 sub bibdata {
   my ($bibnum,$type)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from biblio,biblioitems,bibliosubtitle where biblio.biblionumber=$bibnum
+  my $query="Select *,biblio.notes from biblio,biblioitems,bibliosubtitle where biblio.biblionumber=$bibnum
   and biblioitems.biblionumber=$bibnum and 
 (bibliosubtitle.biblionumber=$bibnum)"; 
 #  print $query;
