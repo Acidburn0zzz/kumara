@@ -74,12 +74,10 @@ sub Returns {
       if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
         if ($reason eq "Returned") {
 	my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
-        debug_msg($env,$fmtitem);
-	
-         unshift @items,$fmtitem;
+           unshift @items,$fmtitem;
 	  
 	} else {
-          debug_msg($env,$reason);
+          error_msg($env,$reason);
 	}
       }
     }
@@ -135,16 +133,13 @@ sub returnrecord {
   my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   my @datearr = localtime(time);
   my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
-  debug_msg($env,"before return $itemno $bornum");
   my $query = "update issues set returndate = '$dateret', branchcode ='$env->{'branchcode'}' where 
     (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
     and (returndate is null)";  
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;
-    debug_msg($env,"after return before stats");
   UpdateStats($env,'branch','return','0');
-    debug_msg($env,"after stats");
   return($amt_owing);
 }
 

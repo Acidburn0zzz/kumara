@@ -3,6 +3,7 @@ package C4::Format; #asummes C4/Format
 use strict;
 require Exporter;
 
+
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -102,7 +103,9 @@ sub fmtdec {
 	   substr($tempint,-3,3) = "";
 	}
 	$fnumb = substr($tempint,-3,3).$fnumb;
-     }
+     } else { 
+        $fnumb = $tempint; 
+     } 
   }
   if ($curr eq "\$") {
      $fnumb = fmtstr($env,$curr.$fnumb,"R".$left+1);

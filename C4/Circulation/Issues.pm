@@ -70,7 +70,6 @@ sub Issue  {
       clearscreen();
       $done = "Circ";
     } else {
-      debug_msg("","bornum = $bornum");  
       #deal with alternative loans
       #now check items 
       clearscreen();
@@ -104,7 +103,7 @@ sub processitems {
    my $i=0;
    my $amountdue = 0;
    my ($itemnum,$reason) = issuewindow($env,'Issues',$items,$items2,$borrower,
-      fmtdec($env,$amountdue,"$32"));
+      fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
       my ($item,$charge) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($item) {
@@ -112,8 +111,8 @@ sub processitems {
     	(fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")); 	
         $row2++;	     
 	$it2p++;
-	$amountdue += $charge;
-      }  
+     	$amountdue += $charge;
+     }  
    }
    $dbh->disconnect;
    #check to see if more books to process for this user
@@ -156,14 +155,11 @@ sub issueitem{
        #check if item is on issue already
        my $currbor = &previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
        #check reserve
-       debug_msg($env,"before check reserve");
        my $resbor = &checkreserve($env,$dbh,$item->{'itemnumber'});    
-       debug_msg($env,"after check reserve");
        #if charge deal with it
      }   
      if ($canissue == 1) {
        $charge = calc_charges($env,$dbh,$item->{'itemnumber'},$bornum);
-              debug_msg($env,"after charge");
      }
      if ($canissue == 1) {
        #now mark as issued
@@ -180,7 +176,6 @@ sub updateissues{
   # issue the book
   my ($env,$itemno,$bitno,$dbh,$bornum)=@_;
   my $loanlength=21;
-  debug_msg($env,"loan length");
   my $query="Select *  from biblioitems,itemtypes
   where (biblioitems.biblioitemnumber='$bitno') 
   and (biblioitems.itemtype = itemtypes.itemtype)";
@@ -190,13 +185,11 @@ sub updateissues{
     $loanlength = $data->{'loanlength'}
   }
   $sth->finish;
-  debug_msg($env,"issue");
   my $datedue = time + $loanlength;
   my @datearr = localtime($datedue);
   my $dateduef = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
   $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
-  values
-  ($bornum,$itemno,'$dateduef','$env->{'branchcode'}')";
+  values ($bornum,$itemno,'$dateduef','$env->{'branchcode'}')";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
@@ -216,7 +209,7 @@ sub calc_charges {
   if (my $data1=$sth1->fetchrow_hashref) {
      $item_type = $data1->{'itemtype'};
      $charge = $data1->{'rentalcharge'};
-      my $q2 = "select rentaldiscount from borrowers,categoryitem 
+     my $q2 = "select rentaldiscount from borrowers,categoryitem 
         where (borrowers.borrowernumber = '$bornum') 
         and (borrowers.categorycode = categories.categorycode)
         and (categoryitem.itemtype = '$item_type')";
@@ -224,7 +217,7 @@ sub calc_charges {
      $sth2->execute;
      if (my $data2=$sth2->fetchrow_hashref) {
         my $discount = $data2->{'rentaldiscount'};
-	$charge = ($charge * $discount) / 100;
+	$charge = ($charge *(100 - $discount)) / 100;
      }
      $sth2->{'finish'};
   }   

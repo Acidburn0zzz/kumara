@@ -90,20 +90,24 @@ sub findborrower  {
 	   my $line = $borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
 	      ', '.$borrower->{'othernames'};
 	   @borrows[$cntbor] = fmtstr($env,$line,"L50");
-	   $bornums[$cntbor]=$borrower->{'borroernumber'};
-	   $cntbor++;
+	   $bornums[$cntbor]=$borrower->{'borrowernumber'};
+           $cntbor++;
        	}
 	if ($cntbor == 1)  {
-           $bornum = $bornums[0];
+           $bornum = $bornums[0];       
+	   my $query = "select * from borrowers where borrowernumber = '$bornum'";	   
+           $sth = $dbh->prepare($query);
+	   $sth->execute;
+	   $borrower =$sth->fetchrow_hashref;
+	   $sth->finish;					         
 	} elsif ($cntbor > 0) {
 	   my ($cardnum) = selborrower($env,$dbh,@borrows,@bornums);
-	    my $query = "select * from borrowers where cardnumber = '$cardnum'";                                
-#	    debug_msg("",$query);
-            $sth = $dbh->prepare($query);                          
-            $sth->execute;                          
-            $borrower =$sth->fetchrow_hashref;
-	    $sth->finish;
-	    $bornum=$borrower->{'borrowernumber'};
+           my $query = "select * from borrowers where cardnumber = '$cardnum'";   
+	   $sth = $dbh->prepare($query);                          
+           $sth->execute;                          
+           $borrower =$sth->fetchrow_hashref;
+	   $sth->finish;
+           $bornum=$borrower->{'borrowernumber'};
         }   	   
         if ($bornum eq '') {
           output(1,1,"Borrower not found, please rescan or re-enter borrower code");
@@ -186,7 +190,8 @@ sub Borenq {
   }
 #  debug_msg("",$reason);
 #  debug_msg("",$data);
-  
+
+
 }  
 
 END { }       # module clean-up code here (global destructor)
