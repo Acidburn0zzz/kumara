@@ -206,7 +206,7 @@ sub mkform3{
 	<input type=radio name=$keys[$i2] value=$data[2]>$data[2]";
       } 
       if ($data[0] eq 'text') {
-        $text="<input type=$data[0] name=$keys[$i2] value=\"$data[1]\">";
+        $text="<input type=$data[0] name=$keys[$i2] value=\"$data[1]\" size=40>";
       }
       if ($data[0] eq 'textarea') {
         $text="<textarea name=$keys[$i2] wrap=physical cols=40 rows=4>$data[1]</textarea>";

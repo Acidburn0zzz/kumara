@@ -37,7 +37,7 @@ if ($data->{'dewey'} == 0){
 
 $inputs{'Class'}="text\t$data->{'classification'}$data->{'dewey'}$data->{'subclass'}\t2";
 $inputs{'Item Type'}="text\t$data->{'itemtype'}\t3";
-$inputs{'Subject'}="text\t$sub\t4";
+$inputs{'Subject'}="textarea\t$sub\t4";
 $inputs{'Publisher'}="text\t$data->{'publishercode'}\t5";
 $inputs{'Copyright date'}="text\t$data->{'copyrightdate'}\t6";
 $inputs{'ISBN'}="text\t$data->{'isbn'}\t7";
