@@ -70,10 +70,12 @@ sub Issue  {
     $env->{'sysarea'} = "Issues";
     $done = "Issues";
     while ($done eq "Issues") {
-      my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
+      my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);      
       #C4::Circulation::Borrowers
       if ($reason ne "") {
         $done = $reason;
+      } elsif ($issuesallowed ne 1) {
+        error_msg($env,"No Issues Allowed");
       } else {
         $env->{'bornum'} = $bornum;
         $env->{'bcard'}  = $borrower->{'cardnumber'};

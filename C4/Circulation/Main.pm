@@ -90,7 +90,7 @@ sub checkoverdues{
   $sth->execute;
   my $data = $sth->fetchrow_hashref;
   $sth->finish;
-  return $data->{'count'};
+  return $data->{'count(*)'};
 }
 
 sub previousissue {

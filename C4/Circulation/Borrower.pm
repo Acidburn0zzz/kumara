@@ -165,11 +165,12 @@ sub findoneborrower {
 sub checktraps {
   my ($env,$dbh,$bornum,$borrower) = @_;
   my $issuesallowed = "1";
-  my @traps_set;
+  #my @traps_set;
   #check amountowing
   my $traps_done; 
   my $odues;
   while ($traps_done ne "DONE") {
+    my @traps_set;
     my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     if ($amount > 0) { push (@traps_set,"FINES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
@@ -195,7 +196,7 @@ sub checktraps {
 
 sub process_traps {
   my ($env,$dbh,$bornum,$borrower,$amount,$odues,$traps_set) = @_;
-  my $issuesallowed = 0;
+  my $issuesallowed = 1;
   my $x = 0;
   my %traps;
   while (@$traps_set[$x] ne "") {
@@ -219,6 +220,13 @@ sub process_traps {
           $borrower->{'borrowernotes'} = $notes;
        }
      }
+     $traps_done = "DONE";
+  }
+  if ($traps{'GNA'} == 1 ) {
+    $issuesallowed=0;
+  }
+  if (($traps{'FINES'} == 1) && ($amount > 0)) {
+    $issuesallowed=0;
   }
   return ($issuesallowed,$traps_done);
 }
