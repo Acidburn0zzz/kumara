@@ -185,16 +185,19 @@ sub CatSearch  {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
-            $query="select count(*) from biblio
-	    where (title like '%$key[0]%'";
+            $query="select count(*) from biblio,biblioitems
+	    where biblioitems.biblionumber=biblio.biblionumber and (title like '%$key[0]%'";
 	    while ($i<$count){
 	      $query=$query." and title like '%$key[$i]%'";
 	      $i++;
 	    }
 	    $query=$query.")";
+	    if ($search->{'class'} ne ''){
+	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
+	    }
 	  } elsif ($search->{'class'} ne ''){
-	     $query="select count(*) from biblioitems where classification
-	     like '%$search->{'class'}%'";
+	     $query="select count(*) from biblioitems,biblio where itemtype =
+'$search->{'class'}' and biblio.biblionumber=biblioitems.biblionumber";
 	  }
 	 
       }
