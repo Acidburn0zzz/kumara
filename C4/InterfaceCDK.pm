@@ -38,13 +38,43 @@ my $stuff  = '';
 my @more   = ();
 	
 # all file-scoped lexicals must be created before
-# the functions below that use them.
+# the functions below that se them.
 		
 # file-private lexicals go here
 my $priv_var    = '';
 my %secret_hash = ();
+
+#defining keystrokes used for screens
 my $lastval = chr(18);
-#my $lastval = "?";			    
+my $key_tab  = chr(9);
+my $key_ctla = chr(1);
+my $key_ctlb = chr(2);
+my $key_ctlc = chr(3);
+my $key_ctld = chr(4);
+my $key_ctle = chr(5);
+my $key_ctlf = chr(6);
+my $key_ctlg = chr(7);
+my $key_ctlh = chr(8);
+my $key_ctli = chr(9);
+my $key_ctlj = chr(10);
+my $key_ctlk = chr(11);
+my $key_ctll = chr(12);
+my $key_ctlm = chr(13);
+my $key_ctln = chr(14);
+my $key_ctlo = chr(15);
+my $key_ctlp = chr(16);
+my $key_ctlq = chr(17);
+my $key_ctlr = chr(18);
+my $key_ctls = chr(19);
+my $key_ctlt = chr(20);
+my $key_ctlu = chr(21);
+my $key_ctlv = chr(22);
+my $key_ctlw = chr(23);
+my $key_ctlx = chr(24);
+my $key_ctly = chr(25);
+my $key_ctlz = chr(26);
+my $lastval = $key_ctlr;
+
 # here's a file-private function as a closure,
 # callable as &$priv_func;  it cannot be prototyped.
 my $priv_func = sub {
@@ -122,12 +152,10 @@ sub helptext {
 sub titlepanel{
   my ($env,$title,$title2)=@_;
   my @header;
-  #debug_msg($env,$title);
   @header[0] = fmtstr($env,$title,"L36").fmtstr($env,$title2,"R36");
   my $label = new Cdk::Label ('Message' =>\@header,
      'Ypos'=>0);
   $label->draw();
-  #debug_msg($env,$title2);
   return $label;
   }
 
@@ -173,7 +201,7 @@ sub borrower_dialog {
   my @coltypes  = ("UMIXED","UMIXED");
   my @colwidths = (12,12);
   #Cdk::refreshCdkScreen();
-  Cdk::raw();
+  #Cdk::raw();
   my $matrix = new Cdk::Matrix (
      'ColTitles'=> \@coltitles,
      'RowTitles'=> \@rowtitles, 
@@ -183,10 +211,7 @@ sub borrower_dialog {
      'Vcols'=>     2);
   borrbind($env,$matrix);
   $matrix->draw();
-  my ($rows,$cols,$info) = $matrix->activate();
-  debug_msg($env,$info->[0][0]);
-  debug_msg($env,$info->[0][1]);
-  
+  my ($rows,$cols,$info) = $matrix->activate(); 
   if ((!defined $rows) && ($info->[0][0] eq "")) { 
     $result = "Circ";
   } else {
@@ -213,33 +238,28 @@ sub selborrower {
 }
 
 sub issuewindow {
-  my ($env,$title,$items1,$items2,$borrower,$amountowing)=@_;
+  my ($env,$title,$items1,$items2,$borrower,$amountowing,$odues)=@_;
   my $titlepanel = titlepanel($env,"Issues","Issue a book");
   my $scroll2 = new Cdk::Scroll ('Title'=>"Previous Issues",
     'List'=>\@$items1,'Height'=> 8,'Width'=>78,'Ypos'=>18);
-  $scroll2->draw();
   my $scroll1 = new Cdk::Scroll ('Title'=>"Current Issues",
     'List'=>\@$items2,'Height'=> 8,'Width'=>78,'Ypos'=>9);
-  $scroll1->draw();
+  my $loanlength = new Cdk::Entry('Label'=>"Due Date:      ",
+    'Max'=>"11",'Width'=>"11",
+    'Xpos'=>0,'Ypos'=>5);
   my $borrbox = borrowerbox($env,$borrower,$amountowing);
-  my @borrinfo;
-  $borrbox->draw();    
   my $entryBox = new Cdk::Entry('Label'=>"Book Barcode:  ",
      'Max'=>"11",'Width'=>"11",
-     'Xpos'=>"0",'Ypos'=>"4",
+     'Xpos'=>"0",'Ypos'=>3,
      'Type'=>"UMIXED");
+  $scroll2->draw();
+  $scroll1->draw(); 
+  $loanlength->draw(); 
+  $borrbox->draw();   
   my $x;
   my $barcode;
-  $entryBox->bind('Key'=>"KEY_TAB",'Function'=>sub {$x = act($scroll1);});
-  $scroll1->bind('Key'=>"KEY_TAB",'Function'=>sub {$x = act($scroll2);});
-  $scroll2->bind('Key'=>"KEY_TAB",'Function'=>sub {
-      $x = act($entryBox);
-      return $x;});  
-  $entryBox->bind('Key'=>"KEY_BTAB",'Function'=>sub {$x = act($scroll2);});
-  $scroll1->bind('Key'=>"KEY_BTAB",'Function'=>sub { 
-      $x = act($entryBox);
-      return $x;});
-  $scroll2->bind('Key'=>"KEY_BTAB",'Function'=>sub {$x = act($scroll1);});
+  $entryBox->preProcess ('Function' => 
+    sub{prebook(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   $barcode = $entryBox->activate();
   my $reason;
   if (!defined $barcode) {
@@ -249,21 +269,95 @@ sub issuewindow {
   $entryBox->erase();
   $scroll2->erase();
   $scroll1->erase();
-   
-  debug_msg($env,"exiting");
-    
+  $loanlength->erase(); 
+  debug_msg($env,"exiting");    
   return $barcode,$reason;
 }  
+sub actscroll1 {
+  my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  $scroll1->preProcess ('Function' =>
+    sub{prescroll1(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+  $scroll1->activate();
+  return 1;
+}
+sub actscroll2 {
+  my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  $scroll2->preProcess ('Function' =>
+    sub{prescroll2(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+  $scroll2->activate();
+  return 1;
+}
+sub actloanlength {
+  my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  $loanlength->preProcess ('Function' =>
+    sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
+  $loanlength->activate();
+  return 1;
+}
 
+sub prebook {
+  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  if ($input eq $key_tab) {    
+    actloanlength($env,$entryBox,$loanlength,$scroll1,$scroll2);
+    return 0;
+  }
+  return 1;
+}
+
+sub prescroll1 {
+  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  if ($input eq $key_tab) {    
+    actscroll2($env,$entryBox,$loanlength,$scroll1,$scroll2);
+    return 0;	
+  }
+  return 1;
+}
+
+sub prescroll2 {
+  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
+  return 1;
+}
+
+sub preloanlen {
+  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_; 
+  if ($input eq $key_tab) {                  
+    actscroll1($env,$entryBox,$loanlength,$scroll1,$scroll2);
+    return 0;
+  }                                     
+  return;                                                 
+}
+	  						  
 sub borrowerbox {
-  my ($env,$borrower,$amountowing) = @_;
+  my ($env,$borrower,$amountowing,$odues) = @_;
   my @borrinfo;
-  $borrinfo[0]="$borrower->{'cardnumber'} ".
-     "$borrower->{'surname'}, $borrower->{'title'} $borrower->{'firstname'}";
-  $borrinfo[1]="$borrower->{'streetaddress'}, $borrower->{'city'}";
-  $borrinfo[2]="<R>Amount Owing</B> $amountowing";
+  my $line = "$borrower->{'cardnumber'} ";
+  $line = $line."$borrower->{'surname'}, ";
+  $line = $line."$borrower->{'title'} $borrower->{'firstname'}";
+  $borrinfo[0]=$line;
+  $line = "$borrower->{'streetaddress'}, $borrower->{'city'}";
+  $borrinfo[1]=$line;
+  $line = "";  
+  if ($borrower->{'gonenoaddress'} == 1) {
+    $line = $line." </R>GNA<!R>";
+  }
+  if ($borrower->{'lost'} == 1) {
+    $line = $line." </R>LOST<!R>";
+  }
+  if ($odues > 0) {
+    $line = $line." </R>ODUE<!R>";
+  }	
+  if ($borrower->{'borrowernotes'} ne "" ) {
+    $line = $line." </R>NOTES<!R>";
+  }
+  if ($amountowing > 0) {
+    $line = $line." </B>$amountowing";
+  }
+  $borrinfo[2]=$line;
+  if ($borrower->{'borrowernotes'} ne "" ) {
+    $borrinfo[3]=substr($borrower->{'borrowernotes'},1,40);     
+  }
   my $borrbox = new Cdk::Label ('Message' =>\@borrinfo,
-     'Ypos'=>4, 'Xpos'=>"RIGHT");
+    'Ypos'=>3, 'Xpos'=>"RIGHT");
   return $borrbox;
 }
 

@@ -128,10 +128,34 @@ sub CatSearch  {
 	#
 	# Commented code does not work properly, but would be much faster 
 	# if it did
-	# Can't make it returne the biblionumber properly
+	# Can't make it return the biblionumber properly
 	#
         my $query1 = "select * from biblioitems where isbn='$search2'";
         #debug_msg($env,$query1);
+#markers
+	#my $sth1=$dbh->prepare($query);
+	#$sth1->execute;
+	#my @biblioarr;
+	#my $bibcnt=0;
+	#while (my @data=$sth1->fetchrow_hashref) {
+        #  debug_msg($env,$data->{'biblionumber'});
+        #  @biblioarr[$bibcnt] = 
+	#    "biblio.biblionumber = '".$data->{'biblionumber'}."'";
+	#  $bibcnt++;
+	#};
+	#$sth1->finish();
+	#my $bibsel = join(" or ",@biblioarr);
+        #debug_msg($env,$bibsel);
+        #$query = "select count(*) from items,biblio,biblioitems ";
+	#$query=$query." where ($bibsel) ";
+	#$query=$query." and items.biblionumber=biblioitems.biblionumber and";
+        #$query=$query." biblioitems.biblionumber=biblio.biblionumber";
+        $query="select count(*) from items,biblio,biblioitems ";
+        my $search2=uc $search->{'isbn'};
+        $query=$query." where biblioitems.isbn='$search2' and
+        items.biblioitemnumber=biblioitems.biblioitemnumber 
+        and biblioitems.biblionumber=biblio.biblionumber";
+# marker 1
 	my $sth1=$dbh->prepare($query);
 	$sth1->execute;
         my $i2=0;
@@ -148,6 +172,7 @@ sub CatSearch  {
            $i2++;
 	   $sth->finish;
 	}
+>>>>>>> 1.41
       }
     }
 #print $query;

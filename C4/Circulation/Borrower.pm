@@ -169,36 +169,28 @@ sub checktraps {
   #check first GNA trap (no address this is the 22nd item in the table)
   my @traps_set;
   if ($borrower->{'gonenoaddress'} == 1){
-    #got to membership update and update member info
     push (@traps_set,"GNA");
-    # output(20,1,"Borrower has no address");
-    #pause();
   }
   #check if member has a card reported as lost
   if ($borrower->{'lost'} ==1){
     push (@traps_set,"LOST");
-    #update member info
-    #output(20,1,"Borrower has lost card");
   }
   #check the notes field if notes exist display them
   if ($borrower->{'borrowernotes'} ne ''){
-    #display notes
-    #deal with notes as issue_process.doc
-    output(20,1,$borrower->{'borrowernotes'});
+    push (@traps_set,"NOTES");
   }
   #check if borrower has overdue items
   #call overdue checker
-  &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
+  my $odues = &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
   #check amountowing
   my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
   #check if borrower has any items waiting
   my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
   #deal with any money still owing
-#    output(30,1,$amount);
   if ($amount > 0){
-    &reconcileaccount($env,$dbh,$bornum,$amount);
+    &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
   }
-  return ($issuesallowed);
+  return ($issuesallowed, $odues);
 }
 
 sub Borenq {

@@ -62,10 +62,11 @@ sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio,biblioitems
-    where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
+    where (borrowernumber=$bornum
+    and (returndate is null)
+    and ((issues.itemnumber=items.itemnumber) 
     and items.biblionumber=biblio.biblionumber
-    and biblioitems.biblioitemnumber=items.biblioitemnumber     
-    and returndate is null
+    and biblioitems.biblioitemnumber=items.biblioitemnumber))     
     order by date_due");
   $sth->execute;
   my $i=0;
@@ -77,9 +78,6 @@ sub pastitems{
   $items2[0]=" "x72;
   while (my $data=$sth->fetchrow_hashref) {
      my $line = C4::Circulation::Issues::formatitem($env,$data,$data->{'date_due'},"");
-     #my $line = "$data->{'date_due'} $data->{'title'}";
-     # $items[$i]=fmtstr($env,$line,"L29");
-     #$items[$i]=fmtstr($env,$line,"L72");
      $items[$i]=$line;
      $i++;
   }
@@ -89,26 +87,25 @@ sub pastitems{
 sub checkoverdues{
   #checks whether a borrower has overdue items
   my ($env,$bornum,$dbh)=@_;
-  my $sth=$dbh->prepare("Select * from issues,items,biblio where
-  borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
-  items.biblionumber=biblio.biblionumber");
+  my @datearr = localtime;
+  my $today = ($datearr[5] + 1900)."-".($datearr[4]+1)."-".$datearr[3];
+  my $query = "Select count(*) from issues where borrowernumber=$bornum and
+        returndate is NULL and date_due < '$today'";
+  my $sth=$dbh->prepare($query);
   $sth->execute;
-  my $row=1;
-  my $col=40;
-  while (my $data=$sth->fetchrow_hashref){
-    output($row,$col,$data->{'title'});
-    $row++;
-  }
+  my $data = $sth->fetchrow_hashref;
   $sth->finish;
+  return $data->{'count'};
 }
 
 sub previousissue {
   my ($env,$itemnum,$dbh,$bornum)=@_;
-  my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber,cardnumber,returndate
-  from issues,borrowers where 
-  issues.itemnumber='$itemnum' and
-  issues.borrowernumber=borrowers.borrowernumber and issues.returndate is
-    NULL");
+  my $sth=$dbh->prepare("Select 
+     firstname,surname,issues.borrowernumber,cardnumber,returndate
+     from issues,borrowers where 
+     issues.itemnumber='$itemnum' and
+     issues.borrowernumber=borrowers.borrowernumber 
+     and issues.returndate is NULL");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
   my $cannissue = 0;
@@ -121,7 +118,6 @@ sub previousissue {
       if ($resp == "y") {
         &renewbook($env,$dbh,$bornum,$itemnum);
       }	 
-      
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
       my $resp = &msg_yn($text,"Mark as returned?");
@@ -140,9 +136,9 @@ sub checkreserve{
   my ($env,$dbh,$itemnum)=@_;
   my $resbor = "";
   my $query = "select * from reserves,items 
-  where (items.itemnumber = '$itemnum')
-  and (items.biblionumber = reserves.biblionumber)
-  and (reserves.found is null) order by priority";
+    where (items.itemnumber = '$itemnum')
+    and (items.biblionumber = reserves.biblionumber)
+    and (reserves.found is null) order by priority";
   my $sth = $dbh->prepare($query);
   $sth->execute();
   if (my $data=$sth->fetchrow_hashref) {
@@ -156,8 +152,8 @@ sub checkwaiting{
   my ($env,$dbh,$bornum)=@_;
   my @itemswaiting="";
   my $query = "select * from reserves
-  where (borrowernumber = '$bornum')
-  and (reserves.found='W')";
+    where (borrowernumber = '$bornum')
+    and (reserves.found='W')";
   my $sth = $dbh->prepare($query);
   $sth->execute();
   if (my $data=$sth->fetchrow_hashref) {
