@@ -19,7 +19,7 @@ my ($count,@suppliers)=bookseller($supplier);
 print <<printend
 <FONT SIZE=6><em>Supplier Search Results</em></FONT>
 <div align=right>
-<a href=supplier.html><img  alt="Add New Supplier" src="/images/new-supplier.gif"  WIDTH=187  HEIGHT=42 BORDER=0 border=0></a>
+<a href=supplier.pl?id=0><img  alt="Add New Supplier" src="/images/new-supplier.gif"  WIDTH=187  HEIGHT=42 BORDER=0 border=0></a>
 </div>
 <CENTER>
 You searched on <b>supplier $supplier,</b> $count results found<p>

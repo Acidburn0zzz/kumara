@@ -14,6 +14,7 @@ my $supplier=$input->param('supplier');
 #print startpage;
 my %data;
 $data{'id'}=$input->param('id');
+
 $data{'name'}=$input->param('company');
 $data{'name'}=~ s/\'/\\\'/g;
 $data{'postal'}=$input->param('company_postal_address');
@@ -41,9 +42,12 @@ $data{'gstreg'}=$input->param('gst');
 $data{'listincgst'}=$input->param('list_gst');
 $data{'invoiceincgst'}=$input->param('invoice_gst');
 $data{'discount'}=$input->param('discount');
-
-updatesup(\%data);
-
+my $id=$input->param('id');
+if ($data{'id'} != 0){
+  updatesup(\%data);
+} else {
+  $id=insertsup(\%data);
+}
 #print startmenu('acquisitions');
 #my ($count,@suppliers)=bookseller($supplier);
 
@@ -53,5 +57,5 @@ updatesup(\%data);
 #print endmenu('acquisitions');
 
 #print endpage;
-my $id=$input->param('id');
+
 print $input->redirect("order.pl?supplier=$id");

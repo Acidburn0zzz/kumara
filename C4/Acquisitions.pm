@@ -13,7 +13,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&getorders &bookseller &breakdown &basket &newbasket &bookfunds
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
- &bookfundbreakdown &curconvert &updatesup);
+ &bookfundbreakdown &curconvert &updatesup &insertsup);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -430,6 +430,24 @@ sub updatesup {
    $dbh->disconnect;
 #   print $query;
 }
+
+sub insertsup {
+  my ($data)=@_;
+  my $dbh=C4Connect;
+  my $sth=$dbh->prepare("Select max(id) from aqbooksellers");
+  $sth->execute;
+  my $data2=$sth->fetchrow_hashref;
+  $sth->finish;
+  $data2->{'max(id)'}++;
+  $sth=$dbh->prepare("Insert into aqbooksellers (id) values ($data2->{'max(id)'})");
+  $sth->execute;
+  $sth->finish;
+  $data->{'id'}=$data2->{'max(id)'};
+  $dbh->disconnect;
+  updatesup($data);
+  return($data->{'id'});
+}
+
 END { }       # module clean-up code here (global destructor)
   
     
