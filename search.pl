@@ -73,7 +73,7 @@ print mktablehdr;
 if ($subject ne ''){
   print mktablerow(1,'#cccc99','<b>SUBJECT</b>');
 } else {
-  print mktablerow(3,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>');
+  print mktablerow(4,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
 }
 my $count2=@results;
 my $i=0;
@@ -90,7 +90,7 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
       $stuff[2]=mklink($url,$stuff[2]);
-      my ($count,$lcount,$nacount,$fcount)=itemcount($env,$stuff[0]);
+      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[0]);
       $stuff[3]=$count;
       if ($nacount > 0){
         $stuff[4]=$stuff[4]."N/A=$nacount";
@@ -100,6 +100,9 @@ while ($i < $count2){
       }
       if ($fcount > 0){
         $stuff[4]=$stuff[4]."F=$fcount";
+      }
+      if ($scount > 0){
+        $stuff[4]=$stuff[4]."S=$scount";
       }
     } else {
       my $word=$stuff[1];
@@ -116,7 +119,7 @@ while ($i < $count2){
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(3,'#cccc99',' &nbsp; ',' &nbsp; ',' &nbsp;');
+print mktablerow(4,'#cccc99',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset";

@@ -401,6 +401,7 @@ sub itemcount {
   my $lcount=0;               
   my $nacount=0;                 
   my $fcount=0;
+  my $scount=0;
   while (my $data=$sth->fetchrow_hashref){
     $count++;                     
     my $query2="select * from issues where itemnumber=                          
@@ -410,19 +411,22 @@ sub itemcount {
     if (my $data2=$sth2->fetchrow_hashref){         
        $nacount++;         
     } else {         
-      if ($data->{'holdingbranch'} eq 'L'){         
+      if ($data->{'holdingbranch'} eq 'C'){         
         $lcount++;               
       }                       
       if ($data->{'holdingbranch'} eq 'F'){         
         $fcount++;               
       }                       
-      
+      if ($data->{'holdingbranch'} eq 'S'){         
+        $scount++;               
+      }                       
+
     }                             
     $sth2->finish;     
   }                                 
   $sth->finish; 
   $dbh->disconnect;                   
-  return ($count,$lcount,$nacount,$fcount); 
+  return ($count,$lcount,$nacount,$fcount,$scount); 
 
 
 }
