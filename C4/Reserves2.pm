@@ -243,7 +243,7 @@ sub updatereserves{
     my $data=$sth->fetchrow_hashref;
     $sth->finish;
     $query="Select * from reserves where biblionumber=$biblio and 
-    priority > $data->{'priority'} and cancellationdate is NULL 
+    priority > '$data->{'priority'}' and cancellationdate is NULL 
     order by priority";
     my $sth2=$dbh->prepare($query) || die $dbh->errstr;
     $sth2->execute || die $sth2->errstr;
