@@ -7,16 +7,16 @@ use C4::Circulation::Fines;
 use Date::Manip;
 
 my ($count,$data)=Getoverdues();
-print $count;
+#print $count;
 my $count2=0;
 #$count=1000;
-my $date=Date_DaysSince999(12,30,1999);
+my $date=Date_DaysSince999(1,1,2000);
 my $bornum;
 my $borrower;
-my $max=25;
+my $max=5;
 for (my $i=0;$i<$count;$i++){
   my @dates=split('-',$data->[$i]->{'date_due'});
-    my $date2=Date_DaysSince999($dates[1],$date[2],$dates[0]);    
+    my $date2=Date_DaysSince999($dates[1],$dates[2],$dates[0]);    
     if ($date2 <= $date){
       $count2++;
       my $difference=$date-$date2;
@@ -28,13 +28,13 @@ for (my $i=0;$i<$count;$i++){
       if ($borrower->{'description'} !~ /Staff/ && $borrower->{'description'} !~ /Branch/){
           my ($amount)=CalcFine($data->[$i]->{'itemnumber'},$borrower->{'categorycode'},$difference);      
 	  if ($amount > $max){
-  	    $amount=25;
+  	    $amount=$max;
 	  }
 	  if ($amount > 0){
             UpdateFine($data->[$i]->{'itemnumber'},$bornum,$amount);
-   	    print "$amount\n";
+   	    print "$i $borrower->{'description'} $difference $amount $data->[$i]->{'date_due'} $date $date2 \n";
 	  } else {
-	    print "0 fine\n";
+#	    print "0 fine\n";
 	  }
       }
     }

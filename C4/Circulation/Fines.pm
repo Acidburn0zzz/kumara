@@ -98,7 +98,7 @@ sub UpdateFine {
   my ($itemnum,$bornum,$amount)=@_;
   my $dbh=C4Connect;
   my $query="Select * from accountlines where itemnumber=$itemnum and
-borrowernumber=$bornum and accounttype='F'";
+borrowernumber=$bornum and accounttype='FU'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   if (my $data=$sth->fetchrow_hashref){
@@ -127,7 +127,7 @@ borrowernumber=$bornum and accounttype='F'";
     $query2="Insert into accountlines
     (borrowernumber,itemnumber,date,amount,
     description,accounttype,amountoutstanding,accountno) values
-    ($bornum,$itemnum,now(),$amount,'Overdue Item','F',
+    ($bornum,$itemnum,now(),$amount,'Overdue Item','FU',
     $amount,$accountno[0])";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;
