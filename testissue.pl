@@ -4,13 +4,13 @@ use strict;
 use C4::Security;
 use C4::Database;                                                                   
 use C4::Circulation::Main;                                                          
-use C4::Circulation::Issues;                                                        
-use C4::Circulation::Returns;                                                       
+#use C4::Circulation::Issues;                                                        
+#use C4::Circulation::Returns;                                                       
 use C4::Circulation::Renewals;                                                      
-use C4::Circulation::Borrower;                                                      
+#use C4::Circulation::Borrower;                                                      
 use C4::Reserves;                                                                   
 use C4::InterfaceCDK;                                                               
-use C4::Security;
+#use C4::Security;
 
 
 # set up environment array
@@ -49,7 +49,9 @@ while ($donext ne 'Quit') {
    my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}");
    system(@args);
   } elsif ($data eq 'Returns') {                                                  
-    $donext=Returns(\%env); #C4::Circulation::Returns                              
+   my @args=('returnswrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}");
+   system(@args);
+#    $donext=Returns(\%env); #C4::Circulation::Returns                              
   } elsif ($data eq 'Select Branch') {                                            
     getbranch(\%env);                                                              
   } elsif ($data eq 'Select Printer') {                                           
