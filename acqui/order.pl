@@ -26,7 +26,7 @@ You searched on <b>supplier $supplier,</b> $count results found<p>
 <table border=0 cellspacing=0 cellpadding=5>
 <tr valign=top bgcolor=#99cc33>
 <td background="/images/background-mem.gif">&nbsp;</td>
-<td background="/images/background-mem.gif"><b>COMAPNY</b></td>
+<td background="/images/background-mem.gif"><b>COMPANY</b></td>
 <td background="/images/background-mem.gif"><b>BASKETS</b></td><td background="/images/background-mem.gif"><b>ITEMS</b></td><td background="/images/background-mem.gif"><b>STAFF</b></td><td background="/images/background-mem.gif"><b>DATE</b></td></tr>
 printend
 ;
