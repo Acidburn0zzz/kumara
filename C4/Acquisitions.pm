@@ -292,7 +292,6 @@ sub modbiblio {
   where
   biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
-#    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
