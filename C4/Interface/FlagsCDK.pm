@@ -117,7 +117,7 @@ sub reservesdisplay {
   $reslist->activate();
   undef $reslist;
   undef $borpanel;
-  under $titlepanel;
+  undef $titlepanel;
 }
 
 END { }       # module clean-up code here (global destructor)
