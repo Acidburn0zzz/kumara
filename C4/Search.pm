@@ -261,12 +261,10 @@ sub CatSearch  {
 #  } else {
     while (my $data=$sth->fetchrow_hashref){
      if ($type ne 'subject'){
-      $results[$i]="$data->{'author'}\t$data->{'title'}\t
-      $data->{'biblionumber'}";
+      $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
      } elsif ($search->{'isbn'} ne ''){
      } else {  
-      $results[$i]="$data->{'author'}\t$data->{'subject'}\t
-      $data->{'biblionumber'}";
+      $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}";
      }
      $i++;
     }
