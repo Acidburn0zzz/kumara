@@ -149,7 +149,7 @@ sub checkissue {
        printreserve($env,$resrec,$resborrower,$itemrec);
        my $mess = "Reserved for collection at branch $resrec->{'branchcode'}"; 
        error_msg($env,$mess);
-       $bsth->finish;
+       $btsh->finish;
      }  
    } else {
      $sth->finish;
