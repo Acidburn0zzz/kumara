@@ -850,6 +850,8 @@ sub itemcount {
   my $fcount=0;
   my $scount=0;
   my $lostcount=0;
+  my $mending=0;
+  my $transit=0;
   while (my $data=$sth->fetchrow_hashref){
     $count++;                     
     my $query2="select * from issues,items where issues.itemnumber=                          
@@ -872,13 +874,18 @@ sub itemcount {
       if ($data->{'itemlost'} eq '1'){
         $lostcount++;
       }
-
+      if ($data->{'holdingbranch'} eq 'FM'){
+        $mending++;
+      }
+      if ($data->{'holdingbranch'} eq 'TR'){
+        $transit++;
+      }
     }                             
     $sth2->finish;     
   }                                 
   $sth->finish; 
   $dbh->disconnect;                   
-  return ($count,$lcount,$nacount,$fcount,$scount,$lostcount); 
+  return ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit); 
 }
 
 sub ItemType {

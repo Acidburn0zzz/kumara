@@ -123,7 +123,7 @@ my $colour=1;
 while ($i < $count2){
 #    print $results[$i]."\n";
     my @stuff=split('\t',$results[$i]);
-    $stuff[1]=~ s/\`/\'/g;
+    $stuff[1]=~ s/\`/\\\'/g;
     my $title2=$stuff[1];
     $title2=~ s/ /%20/g;
     if ($subject eq ''){
@@ -138,7 +138,7 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/koha/search.pl?author=$word&type=$type";
       $stuff[0]=mklink($url,$stuff[0]);
-      my ($count,$lcount,$nacount,$fcount,$scount,$lostcount)=itemcount($env,$stuff[2],$type);
+      my ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit)=itemcount($env,$stuff[2],$type);
       $stuff[4]=$count;
       if ($nacount > 0){
         $stuff[5]=$stuff[5]."On Loan";
@@ -175,6 +175,21 @@ while ($i < $count2){
          }                                                                                                                         
 	 $stuff[5].=" ";	
       }
+      if ($mending > 0){
+        $stuff[5]=$stuff[5]."Mending";
+         if ($mending >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($mending)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";	
+      }
+      if ($transit > 0){
+        $stuff[5]=$stuff[5]."In Transiit";
+         if ($transit >1 ){                                                                                                         
+	  $stuff[5]=$stuff[5]." ($transit)";                                                                                            
+         }                                                                                                                         
+	 $stuff[5].=" ";	
+      }
+      
       if ($type ne 'opac'){
         $stuff[6]=mklink("/cgi-bin/koha/request.pl?bib=$stuff[2]","Request");
       }

@@ -67,7 +67,7 @@ print <<printend
 <TD><input type=text size=20 name=member></td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=L>Levin
+<option value=C>Levin
 <option value=F>Foxton
 <option value=S>Shannon
 <option value=T>Tokomaru
@@ -173,8 +173,8 @@ print "</select>
 <TD><a href=/cgi-bin/koha/member.pl?member=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=L";
-if ($reserves->[$i]{'branchcode'} eq 'L'){
+<option value=C";
+if ($reserves->[$i]{'branchcode'} eq 'C'){
   print " selected";
 }
 print ">Levin

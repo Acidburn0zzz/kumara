@@ -67,7 +67,7 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/koha/search.pl?author=$word&type=opac";
       $stuff[0]=mklink($url,$stuff[0]);
-      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
+      my ($count,$lcount,$nacount,$fcount,$scount,$lostcount,$mending,$transit)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
       if ($nacount > 0){
         $stuff[4]=$stuff[4]."On Loan";
@@ -94,6 +94,20 @@ while ($i < $count2){
         $stuff[4]=$stuff[4]."Shannon";
 	if ($scount >1 ){
 	  $stuff[4]=$stuff[4]." ($scount)";
+	}
+	$stuff[4].=" ";
+      }
+      if ($mending > 0){
+        $stuff[4]=$stuff[4]."Mending";
+	if ($mending >1 ){
+	  $stuff[4]=$stuff[4]." ($mending)";
+	}
+	$stuff[4].=" ";
+      }
+      if ($transit > 0){
+        $stuff[4]=$stuff[4]."In Transit";
+	if ($transit >1 ){
+	  $stuff[4]=$stuff[4]." ($transit)";
 	}
 	$stuff[4].=" ";
       }

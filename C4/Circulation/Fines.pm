@@ -93,7 +93,7 @@ sub CalcFine {
     $amount=$data->{'fine'}*2;
     $printout="Second Notice";
   }
-  if ($difference == $data->{'accountsent'}){
+  if ($difference == $data->{'accountsent'} && $data->{'fine'} > 0){
     $amount=5;
     $printout="Final Notice";
   }

@@ -268,7 +268,7 @@ sub endpage{
 
 sub mklink {
   my ($url,$text)=@_;
-  my $string="<a href=$url>$text</a>";
+  my $string="<a href=\"$url\">$text</a>";
   return ($string);
 }
 
