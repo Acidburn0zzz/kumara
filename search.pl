@@ -232,7 +232,7 @@ if ($type ne 'opac'){
 }
 print mktableft();
 my $search;
-if ($offset < $count){
+
     $search="num=$num&offset=$offset&type=$type";
     if ($subject ne ''){
       $subject=~ s/ /%20/g;
@@ -255,7 +255,7 @@ if ($offset < $count){
       $search=$search."&class=$class";
     }
     $search.="&ttype=$ttype";    
-    
+if ($offset < $count){    
     my $stuff=mklink("/cgi-bin/koha/search.pl?$search",'Next');
     print $stuff;
 }
