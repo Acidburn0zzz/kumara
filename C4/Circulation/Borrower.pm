@@ -95,8 +95,8 @@ sub findborrower  {
 	if ($cntbor == 1)  {
            $bornum = $bornums[0];
 	} elsif ($cntbor > 0) {
-	   my $bornum = selborrower($env,$dbh,@borrows,@bornums);
-	}   	   
+	   ($bornum,$borrower) = selborrower($env,$dbh,@borrows,@bornums);
+        }   	   
         if ($bornum eq '') {
           output(1,1,"Borrower not found, please rescan or reenter borrower code");
         }
