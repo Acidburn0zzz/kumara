@@ -228,7 +228,7 @@ biblio.title,reserves.reservedate";
   $sth=$dbh->prepare($query);
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
-    @results[$i];
+    @results[$i]=$data;
     $i++;
   }
   $sth->finish;
