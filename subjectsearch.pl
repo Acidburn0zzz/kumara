@@ -38,7 +38,7 @@ print mktablehdr;
 if ($type ne 'opac'){
   print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION'),"/images/background-mem.gif"); 
 } else {
-  print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION')); 
+  print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('BRANCH')); 
 }
 my $colour=1;
 while ($i < $count){
@@ -51,22 +51,38 @@ while ($i < $count){
   my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$results[2]);                                                                     
   $results[3]=$count;                                                                                                                           
   if ($nacount > 0){                                                                                                                          
-    $results[4]=$results[4]."On Loan 1";                                                                                                          
+    $results[4]=$results[4]."On Loan";                                                                                                          
+    if ($nacount > 1){
+      $results[4].=" $nacount";
+    }
+    $results[4].=" ";
   }                                                                                                                                           
   if ($lcount > 0){                                                                                                                           
-    $results[4]=$results[4]." L$lcount";                                                                                                          
+    $results[4]=$results[4]." Levin";                                                                                                          
+    if ($lcount > 1){
+      $results[4].=" $lcount";
+    }
+    $results[4].=" ";
   }                                                                                                                                           
   if ($fcount > 0){                                                                                                                           
-    $results[4]=$results[4]." F$fcount";                                                                                                          
+    $results[4]=$results[4]." Foxton";                                                                                                          
+    if ($fcount > 1){
+      $results[4].=" $fcount";
+    }
+    $results[4].=" ";
   }                                                                                                                                           
   if ($scount > 0){                                                                                                                           
-    $results[4]=$results[4]." S$scount";                                                                                                          
+    $results[4]=$results[4]." Shannon";                                                                                                          
+    if ($scount > 1){
+      $results[4].=" $scount";
+    }
+    $results[4].=" ";
   }             
   if ($type ne 'opac'){
     $results[6]=mklink("/cgi-bin/koha/request.pl?bib=$results[2]","Request");
   }
   if ($colour == 1){                                                                          
-    print mktablerow(5,'#ffffcc',$results[0],$results[1],$results[3],$results[4],$results[6]);                                        
+    print mktablerow(5,$secondary,$results[0],$results[1],$results[3],$results[4],$results[6]);                                        
     $colour=0;                                                                   
   } else{                                                                        
     print mktablerow(5,'white',$results[0],$results[1],$results[3],$results[4],$results[6]);                                     
