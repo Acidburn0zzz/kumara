@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch); 
+@EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -53,17 +53,19 @@ my $priv_func = sub {
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
-  my $query="Select * from biblio,catalogueentry
+  my $query="(Select * from biblio,catalogueentry
   where (catalogueentry.catalogueentry=biblio.author and
   catalogueentry.entrytype='a' and catalogueentry.catalogueentry like
   '$search->{'keyword'}%') union select * from biblio,catalogueentry where 
   (catalogueentry.catalogueentry=biblio.title and 
   catalogueentry.entrytype='t' and catalogueentry.catalogueentry like
-  '%$search->{'keyword'}%') order by biblio.title"; 
+  '%$search->{'keyword'}%')) order by biblio.title"; 
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
   my $i=0;
+  my $i2=0;
+  my $limit=$num+$offset;
   my $count=0;
   my @results;
   while (my $data=$sth->fetchrow_hashref){
@@ -74,9 +76,11 @@ sub KeywordSearch {
   $sth=$dbh->prepare($query);
   $sth->execute;
 #  print $query;
-  while (my $data=$sth->fetchrow_hashref){
-     $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
-    $data->{'author'}";
+  while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
+    if ($i >= $offset){
+      $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
+      $i2++;
+    }
     $i++;
   }
   $sth->finish;
@@ -139,7 +143,7 @@ sub CatSearch  {
 	and biblioitems.biblionumber=biblio.biblionumber";
       }
     }
-  print "$query\n";
+
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count2=0;
@@ -175,6 +179,7 @@ sub CatSearch  {
     $i++;
   }
   $sth->finish;
+#    print "$query\n";
   #only update stats if search is from opac
 #  updatesearchstats($dbh,$query);
   $dbh->disconnect;
@@ -185,6 +190,25 @@ sub updatesearchstats{
   my ($dbh,$query)=@_;
   
 }
+
+sub subsearch {
+  my ($env,$subject)=@_;
+  my $dbh=C4Connect();
+  my $query="Select * from bibliosubject,biblio where subject='$subject'
+  and bibliosubject.biblionumber=biblio.biblionumber";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $i=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]="$data->{'title'}\t$data->{'author'}\t$data->{'biblionumber'}";
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return(@results);
+}
+
 
 sub ItemInfo {
   my ($env,$biblionumber)=@_;

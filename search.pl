@@ -82,10 +82,12 @@ while ($i < $count2){
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
-      my $url="/cgi-bin/kumara/testsearch.pl?author=$word&type=a";
+      my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
       $stuff[2]=mklink($url,$stuff[2]);
     } else {
-      $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$stuff[1]",$stuff[1]);
+      my $word=$stuff[1];
+      $word=~ s/ /%20/;
+      $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
     }
     if ($colour == 1){
       print mktablerow(2,'#ffffcc',$stuff[1],$stuff[2]);
