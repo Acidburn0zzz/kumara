@@ -132,7 +132,12 @@ sub checkissue {
      } else {
        $sth->finish;
        $reason = "Item not issued";
-     }       
+     }
+     my ($resfound,$issrec) = find_reserves($env,$dbh,$itemrec->{'itemnumber'});
+     if ($resfound eq "y") {
+       my $mess = "Reserved for collection at branch $issrec->{'branchcode'}"; 
+       error_msg($env,$mess);
+     }  
    } else {
      $sth->finish;
      $reason = "Item not found";
@@ -164,4 +169,48 @@ sub calc_odues {
   return($amt_owing);
 }  
 
+sub find_reserves {
+  my ($env,$dbh,$itemno) = @_;
+  my $itemdata = itemnodata($env,$dbh,$itemno);
+  my $query = "select * from reserves where found is null 
+  and biblionumber = $itemdata->{'biblionumber'} order by priority,reservedate ";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  my $resfound = "n";
+  my $resrec;
+  while (($resrec=$sth->fetchrow_hashref) && ($resfound eq "n")) {
+    if ($resrec->{'constrainttype'} eq "a") {
+      $resfound = "y";
+    } else {
+      my $conquery = "select * from reserveconstraints
+        where borrowernumber = $resrec->{'borrowernumber'}
+	and reservedate = $resrec->{'reservedate'}
+	and biblionumber = $resrec->{'biblionumber'}
+	and biblioitemnumber = $itemdata->{'biblioitemnumber'}";
+      my $consth = $dbh->prepare($conquery);
+      $consth->execute;
+      if (my $conrec=$consth->fetchrow_hashref) {
+        if ($resrec->{'constrainttype'} eq "o") {
+	   $resfound = "y";
+	 }
+      } else {
+        if ($resrec->{'constrainttype'} eq "e") {
+	  $resfound = "y";
+	}
+      }
+      $consth->finish;
+    }
+    if ($resfound = "y") {
+      my $updquery = "update reserves set found = 'W'
+        where borrowernumber = $resrec->{'borrowernumber'}
+        and reservedate = '$resrec->{'reservedate'}'
+        and biblionumber = $resrec->{'biblionumber'}";
+      my $updsth = $dbh->prepare($updquery);
+      $updsth->execute;
+      $updsth->finish;
+    }
+  }
+  $sth->finish;
+  return ($resfound,$resrec);   
+}
 END { }       # module clean-up code here (global destructor)
