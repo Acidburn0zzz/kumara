@@ -198,6 +198,9 @@ sub CatSearch  {
   #only update stats if search is from opac
 #  updatesearchstats($dbh,$query);
   $dbh->disconnect;
+  if ($search->{'isbn'} ne ''){
+    $count=1;
+  }
   return($count,@results);
 }
 
