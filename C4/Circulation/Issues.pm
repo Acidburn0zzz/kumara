@@ -11,7 +11,7 @@ use C4::Accounts;
 use C4::Interface;
 use C4::Circulation;
 use C4::Scan;
-
+use C4::Stats;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking

@@ -6,7 +6,7 @@ package C4::Stats; #asummes C4/Stats
 use strict;
 require Exporter;
 use DBI;
-use C4::Interface;
+use C4::Database;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 # set the version for version checking
@@ -51,6 +51,13 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub UpdateStats {
+  #module to insert stats data into stats table
+  my ($branch,$type,$amount)=@_;
+  my $dbh=C4Connect();
+  my $sth=$sbh->prepare("Insert into statistics (datetime,branch,type) values
+  (datetime('now'::abstime),'$branch','$type'))");
+  $sth->execute;
+  $sth->finish;
 }
 
 END { }       # module clean-up code here (global destructor)
