@@ -137,6 +137,7 @@ if ($insert eq ''){
    my $i=0;
    my @inputs;
    while (my ($key, $value) = each %data) {
+     $value=~ s/\"/%22/g;
      $inputs[$i]=["hidden","$key","$value"];       
      $i++;
    }

@@ -24,6 +24,7 @@ my $env;
 foreach my $key (@names){
   $data{$key}=$input->param($key);
   $data{$key}=~ s/\'/\\\'/g;
+  $data{$key}=~ s/%22/\\\"/g;
 }
 my $dbh=C4Connect;
 my $query="Select * from borrowers where borrowernumber=$data{'borrowernumber'}";
