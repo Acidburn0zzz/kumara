@@ -116,10 +116,10 @@ sub pause {
   Newt::WaitForKey();
 }
 
-#sub output {
-#  my($left,$top,$msg)=@_;
-#  Newt::DrawRootText($left,$top,$msg);
-#}
+sub output {
+  my($left,$top,$msg)=@_;
+  Newt::DrawRootText($left,$top,$msg);
+}
 
 sub helptext {
   my ($text)=@_;
