@@ -313,9 +313,9 @@ sub bibdata {
 sub itemnodata {
   my ($env,$dbh,$itemnumber) = @_;
   my $query="Select * from biblio,items,biblioitems
-    where itemnumber = '$itemnumber'
-    and biblio.biblionumber = items.itemnumber
-    and biblioitems.biblionumber = items.biblionumber";
+    where items.itemnumber = '$itemnumber'
+    and biblio.biblionumber = items.biblionumber
+    and biblioitems.biblioitemnumber = items.biblioitemnumber";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;

@@ -108,17 +108,6 @@ sub processitems {
       my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($datedue ne "") {
          my $line = formatitem($env,$item,$datedue,$charge);
-	 #$datedue." ".$item->{'title'}.", ".$item->{'author'};
-	 #my $iclass =  $item->{'itemtype'};
-	 #if ($item->{'dewey'} > 0) {
-	 #  $iclass = $iclass.$item->{'dewey'}.$item->{'subclass'};
-	 #};
-	 #my $llen = 65 - length($iclass);
-	 #my $line = fmtstr($env,$line,"L".$llen);
-	 #my $line = $line." $iclass ";
-         #my $line = $line.fmtdec($env,$charge,"22"); 		  
-         #$items2->[$it2p] = $datedue." ".
-         #  fmtstr($env,$item->{'title'},"L55")." ".fmtdec($env,$charge,"22");
          $items2->[$it2p] = $line;
 	 $it2p++;
          $amountdue += $charge;
