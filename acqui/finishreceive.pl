@@ -39,7 +39,8 @@ my $freight=$input->param('freight');
 my $volinf=$input->param('volinf');
 if ($volinf ne ''){
 #  print "$bibitemno";
-  $bibitemno=newbiblioitem($biblio,$itemtype,$isbn,$volinf);
+  $class="Periodical";
+  $bibitemno=newbiblioitem($biblio,$itemtype,$isbn,$volinf,$class);
 #  print "here $bibitemno";
 }
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);

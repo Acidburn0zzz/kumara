@@ -195,7 +195,7 @@ $offset=$num+$offset;
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset&type=$type&id=$id&basket=$basket&search=$keyword";
-    my $stuff=mklink("/cgi-bin/koha/newbasket2.pl?$search",'Next');
+    my $stuff=mklink("/cgi-bin/koha/acqui/newbasket2.pl?$search",'Next');
     print $stuff;
 }
 
