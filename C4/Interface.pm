@@ -319,6 +319,42 @@ sub dialog {
 }
 
 
+  
+sub logondialog {
+   my ($env,$title,$branches)=@_;
+   my $entry1=Newt::Entry(10,NEWT_FLAG_SCROLL );
+   my $label1=Newt::Label("User Name");  
+   my $label2=Newt::Label("Password");
+   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL );       
+   my $panel1=Newt::Panel(2,4,$title);
+   my $panel2=Newt::Panel(5,1,''); 
+   my $listbx=Newt::Listbox(12, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT |
+NEWT_FLAG_MULTIPLE | NEWT_FLAG_BORDER );
+   $panel1->AddHotKey(NEWT_KEY_F11);
+   $panel1->AddHotKey(NEWT_KEY_F10);   
+   $panel1->Add(0,0,$panel2,NEWT_ANCHOR_LEFT); 
+   $panel1->Add(1,0,$listbx,NEWT_ANCHOR_LEFT);   
+   $panel2->Add(0,0,$label1,NEWT_ANCHOR_LEFT);
+   $panel2->Add(1,0,$entry1,NEWT_ANCHOR_LEFT);
+   $panel2->Add(2,0,$label2,NEWT_ANCHOR_LEFT);
+   $panel2->Add(3,0,$entry2,NEWT_ANCHOR_LEFT);
+   $listbx->Add($branches);	
+   my ($reason,$data)=$panel1->Run();
+   my ($username) = $entry1->Get();
+   my ($password) = $entry2->Get();
+   my @stuff=$listbx->Get();
+   my ($branch)   = $stuff[0];
+   if ($reason eq NEWT_EXIT_HOTKEY) {
+      if ($data eq NEWT_KEY_F11) {
+	 $reason="Cancelled Input ";
+      }
+      if ($data eq NEWT_KEY_F12){
+         $reason="Quit";
+      }
+   }
+   return($reason,$username,$password,$branch);
+}
+									  
 sub borrower_dialog {
   my ($env)=@_;
   my $name = "Borrower";
