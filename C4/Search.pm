@@ -802,9 +802,20 @@ sub getboracctrecord {
       $numlines++;
       $total = $total+ $data->{'amountoutstanding'};
    }
-   return ($numlines,\@acctlines,$total);
    $sth->finish;
+   $query="Select * from accountlines where
+borrowernumber=$params->{'borrowernumber'} and itemnumber is NULL order by
+date desc";
+   $sth->execute;
+   while (my $data=$sth->fetchrow_hashref){
+      $acctlines[$numlines] = $data;
+      $numlines++;
+      $total = $total+ $data->{'amountoutstanding'};
+   }
+      $sth->finish;
    $dbh->disconnect;
+   return ($numlines,\@acctlines,$total);
+
 }
 
 sub itemcount { 
