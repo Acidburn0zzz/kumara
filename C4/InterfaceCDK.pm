@@ -71,7 +71,7 @@ sub startint {
 sub menu {
   my ($env,$type,$title,@items)=@_;
   $env->{'sysarea'}="Menu";
-  my $titlebar=titlepanel($env,"Library System","Main Menu");
+  my $titlebar=titlepanel($env,"Koha","Main Menu");
   my $reason;
   my $data;
   my @mitems;
@@ -180,7 +180,7 @@ sub endint {
 sub brmenu {
   my ($env,$brrecs)=@_;
   $env->{'sysarea'}="Menu";
-  my $titlebar=titlepanel($env,"Library System","Select branch");
+  my $titlebar=titlepanel($env,"Koha","Select branch");
   my @mitems;
   my $x = 0;
   while (@$brrecs[$x] ne "") {
@@ -210,7 +210,7 @@ sub brmenu {
 sub prmenu {
   my ($env,$prrecs)=@_;
   $env->{'sysarea'}="Menu";
-  my $titlebar=titlepanel($env,"Library System","Select printer");
+  my $titlebar=titlepanel($env,"Koha","Select printer");
   my @mitems;
   my $x = 0;
   while (@$prrecs[$x] ne "") {
