@@ -125,18 +125,26 @@ sub MakeReserveScreen {
   $bookpanel->draw();
   my $branchlist =  new Cdk::Radio('Title'=>"Collection Branch",
      'List'=>\@$branches,
-     'Xpos'=>"2",'Ypos'=>"7",'Width'=>"23",'Height'=>"17");
+     'Xpos'=>"20",'Ypos'=>"5",'Width'=>"18",'Height'=>"6");
   $branchlist->draw();	    
   my $i = 0;
-  while ($i < 4) {
-    $branchlist->inject('Input'=>"KEY_DOWN");
-    $i++;
+  my $brcnt = @$branches;
+  my $brdef = 0;
+  while (($brdef == 0) && ($i < $brcnt)) {
+    my $brcode = substr(@$branches[$i],0,2);
+    my $brtest = fmtstr($env,$env->{'branchcode'},"L2");
+    if ($brcode eq $brtest) {
+      $brdef = 1
+    } else {  
+      $branchlist->inject('Input'=>"KEY_DOWN");
+      $i++;
+    }  
   }  
   $branchlist->inject('Input'=>" ");
   my @constraintlist = ("Any item","Only Selected","Except Selected");
   my $constrainttype = new Cdk::Radio('Title'=>"Reserve Constraints",
      'List'=>\@constraintlist,
-     'Xpos'=>"54",'Ypos'=>"4",'Width'=>"17",'Height'=>"6");
+     'Xpos'=>"54",'Ypos'=>"5",'Width'=>"17",'Height'=>"6");
   $constrainttype->draw();
   my $numbit   = @$bitems;
   my @itemarr;
@@ -157,9 +165,9 @@ sub MakeReserveScreen {
   my @sel = ("Y ","N ");
   my $itemlist = new Cdk::Selection('Title'=>"Items Held",
      'List'=>\@itemarr,'Choices'=>\@sel,
-     'Xpos'=>"36",'Ypos'=>"9",'Width'=>"40",'Height'=>"15");
+     'Xpos'=>"1",'Ypos'=>"12",'Width'=>"70",'Height'=>"8");
   $itemlist->draw();
-  my $borrowerentry = new Cdk::Entry('Label'=>"Borrower:  ",
+  my $borrowerentry = new Cdk::Entry('Label'=>"",'Title'=>"Borrower",
      'Max'=>"11",'Width'=>"11",
      'Xpos'=>"2",'Ypos'=>"5",
      'Type'=>"UMIXED");

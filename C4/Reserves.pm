@@ -98,7 +98,7 @@ sub EnterReserves{
     if ($no_ents > 0) {
       if ($no_ents == 1) {
         my @ents = split("\t",@results[0]);
-        $biblionumber  = @ents[0];       
+        $biblionumber  = @ents[2];       
       } else {  
         my %biblio_xref;
         my @bibtitles;
@@ -107,10 +107,10 @@ sub EnterReserves{
         while ($i < $no_ents) {
           my @ents = split("\t",@results[$i]);
           $line = fmtstr($env,@ents[1],"L70");
-	  my $auth = substr(@ents[2],0,30);
+	  my $auth = substr(@ents[0],0,30);
 	  substr($line,(70-length($auth)-2),length($auth)+2) = "  ".$auth;
           @bibtitles[$i]=$line;	 
-          $biblio_xref{$line}=@ents[0];
+          $biblio_xref{$line}=@ents[2];
           $i++;
         }
         my $title = titlepanel($env,"Reserves","Select Title");
@@ -129,9 +129,9 @@ sub EnterReserves{
       if ($biblionumber eq "") {
         error_msg($env,"No items found");   
       } else {
-        debug_msg($env,"getting items $biblionumber");	
+        #debug_msg($env,"getting items $biblionumber");	
         my @items = GetItems($env,$biblionumber);
-        debug_msg($env,"got items ");
+        #debug_msg($env,"got items ");
 	 
 	my $cnt_it = @items;
 	my $dbh = &C4Connect;
