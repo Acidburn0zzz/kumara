@@ -274,7 +274,7 @@ sub CatSearch  {
   }
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
-  $query=$query." group by biblio.biblionumber";
+#  $query=$query." group by biblio.biblionumber";
   if ($type ne 'precise' && $type ne 'subject'){
     if ($search->{'author'} ne ''){
       $query=$query." order by author,title limit $offset,$num";
