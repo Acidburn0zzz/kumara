@@ -85,7 +85,7 @@ sub NewBorrowerNumber {
 
 sub OpacSearch {
   my ($env,$type,$search,$num,$offset)=@_;
-  my $dbh = &C4Connect;
+  my $dbh = &OpacConnect;
   $search->{'keyword'}=~ s/'/\\'/g;
   my @key=split(' ',$search->{'keyword'});
   my $count=@key;

@@ -12,7 +12,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect &sqlinsert &sqlupdate &getmax &makelist);
+@EXPORT = qw(&C4Connect &sqlinsert &sqlupdate &getmax &makelist
+&OpacConnect);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -51,6 +52,17 @@ my $priv_func = sub {
 
 
 sub C4Connect  {
+  my $dbname="c4"; 
+#  my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", "chris", "");
+   my $database='c4test';
+   my $hostname='localhost';
+   my $user='hdl';
+   my $pass='testing';
+   my $dbh=DBI->connect("DBI:mysql:$database:$hostname",$user,$pass);
+  return $dbh;
+}    
+
+sub Opaconnect  {
   my $dbname="c4"; 
 #  my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", "chris", "");
    my $database='c4test';

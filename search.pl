@@ -34,25 +34,25 @@ if ($type eq 'opac'){
 my $blah;
 my %search;
 #build hash of users input
-my $title=$input->param('title');
+my $title=validate($input->param('title'));
 $search{'title'}=$title;
-my $keyword=$input->param('keyword');
+my $keyword=validate($input->param('keyword'));
 $search{'keyword'}=$keyword;
-$search{'front'}=$input->param('front');
-my $author=$input->param('author');
+$search{'front'}=validate($input->param('front'));
+my $author=validate($input->param('author'));
 $search{'author'}=$author;
-my $subject=$input->param('subject');
+my $subject=validate($input->param('subject'));
 $search{'subject'}=$subject;
-my $itemnumber=$input->param('item');
+my $itemnumber=validate($input->param('item'));
 $search{'item'}=$itemnumber;
-my $isbn=$input->param('isbn');
+my $isbn=validate($input->param('isbn'));
 $search{'isbn'}=$isbn;
-my $datebefore=$input->param('date-before');
+my $datebefore=validate($input->param('date-before'));
 $search{'date-before'};
 my $class=$input->param('class');
 $search{'class'}=$class;
 $search{'ttype'}=$ttype;
-my $dewey=$input->param('dewey');
+my $dewey=validate($input->param('dewey'));
 $search{'dewey'}=$dewey;
 my @results;
 my $offset=$input->param('offset');
@@ -85,8 +85,8 @@ if ($itemnumber ne '' || $isbn ne ''){
       ($count,@results)=&KeywordSearch(\$blah,'intra',\%search,$num,$offset);
     } elsif ($search{'front'} ne '') {
     ($count,@results)&FrontSearch(\$blah,'intra',\%search,$num,$offset);
-    print "hey";
-    }else {
+#    print "hey";
+    }elsif ($title ne '' || $author ne '' || $dewey ne '' || $class ne '') {
       ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
 #            print "hey";
     }
@@ -273,3 +273,14 @@ for (my $i=1;$i<$pages;$i++){
 print endcenter();
 print endmenu($type);
 print endpage();
+
+
+sub validate {
+  my ($input)=@_;
+  $input=~ s/\<[a-z]+\>//gi;
+  $input=~ s/\<\/[a-z]+\>//gi;
+  $input=~ s/\<//g;
+  $input=~ s/\>//g;
+  $input=~ s/^%//g;
+  return($input);
+}

@@ -12,13 +12,14 @@ use C4::Output;
 my $env;
 my $input = new CGI;
 print $input->header;
-#print $input->dump;
+#print $input->Dump;
 my $blah;
 my %search;
 #build hash of users input
 
 
-my $keyword=$input->param('keyword');
+my $keyword=validateinp($input->param('keyword'));
+#my $keyword=$input->param('keyword');
 #$keyword=~ s/'/\'/g;
 $search{'keyword'}=$keyword;
 
@@ -37,9 +38,9 @@ print mkheadr(1,"Opac Search Results for $keyword");
 print center();
 my $count;
 my @results;
-
-($count,@results)=&OpacSearch(\$blah,'loose',\%search,$num,$offset);
-
+if ($search{'keyword'} ne ''){
+  ($count,@results)=&OpacSearch(\$blah,'loose',\%search,$num,$offset);
+}
 #print "You searched on <b>$keyword</b>";
 
 print " $count results found";
@@ -137,3 +138,14 @@ print mktableft();
 print endcenter();
 print endmenu('opac');
 print endpage();
+
+
+sub validateinp {
+  my ($input)=@_;
+  $input=~ s/\<[a-z]+\>//gi;
+  $input=~ s/\<\/[a-z]+\>//gi;
+  $input=~ s/\<//g;
+  $input=~ s/\>//g;
+  $input=~ s/^%//g;
+  return($input);
+}
