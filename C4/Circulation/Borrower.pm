@@ -138,7 +138,7 @@ sub findoneborrower {
     # where surname ~* '$borcode' order by surname";
 	      
     my $borquery = "Select * from borrowers 
-      where lower(surname) = \"$lcborcode\" order by surname,firstname";
+      where lower(surname) like \"$lcborcode%\" order by surname,firstname";
     my $sthb =$dbh->prepare($borquery);
     $sthb->execute;
     my $cntbor = 0;
