@@ -12,7 +12,7 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
-&startmenu &endmenu &mkheadr &center &endcenter &mkform &bold);
+&startmenu &endmenu &mkheadr &center &endcenter &mkform &mkform2 &bold);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -109,8 +109,10 @@ sub mkform{
   my $string="<form action=$action method=post>\n";
   $string=$string.mktablehdr();
   my $key;
+  my @order;
   while ( my ($key, $value) = each %inputs) {
     my @data=split('\t',$value);
+    #my $posn = shift(@data);
     if ($data[0] eq 'hidden'){
       $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
     } else {
@@ -118,7 +120,7 @@ sub mkform{
       if ($data[0] eq 'radio') {
         $text="<input type=radio name=$key value=$data[1]>$data[1]
 	<input type=radio name=$key value=$data[2]>$data[2]";
-      }
+      } 
       if ($data[0] eq 'text') {
         $text="<input type=$data[0] name=$key value=\"$data[1]\">";
       }
@@ -130,19 +132,64 @@ sub mkform{
 	my $i=1;
        	while ($data[$i] ne "") {
 	  my $val = $data[$i+1];
-	   
-	  $text = $text."<option value=$data[$i]>$val";
+      	  $text = $text."<option value=$data[$i]>$val";
 	  $i = $i+2;
 	}
 	$text=$text."</select>";
       }	
       $string=$string.mktablerow(2,'white',$key,$text);
+      #@order[$posn] =mktablerow(2,'white',$key,$text);
     }
   }
+  #$string=$string.join("\n",@order);
   $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
   $string=$string.mktableft;
   $string=$string."</form>";
 }
+
+sub mkform2{
+  my ($action,%inputs)=@_;
+  my $string="<form action=$action method=post>\n";
+  $string=$string.mktablehdr();
+  my $key;
+  my @order;
+  while ( my ($key, $value) = each %inputs) {
+    my @data=split('\t',$value);
+    my $posn = shift(@data);
+    if ($data[0] eq 'hidden'){
+      $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
+    } else {
+      my $text;
+      if ($data[0] eq 'radio') {
+        $text="<input type=radio name=$key value=$data[1]>$data[1]
+	<input type=radio name=$key value=$data[2]>$data[2]";
+      } 
+      if ($data[0] eq 'text') {
+        $text="<input type=$data[0] name=$key value=\"$data[1]\">";
+      }
+      if ($data[0] eq 'textarea') {
+        $text="<textarea name=$key wrap=physical cols=40 rows=4>$data[1]</textarea>";
+      }
+      if ($data[0] eq 'select') {
+        $text="<select name=$key>";
+	my $i=1;
+       	while ($data[$i] ne "") {
+	  my $val = $data[$i+1];
+      	  $text = $text."<option value=$data[$i]>$val";
+	  $i = $i+2;
+	}
+	$text=$text."</select>";
+      }	
+      #$string=$string.mktablerow(2,'white',$key,$text);
+      @order[$posn] =mktablerow(2,'white',$key,$text);
+    }
+  }
+  $string=$string.join("\n",@order);
+  $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
+  $string=$string.mktableft;
+  $string=$string."</form>";
+}
+
 
 sub endpage{
   my $string="</body></html>\n";
