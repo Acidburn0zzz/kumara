@@ -190,7 +190,11 @@ sub CatSearch  {
 	      $i++;
 	    }
 	    $query=$query.")";
-	 }
+	  } elsif ($search->{'class'} ne ''){
+	     $query="select count(*) from biblioitems where classification
+	     like '%$search->{'class'}%'";
+	  }
+	 
       }
   } 
   if ($type eq 'subject'){

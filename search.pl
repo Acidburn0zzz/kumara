@@ -30,6 +30,8 @@ my $isbn=$input->param('isbn');
 $search{'isbn'}=$isbn;
 my $datebefore=$input->param('date-before');
 $search{'date-before'};
+my $class=$input->param('class');
+$search{'class'}=$class;
 my @results;
 my $offset=$input->param('offset');
 if ($offset eq ''){
