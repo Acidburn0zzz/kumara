@@ -69,7 +69,7 @@ sub accountsdialog {
      'Max'=>"10",'Width'=>"10",
      'Xpos'=>"1",'Ypos'=>"4",
      'Type'=>"INT");
-  $amountentry->set('Value'=>$amountowing);
+  #$amountentry->set('Value'=>$amountowing);
   my $amount =$amountentry->activate();
                                                                 
   #debug_msg($env,"accounts $amount");

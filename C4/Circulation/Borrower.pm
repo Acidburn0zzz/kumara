@@ -76,6 +76,7 @@ sub findborrower  {
     if ($reason eq "") {
       if ($borcode ne '') {
         ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
+        $env->{'IssuesAllowed'} = 1;
       } elsif ($book ne "") {
         my $query = "select * from issues,items where (barcode = '$book') 
           and (items.itemnumber = issues.itemnumber) 
@@ -103,9 +104,9 @@ sub findborrower  {
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
     my $odues;
     ($issuesallowed,$odues) = &checktraps($env,$dbh,$bornum,$borrower);
-    debug_msg ($env,"issuesallowed1 =  $issuesallowed");
+    #debug_msg ($env,"issuesallowed1 =  $env->{'IssuesAllowed'}");
   }
-  debug_msg ($env,"issuesallowed2 =  $issuesallowed");
+  #debug_msg ($env,"issuesallowed2 =  $env->{'IssuesAllowed'}");
   return ($bornum, $issuesallowed,$borrower,$reason);
 };
 
@@ -174,7 +175,7 @@ sub checktraps {
   my $odues;
   while ($traps_done ne "DONE") {
     my @traps_set;
-    debug_msg($env,"entering traps");
+    #debug_msg($env,"entering traps");
     my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     if ($amount > 0) { push (@traps_set,"FINES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
@@ -191,12 +192,12 @@ sub checktraps {
     if (@traps_set[0] ne "" ) {
        $issuesallowed,$traps_done = 
          process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set); 
-       debug_msg($env,"returned issuesallowed $issuesallowed");
+       #debug_msg($env,"returned issuesallowed $env->{'IssuesAllowed'}");
     } else {
        $traps_done = "DONE";
     }   
   }
-  debug_msg($env,"returning issuesallowed $issuesallowed");
+  #debug_msg($env,"returning issuesallowed $env->{'IssuesAllowed'}");
   return ($issuesallowed, $odues);
 }
 
@@ -207,7 +208,7 @@ sub process_traps {
   my %traps;
   while (@$traps_set[$x] ne "") {
     $traps{@$traps_set[$x]} = 1; 
-    debug_msg($env,"set @$traps_set[$x]");
+    #debug_msg($env,"set @$traps_set[$x]");
     $x++;
   }
   my $traps_done;
@@ -231,14 +232,16 @@ sub process_traps {
   }
   if ($traps{'GNA'} eq 1 ) {
     $issuesallowed=0;
+    $env->{'IssuesAllowed'} = 0;
   }
   if ($traps{'FINES'} eq 1) {
     if ($amount > 5) {
-      debug_msg($env,"fines2 $amount");
-      $issuesallowed=0;
+      #debug_msg($env,"fines2 $amount");
+    $env->{'IssuesAllowed'} = 0;
+    $issuesallowed=0;
     }
   }
-  debug_msg($env,"ia $issuesallowed");
+  #debug_msg($env,"ia $env->{'IssuesAllowed'}");
   return ($issuesallowed,$traps_done);
 } # end of process_traps
 

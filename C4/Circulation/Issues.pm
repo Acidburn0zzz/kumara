@@ -73,10 +73,12 @@ sub Issue  {
       my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);      
       #C4::Circulation::Borrowers
       $env->{'loanlength'}="";
+      
       if ($reason ne "") {
         $done = $reason;
-      } elsif ($issuesallowed eq "0") {
-        error_msg($env,"No Issues Allowed =$issuesallowed");
+      #} elsif ($issuesallowed eq "0") {
+      } elsif ($env->{'IssuesAllowed'} eq '0') {
+        error_msg($env,"No Issues Allowed =$env->{'IssuesAllowed'}");
       } else {
         $env->{'bornum'} = $bornum;
         $env->{'bcard'}  = $borrower->{'cardnumber'};
