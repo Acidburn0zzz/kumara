@@ -336,7 +336,7 @@ sub reserveslist {
   my $x=0;
   my $query="Select * from reserves where
   borrowernumber='$borrower->{'borrowernumber'}' and found='W' and
-  cancellationdate is null";
+  cancellationdate is null order by timestamp";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
