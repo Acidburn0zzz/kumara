@@ -67,19 +67,22 @@ sub Returns {
   my $itemrec;
   my $bornum;
   my $amt_owing;
-  until (($reason eq "Circ") || ($reason eq "Quit")) {
+# until (($reason eq "Circ") || ($reason eq "Quit")) {
+  until ($reason ne "") {
     ($reason,$item) =  returnwindow($env,"Enter Returns",$item,\@items,$borrower,$amt_owing);
-    if (($reason ne "Circ") && ($reason ne "Quit")) {
+    debug_msg($env,$reason);
+    #if (($reason ne "Circ") && ($reason ne "Quit")) {
+    if ($reason eq "") {
       ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
-      if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
+      #if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
         if ($reason eq "Returned") {
 	  my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
-       	  unshift @items,$fmtitem;
-	  
+      	  unshift @items,$fmtitem;
+          $reason = "";     	  
   	} else {
-            error_msg($env,$reason);
+            debug_msg($env,$reason);
 	}
-      }
+      #}
     }
   }
   clearscreen;

@@ -229,6 +229,7 @@ sub returnwindow {
      }
   } else {
     my $stuff=$entry->Get();
+    $reason="";
   }
   return($reason,$stuff);
 }
