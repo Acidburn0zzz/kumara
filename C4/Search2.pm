@@ -499,7 +499,7 @@ sub CatSearch  {
 	$sth1->finish;
       }
   }
-print $query;
+#print $query;
 if ($type ne 'precise' && $type ne 'subject'){
   if ($search->{'author'} ne ''){   
       $query=$query." order by biblio.author,title";
