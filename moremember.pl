@@ -77,7 +77,17 @@ Alternative Contact:$data->{'contactname'}<BR>
 Phone: $data->{'altphone'}<BR>
 Relationship: $data->{'altrelationship'}<BR>
 Notes: $data->{'altnotes'}<P>
-Guarantees: <A HREF=""></a><P>
+Guarantees:
+printend
+;
+my ($count,$guarantees)=findguarantees($data->{'borrowernumber'});
+for (my $i=0;$i<$count;$i++){
+  print "<A HREF=\"/cgi-bin/koha/moremember.pl?bornum=$guarantees->[$i]->{'borrowernumber'}\">$guarantees->[$i]->{'cardnumber'}</a><br>";
+}
+print <<printend
+
+
+<P>
 
 General Notes: <A HREF="popbox.html" onclick="messenger(200,250,'Form that lets you add to and delete notes.'); return false">
 $data->{'borrowernotes'}</a>

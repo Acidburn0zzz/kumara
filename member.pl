@@ -49,9 +49,11 @@ for (my $i=0; $i < $count; $i++){
 }
 print mktableft;
 print <<printend
-<A HREF="/cgi-bin/koha/memberentry.pl?type=Add"><img src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" BORDER=0 ></a><br>
+<form action=/cgi-bin/koha/simpleredirect.pl method=post>
+<input type=image src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" BORDER=0 ></a><br>
 <INPUT TYPE="radio" name="chooseform" value="adult" checked>Adult
 <INPUT TYPE="radio" name="chooseform" value="organisation" >Organisation
+</form>
 printend
 ;
 print endmenu('member');

@@ -67,11 +67,29 @@ if ($ok == 0){
   print mkheadr(1,'Confirm Record');
   my $main="#99cc33";                                                                                     
   my $image="/images/background-mem.gif"; 
-  print mktablehdr;                                                                                    
-  print mktablerow(2,$main,bold('NEW MEMBER'),"",$image);
-  print mktablerow(2,'white',bold('Membership Number'),$data{'borrowernumber'});
-  print mktableft;
-  
+  for (my $i=0;$i<3;$i++){
+    if ($data{"cardnumber_child_$i"} ne ''){
+      print mktablehdr;                                                                                    
+      print mktablerow(2,$main,bold('NEW MEMBER'),"",$image);
+      my $name=$data{"firstname_child_$i"}.$data{"surname_child_$i"};
+      print mktablerow(2,'white',bold('Name'),$name);
+      print mktablerow(2,$main,bold('MEMBERSHIP DETAILS'),"",$image);
+      print mktablerow(2,'white',bold('Membership Number'),$data{"bornumber_child_$i"});
+      print mktablerow(2,'white',bold('Date of Birth'),$data{"dateofbirth_child_$i"});
+      my $sex;
+      if ($data{"sex_child_$i"} eq 'M'){
+         $sex="Male";
+      } else {
+         $sex="Female";
+      }
+      print mktablerow(2,'white',bold('Sex'),$sex);
+      print mktablerow(2,'white',bold('School'),$data{"school_child_$i"});
+      print mktablerow(2,'white',bold('General Notes'),$data{"altnotes_child_$i"});
+      
+      print mktableft;
+      print "<p>";
+    }
+  }
   my $i=0;                                                                                             
   my @inputs;                                                                                          
   while (my ($key, $value) = each %data) {                                                             

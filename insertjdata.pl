@@ -11,7 +11,7 @@ use Date::Manip;
 use strict;
 
 my $input= new CGI;
-print $input->header;
+#print $input->header;
 #print $input->Dump;
 
 #get all the data into a hash
@@ -74,7 +74,7 @@ if (my $data=$sth->fetchrow_hashref){
   '$data{'ethnicity'}','$bornum','$guarant','$school')";
 }
 
-print $query;
+#print $query;
   my $sth2=$dbh->prepare($query);
   $sth2->execute;
   $sth2->finish;
