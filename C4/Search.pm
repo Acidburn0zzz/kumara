@@ -576,7 +576,7 @@ sub bibdata {
   $sth=$dbh->prepare($query);
   $sth->execute;
   while (my $dat=$sth->fetchrow_hashref){
-    $data->{'subject'}.="| $dat->{'subject'}";
+    $data->{'subject'}.="|$dat->{'subject'}";
 
   }
   #print $query;
