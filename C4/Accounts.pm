@@ -144,7 +144,7 @@ sub recordpayment{
      $updquery = "insert into accountoffsets 
     (borrowernumber, accountno, offsetaccount,  offsetamount)
      values ($bornumber,$accdata->{'accountno'},$nextaccntno,$newamtos)";
-     my $usth = $dbh->prepare($query);
+     my $usth = $dbh->prepare($updquery);
 #     print $updquery
      $usth->execute;
      $usth->finish;
