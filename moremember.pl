@@ -9,9 +9,11 @@ use CGI;
 use C4::Search;
 use Date::Manip;
 use C4::Reserves2;
+use C4::Circulation::Renewals2;
 my $input = new CGI;
 my $bornum=$input->param('bornum');
 
+my %env;
 print $input->header;
 #start the page and read in includes
 print startpage();
@@ -151,7 +153,8 @@ for (my $i=0;$i<$count;$i++){
   print "$issue->[$i]{'title'}</td>
   <TD>$issue->[$i]{'date_due'}</td>";
   #find the charge for an item
-  print "<TD></td>";
+  my $charge=calc_charges(\%env,$issue->[$i]{'itemnumber'},$bornum);
+  print "<TD>$charge</td>";
 
   if ($datedue < $today){
     print "<td>Overdue</td>";
