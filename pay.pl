@@ -49,6 +49,7 @@ print <<printend
 printend
 ;
 for (my $i=0;$i<$numaccts;$i++){
+if ($accts->[$i]{'amountoutstanding'} > 0){
 print <<printend
 <tr VALIGN=TOP  >
 <TD><input type=radio name=payfine$i value=no checked>Unpaid
@@ -68,6 +69,7 @@ print <<printend
 </tr>
 printend
 ;
+}
 }
 print <<printend
 <tr VALIGN=TOP  >

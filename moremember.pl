@@ -80,26 +80,31 @@ $data->{'borrowernotes'}</a>
 <img src="/images/holder.gif" width=16 height=800 align=left>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 <TR VALIGN=TOP>
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=3><B>FINES & CHARGES</TD></TR>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>FINES & CHARGES</TD></TR>
 printend
 ;
 my %bor;
 $bor{'borrowernumber'}=$bornum;
 my ($numaccts,$accts,$total)=getboracctrecord('',\%bor);
+if ($numaccts > 10){
+  $numaccts=10;
+}
 for (my$i=0;$i<$numaccts;$i++){
-if ($accts->[$i]{'accounttype'} ne 'Pay'){
-  my $amount= $accts->[$i]{'amountoutstanding'} + 0.00;
+#if ($accts->[$i]{'accounttype'} ne 'Pay'){
+  my $amount= $accts->[$i]{'amount'} + 0.00;
+    my $amount2= $accts->[$i]{'amountoutstanding'} + 0.00;
   print "<tr VALIGN=TOP  >";
   my $item=" &nbsp; ";
   if ($accts->[$i]{'accounttype'} ne 'Res'){
     #get item data
     #$item=
   }
-  print "<TD>$item</td>";
+  print "<td>$accts->[$i]{'date'}</td>";
+#  print "<TD>$accts->[$i]{'accounttype'}</td>";
   print "<TD>$accts->[$i]{'description'}</td>
-  <TD>$amount</td>
+  <TD>$amount</td><td>$amount2</td>
   </tr>";
-}
+#}
 }
 print <<printend
 
