@@ -249,17 +249,17 @@ sub issuewindow {
   my $scroll1 = new Cdk::Scroll ('Title'=>"Current Issues",
     'List'=>\@$items2,'Height'=> 8,'Width'=>78,'Ypos'=>9);
   my $loanlength = new Cdk::Entry('Label'=>"Due Date:      ",
-    'Max'=>"11",'Width'=>"11",
-    'Xpos'=>0,'Ypos'=>5);
+    'Max'=>"30",'Width'=>"11",
+    'Xpos'=>0,'Ypos'=>5,'Type'=>"UMIXED");
   my $borrbox = borrowerbox($env,$borrower,$amountowing);
   my $entryBox = new Cdk::Entry('Label'=>"Book Barcode:  ",
      'Max'=>"11",'Width'=>"11",
-     'Xpos'=>"0",'Ypos'=>3,
-     'Type'=>"UMIXED");
+     'Xpos'=>"0",'Ypos'=>3,'Type'=>"UMIXED");
   $scroll2->draw();
   $scroll1->draw(); 
   $loanlength->draw(); 
   $borrbox->draw();   
+  $env->{'loanlength'} = "";
   my $x;
   my $barcode;
   $entryBox->preProcess ('Function' => 
@@ -295,8 +295,18 @@ sub actloanlength {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
   $loanlength->preProcess ('Function' =>
     sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
-  $loanlength->activate();
-  return 1;
+  $validdate = "N"
+  while ($validdate = "N") {
+    my $loanlength = $loanlength->activate();
+    if (!defined $loanlength) {
+      $env->{'loanlength'} = "";
+      $validdate = "Y";
+    } else {
+      ***************
+      $env->{'loanlength'} = $loanlength;
+    }
+  }  
+  return;
 }
 
 sub prebook {
@@ -328,7 +338,7 @@ sub preloanlen {
     actscroll1($env,$entryBox,$loanlength,$scroll1,$scroll2);
     return 0;
   }                                     
-  return;                                                 
+  return 1;                                                 
 }
 	  						  
 sub borrowerbox {

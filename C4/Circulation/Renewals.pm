@@ -96,6 +96,7 @@ sub renewbook {
   # mark book as renewed
   my ($env,$dbh,$bornum,$itemno,$datedue)=@_;
   if ($datedue eq "" ) {    
+     debug_msg($env, "getting date");
      my $loanlength=21;
      my $query= "Select * from biblioitems,items,itemtypes
        where (items.itemnumber = '$itemno')
@@ -108,9 +109,9 @@ sub renewbook {
      }
      $sth->finish;
      my $ti = time;
-     my $datedue = time + ($loanlength * 86400);
-     my @datearr = localtime($datedue);
-     my $datedue = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
+     my $datedu = time + ($loanlength * 86400);
+     my @datearr = localtime($datedu);
+     $datedue = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   }
   my $issquery = "select * from issues where borrowernumber='$bornum' and
     itemnumber='$itemno' and returndate is null";
@@ -119,6 +120,7 @@ sub renewbook {
   my $issuedata=$sth->fetchrow_hashref;
   $sth->finish;
   my $renews = $issuedata->{'renewals'} +1;
+  debug_msg($env,"renewing $datedue");
   my $updquery = "update issues 
     set date_due = '$datedue', renewals = '$renews'
     where borrowernumber='$bornum' and
