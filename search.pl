@@ -111,6 +111,8 @@ while ($i < $count2){
 #      print $stuff[0];
       $stuff[1]=mklink("/cgi-bin/koha/detail.pl?type=$type&bib=$stuff[2]&title=$title2",$stuff[1]);
       my $word=$stuff[0];
+#      print $word;
+      $word=~ s/[a-z] +[a-z]/$1%20$2/ig;
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
