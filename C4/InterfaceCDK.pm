@@ -299,14 +299,15 @@ sub actfmenu {
   } elsif ($funct == 0 ) {
     actloanlength ($env,$entryBox,$loanlength,$scroll1,$scroll2);
   } elsif ($funct == 1 ) {
+    
     $entryBox->erase();
     $scroll1->erase();
     $scroll2->erase();
     $loanlength->erase();
-    debug_msg($env,"");
-    C4::Circulation::Renewals::bulkrenew($env,$dbh,$borrower->{'borrowernumber'},
-      $amountowing,$borrower,$odues);
-    debug_msg($env,"");
+    #debug_msg($env,"");
+    C4::Circulation::Renewals::bulkrenew($env,$dbh,
+      $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
+    #debug_msg($env,"");
     Cdk::refreshCdkScreen();
   } elsif ($funct == 2 ) {
     $entryBox->erase();

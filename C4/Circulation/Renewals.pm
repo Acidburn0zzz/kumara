@@ -135,7 +135,6 @@ sub renewbook {
 
 sub bulkrenew {
   my ($env,$dbh,$bornum,$amount,$borrower,$odues) = @_;
-  debug_msg($env,"got here");
   my $query = "select * from issues 
     where borrowernumber = '$bornum' and returndate is null order by date_due";
   my $sth = $dbh->prepare($query);
@@ -145,7 +144,7 @@ sub bulkrenew {
   my @renewdef;
   my $x;
   while (my $issrec = $sth->fetchrow_hashref) {
-     my $itemdata = itemnodata($env,$dbh,$issrec->{'itemnumber'});
+     my $itemdata = C4::Search::itemnodata($env,$dbh,$issrec->{'itemnumber'});
      my $line = $issrec->{'date_due'}." ".$issrec->{'renewals'}." ";
      my $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
      $items[$x] = $line;
@@ -158,7 +157,11 @@ sub bulkrenew {
      $renewdef[$x] = $rdef;
      $x++;
   }  
-  my $renews = renew_window($env,\@items,$borrower,$amount,$odues);
+  if ($x < 1) { 
+     C4::InterfaceCDK::debug_msg($env,"no issues");
+     return;
+  }   
+  my $renews = C4::Interface::RenewalsCDK::renew_window($env,\@items,$borrower,$amount,$odues);
   my $isscnt = $x;
   $x =0;
   while ($x < $isscnt) {

@@ -83,13 +83,13 @@ my $priv_func = sub {
 
 sub renew_window {
   my ($env,$issueditems,$borrower,$amountowing,$odues)=@_;
-  my $titlepanel = titlepanel($env,$env->{'sysarea'},"Renewals");
+  my $titlepanel = C4::InterfaceCDK::titlepanel($env,$env->{'sysarea'},"Renewals");
   my @sel = ("N ","Y ");
   my $issuelist = new Cdk::Selection ('Title'=>"Renew items",
     'List'=>\@$issueditems,'Choices'=>\@sel,
     'Height'=> 14,'Width'=>78,'Ypos'=>8);
   my $x = 0;
-  my $borrbox = borrowerbox($env,$borrower,$amountowing);
+  my $borrbox = C4::InterfaceCDK::borrowerbox($env,$borrower,$amountowing);
   $borrbox->draw();
   my @renews = $issuelist->activate();
   $issuelist->erase();
