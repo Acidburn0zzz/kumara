@@ -716,7 +716,8 @@ sub borrissues {
   my $query;
   $query="Select * from issues,biblio,items where borrowernumber='$bornum' and
 items.itemnumber=issues.itemnumber and
-items.biblionumber=biblio.biblionumber and issues.returndate is NULL";
+items.biblionumber=biblio.biblionumber and issues.returndate is NULL order
+by date_due";
   #print $query;
   my $sth=$dbh->prepare($query);
     $sth->execute;
