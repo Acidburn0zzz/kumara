@@ -332,6 +332,8 @@ sub modsubject {
   my $count=@subject;
   my $error;
   for (my $i=0;$i<$count;$i++){
+    $subject[$i]=~ s/^ //g;
+    $subject[$i]=~ s/ $//g;
     my $query="select * from catalogueentry where entrytype='s' and
     catalogueentry='$subject[$i]'";
     my $sth=$dbh->prepare($query);
