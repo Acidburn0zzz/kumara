@@ -30,7 +30,7 @@ Our Reference: HLT-$basket<br>
 Authorsed By: $user<br>
 $date
 </div>
-<FONT SIZE=6><em>Shopping Basket For: <a href=whitcoulls.html>
+<FONT SIZE=6><em>Shopping Basket For: <a href=/cgi-bin/koha/acqui/supplier.pl?id=$booksellers[0]->{'id'}>
 $booksellers[0]->{'name'}</a></em></FONT><br>
 Ph: $booksellers[0]->{'phone'}, Fax: $booksellers[0]->{'fax'},
 $booksellers[0]->{'address1'}, $booksellers[0]->{'address2'}, 
@@ -56,7 +56,7 @@ Levin<br>
 New Zealand<p>
 
 Ph: +64-6-368 1953<br>
-Email: <a href="mailto:ruth\@levin.library.org.nz">ruth\@levin.library.org.nz</a>
+Email: <a href="mailto:orders\@library.org.nz">orders\@library.org.nz</a>
 
 </dl>
 

@@ -376,12 +376,12 @@ printend
 ;
 if ($type ne 'modify'){
   print <<printend
-<input type=image src="/images/modify-mem.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
+<input type=image src="/images/save-changes.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
 printend
 ;
 } else {
 print <<printend
-<input type=image src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
+<input type=image src="/images/save-changes.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
 printend
 ;
 }

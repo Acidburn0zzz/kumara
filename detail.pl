@@ -217,7 +217,7 @@ if ($type ne 'opac'){
 print <<printend
 <TR VALIGN=TOP>
 <TD  bgcolor="99cc33" background="/images/background-mem.gif" colspan=2><p><b>HELP</b><br>
-<b>Update Biblio for all Items:</b> Click on the <b>Modify</b> button [left] to ammend the biblio.  Any changes you make will update the record for <b>all</b> the items listed above. <p>
+<b>Update Biblio for all Items:</b> Click on the <b>Modify</b> button [left] to amend the biblio.  Any changes you make will update the record for <b>all</b> the items listed above. <p>
 <b>Updating the Biblio for only ONE or SOME Items:</b> If some of the items listed above need a different biblio, or are on the wrong biblio, you must use the <a href="acquisitions/">acquisitions</a> process to fix this. You will need to "re-order" the items, and delete them from this biblio.<p>
 
    </TR>

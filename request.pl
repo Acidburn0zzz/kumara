@@ -66,7 +66,7 @@ my $date="$mday/$mon/$year";
 print <<printend
 </select>
 </td>
-<TD><input type=text size=20 name=member></td>
+<TD><input type=text size=10 name=member></td>
 <TD><input type=text size=20 name=notes></td>
 <TD>$date</td>
 <TD><select name=pickup>
@@ -217,7 +217,7 @@ print <<printend
 <tr VALIGN=TOP  >
 
 <TD colspan=6 align=right>
-Delete a request by selcting "del" from the rank list.
+Delete a request by selecting "del" from the rank list.
 
 <INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=64 BORDER=0 src="/images/ok.gif"></td>
 

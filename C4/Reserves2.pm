@@ -60,17 +60,19 @@ sub FindReserves {
     if ($bor ne ''){
        $query=$query." where reserves.biblionumber=$bib and
        reserves.borrowernumber=borrowers.borrowernumber and
-       biblio.biblionumber=$bib and cancellationdate is NULL and found
-       <> 'F'";
+       biblio.biblionumber=$bib and cancellationdate is NULL and 
+       (found <> 'F' or found is NULL)";
     } else {
        $query=$query." where reserves.borrowernumber=borrowers.borrowernumber
        and biblio.biblionumber=$bib and reserves.biblionumber=$bib
-       and cancellationdate is NULL and found <> 'F'";
+       and cancellationdate is NULL and 
+       (found <> 'F' or found is NULL)";
     }
   } else {
     $query=$query." where borrowers.borrowernumber=$bor and
     reserves.borrowernumber=borrowers.borrowernumber and reserves.biblionumber
-    =biblio.biblionumber and cancellationdate is NULL and found <> 'F'";
+    =biblio.biblionumber and cancellationdate is NULL and 
+    (found <> 'F' or found is NULL)";
   }
   $query.=" order by priority";
   my $sth=$dbh->prepare($query);

@@ -10,7 +10,7 @@ use C4::Acquisitions;
 #print $inp->header;
 my ($count,@results)=bookfunds;
 
-open (FILE,'>/usr/local/www/koha/htdocs/includes/budgets.inc') || die "Cant open file";
+open (FILE,'>/usr/local/www/hdl/htdocs/includes/budgets.inc') || die "Cant open file";
 print FILE <<printend
 
 <TABLE  width="40%"  cellspacing=0 cellpadding=5 border=1 >
@@ -34,7 +34,7 @@ for (my $i=0;$i<$count;$i++){
   my $avail=$results[$i]->{'budgetamount'}-($spent+$comtd);
   print FILE <<EOP
 <tr><td>
-<A HREF="total-budget-1.html">$results[$i]->{'bookfundname'}</a> </TD> 
+$results[$i]->{'bookfundname'} </TD> 
 <TD>$results[$i]->{'budgetamount'}</TD> <TD>
 EOP
 ;
@@ -55,7 +55,7 @@ print FILE <<printend
 <hr size=1 noshade></TD></TR>
 
 <tr><td>
-<A HREF="total.html">Total</a> </TD> <TD>$total</TD> <TD>
+Total </TD> <TD>$total</TD> <TD>
 printend
 ;
 printf FILE ("%.2f",$totspent);

@@ -116,12 +116,7 @@ To add new orders to this supplier, start with a search. </td>
 </table>
 </CENTER>
 
-<b><font color=red>NOTES TO LIBRARY AND PROGRAMMERS</FONT></B>
-<BR>
-Again a bunch of questions here that you may have already answered elsewhere - but I couldn't spot it. 
-Is GST charged on overseas orders?  
-<br>
-Is GST usually include in the RRP, and thus the Estimated price? Or do your suppliers quote ex GST
+
 
 EOP
 ;

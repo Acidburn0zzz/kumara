@@ -36,9 +36,9 @@ my $i=0;
 print center();
 print mktablehdr;
 if ($type ne 'opac'){
-  print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION'),"/images/background-mem.gif"); 
+  print mktablerow(5,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION'),' ',"/images/background-mem.gif"); 
 } else {
-  print mktablerow(4,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('BRANCH')); 
+  print mktablerow(5,$main,bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('BRANCH'),' &nbsp; '); 
 }
 my $colour=1;
 while ($i < $count){

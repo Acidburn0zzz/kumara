@@ -55,11 +55,11 @@ printend
 ;
  for (my $i2=1;$i2<$ordcount;$i2++){
    print <<printend
-   <tr valign=top bgcolor=white>
-   <td></td>
-   <td></td>
+   <tr valign=top bgcolor=$colour>
+   <td> &nbsp; </td>
+   <td> &nbsp; </td>
    <td><a href="/cgi-bin/koha/acqui/basket.pl?basket=$orders->[$i2]->{'basketno'}">HLT-$orders->[$i2]->{'basketno'}</a></td>
-   <td>$orders->[$i2]->{'count(*)'}</td><td>$orders->[$i2]->{'authorisedby'}</td>
+   <td>$orders->[$i2]->{'count(*)'}</td><td>$orders->[$i2]->{'authorisedby'} &nbsp; </td>
    <td>$orders->[$i2]->{'entrydate'}</td></tr>
    
 printend

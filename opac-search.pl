@@ -146,6 +146,6 @@ sub validateinp {
   $input=~ s/\<\/[a-z]+\>//gi;
   $input=~ s/\<//g;
   $input=~ s/\>//g;
-  $input=~ s/^%//g;
+  $input=~ s/%//g;
   return($input);
 }

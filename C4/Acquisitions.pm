@@ -16,7 +16,7 @@ $VERSION = 0.01;
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
 &getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
 &findall &needsmod &delitem &delbibitem &delbiblio &delorder &branches
-&getallorders);
+&getallorders &updatecurrencies);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -600,7 +600,17 @@ sub getcurrencies {
   }
   $sth->finish;
   $dbh->disconnect;
-  return($i,@results);
+  return($i,\@results);
+} 
+
+sub updatecurrencies {
+  my ($currency,$rate)=@_;
+  my $dbh=C4Connect;
+  my $query="update currency set rate=$rate where currency='$currency'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
 } 
 
 sub updatesup {

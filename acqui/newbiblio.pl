@@ -114,9 +114,9 @@ print <<printend
 <input type=hidden name=applygst value=$booksellers[0]->{'gstreg'}>
 printend
 ;
-my ($count2,@currencies)=getcurrencies;
+my ($count2,$currencies)=getcurrencies;
 for (my $i=0;$i<$count2;$i++){
-  print "<input type=hidden name=\"$currencies[$i]->{'currency'}\" value=$currencies[0]->{'rate'}>";
+  print "<input type=hidden name=\"$currencies->[$i]->{'currency'}\" value=$currencies->[0]->{'rate'}>";
 }
 
 print <<printend;
@@ -263,11 +263,7 @@ BUDGETED TOTAL</B></td>
 <LI><B>Bold</B> fields must be filled in to create a new bibilo and item.<p>
 <LI>Shaded fields can be used to do a "quick" recieve, when items have been purchased locally or gifted. In this case the quantity "ordered" will also  be entered into the database as the quantity recieved.
 </UL>
-<b><font color=red>NOTES TO LIBRARY AND PROGRAMMERS</FONT></B>
-<BR>
-Is it desirable  to make the shaded fields ONLY available if the supplier is set to "Gift" or "Local Supplier".<br>
-Library can you confirm that you do not actually record the name of the local supplier?
-<br clear=all>
+
 <p> &nbsp; </p>
 printend
 ;

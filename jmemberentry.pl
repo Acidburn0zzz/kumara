@@ -154,7 +154,7 @@ printend
 }
 print <<printend
    <tr valign=top bgcolor=white><td  COLSPAN=5 align=right >
-   <input type=image src="/images/modify-mem.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
+   <input type=image src="/images/save-changes.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
    </tr>
    </TABLE>
    </table>
