@@ -113,10 +113,11 @@ sub KeywordSearch {
   my $count=@key;
   my $i=1;
   my @results;
-  my $query ="Select * from biblio where
-  (title like '%$key[0]%' ";
+  my $query ="Select * from biblio,bibliosubtitle where
+  biblio.biblionumber=bibliosubtitle.biblionumber and
+  ((title like '%$key[0]%' or subtitle like '%$key[0]%')";
   while ($i < $count){
-    $query=$query." and title like '%$key[$i]%'";
+    $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
     $i++;
   }
   $query=$query.") order by author,title";
