@@ -9,6 +9,7 @@ use DBI;
 use C4::Database;
 use C4::Format;
 use C4::Accounts;
+use C4::Stats;
 use C4::InterfaceCDK;
 use C4::Interface::ReserveentCDK;
 use C4::Circulation::Main;
@@ -242,7 +243,7 @@ sub CalcReserveFee {
   }
   $dbh->disconnect();
   return $fee;
-}
+} # end CalcReserveFee
 
 sub CreateReserve {
   my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems,$fee) = @_;
@@ -279,6 +280,7 @@ sub CreateReserve {
 	$i++;
       }
     }
+  UpdateStats($env,'branch','reserve',$fee);
   #$dbh->commit();
   #};
   #if (@_) {
@@ -289,7 +291,7 @@ sub CreateReserve {
   #}
   $dbh->disconnect();
   return();
-}    
+} # end CreateReserve    
     
 
 

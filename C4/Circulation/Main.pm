@@ -141,10 +141,31 @@ sub checkreserve{
     and (reserves.found is null) order by priority";
   my $sth = $dbh->prepare($query);
   $sth->execute();
+  my $resrec;
   if (my $data=$sth->fetchrow_hashref) {
-    $resbor = $data->{'borrowernumber'}; 
+    $resrec=$data;
+    my $const = $data->{'constrainttype'};
+    if ($const eq "a") {
+      $resbor = $data->{'borrowernumber'}; 
+    } else {
+      my $found = 0;
+      my $cquery = "select * from reserveconstraints
+         where borrowernumber='$data->{'borrowernumber'}'
+	 and reservedate='$data->{'reservedate'}'
+	 and biblionumber='$data->{'biblionumber'}'
+	 and biblioitemnumber=$itemnum";
+      my $csth = $dbh->prepare($cquery);
+      $csth->execute;
+      if (my $cdata=$csth->fetchrow_hashref) {$found = 1;}	   	
+      if ($const eq 'o') {
+        if ($found == 1) {$resbor = $data->{'borrowernumber'};}
+      } else {
+        if ($found == 0) {$resbor = $data->{'borrowernumber'};} 
+      }
+      $csth->finish();
+    }     
   }
-  return ($resbor);
+  return ($resbor,$resrec);
 }
 
 sub checkwaiting{

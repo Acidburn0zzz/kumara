@@ -9,6 +9,7 @@ use DBI;
 use C4::Database;
 use C4::Format;
 use C4::Search;
+use C4::Stats;
 use C4::InterfaceCDK;
 use C4::Interface::AccountsCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -181,6 +182,7 @@ sub recordpayment{
   my $usth = $dbh->prepare($updquery);
   $usth->execute;
   $usth->finish;
+  UpdateStats($env,'branch','payment',$data)
 #  $sth->finish;
 #  $query = "commit";
 #  $sth = $dbh->prepare;

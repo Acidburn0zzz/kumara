@@ -70,7 +70,7 @@ sub Start_circ{
       clearscreen();        
       ($reason,$data) = menu($env,'console','Circulation', 
         ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-      debug_msg($env,"data = $data");
+      #debug_msg($env,"data = $data");
     } else {
       $data = $donext;
     }

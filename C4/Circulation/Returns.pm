@@ -14,6 +14,8 @@ use C4::Format;
 use C4::Scan;
 use C4::Stats;
 use C4::Search;
+use C4::Print;
+
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -70,6 +72,7 @@ sub Returns {
   my $bornum;
   my $amt_owing;
   my $odues;
+  my $issues;
 # until (($reason eq "Circ") || ($reason eq "Quit")) {
   until ($reason ne "") {
     ($reason,$item) =  
@@ -80,6 +83,7 @@ sub Returns {
     if ($reason eq "")  {
       my $resp;
       ($resp,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
+      ($issues,$odues,$amt_owing) = borrdata2($env,$bornum);
       if ($resp ne "") {
         if ($resp eq "Returned") {
 	  my $item = itemnodata($env,$dbh,$itemno);
@@ -106,7 +110,7 @@ sub checkissue {
   my $itemrec;
   my $amt_owing;
   $item = uc $item;
-  my $query = "select * from items,biblio 
+  my $query = "select * from items,biblio,biblioitems 
     where barcode = '$item'
     and (biblio.biblionumber=items.biblionumber)";
   my $sth=$dbh->prepare($query); 
@@ -135,10 +139,17 @@ sub checkissue {
        updatelastseen($env,$dbh,$itemrec->{'itemnumber'});
        $reason = "Item not issued";
      }
-     my ($resfound,$issrec) = find_reserves($env,$dbh,$itemrec->{'itemnumber'});
+     my ($resfound,$resrec) = find_reserves($env,$dbh,$itemrec->{'itemnumber'});
      if ($resfound eq "y") {
-       my $mess = "Reserved for collection at branch $issrec->{'branchcode'}"; 
+       my $bquery = "select * from borrowers 
+          where borrowernumber = '$resrec->{'borrowernumber'}'";
+       my $btsh = $dbh->prepare($bquery);
+       $btsh->execute;                   
+       my $resborrower = $bsth->fetchrow_hashref;
+       printreserve($env,$resrec,$resborrower,$itemrec);
+       my $mess = "Reserved for collection at branch $resrec->{'branchcode'}"; 
        error_msg($env,$mess);
+       $bsth->finish;
      }  
    } else {
      $sth->finish;

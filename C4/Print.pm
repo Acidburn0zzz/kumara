@@ -10,7 +10,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&remoteprint);
+@EXPORT = qw(&remoteprint &printreserve);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -58,10 +58,30 @@ sub remoteprint {
     print FILE "$items->[$i]\n";
     $i++;
   }
+  print FILE "\n\n\n\n\n\n\n\n\n\n";
   close FILE;
   system("lpr /tmp/$file");
 }
 
+sub printreserve {
+  my($env,$resrec,$rbordata,$itemdata)=@_;
+  my $file=time;
+  open (FILE,">/tmp/$file");
+  print FILE "Collect at $resrec->{'branchcode'}\n\n";
+  print FILE "$rbordata->{'surname'}; $rbordata->{'firstname'}\n";
+  print FILE "$rbordata->{'cardnumber'}\n";
+  print FILE "Phone: $rbordata->{'phone'}\n";
+  print FILE "$rbordata->{'streetaddress'}\n";
+  print FILE "$rbordata->{'suburb'}\n";
+  print FILE "$rbordata->{'town'}\n";   
+  print FILE "$rbordata->{'emailaddress'}\n\n";
+  print FILE "$itemdata->{'barcode'}\n";
+  print FILE "$itemdata->{'title'}\n";
+  print FILE "$itemdata->{'author'}";
+  print FILE "\n\n\n\n\n\n\n\n\n\n";
+  close FILE;
+  system("lpr /tmp/$file");
+}
 END { }       # module clean-up code here (global destructor)
   
     

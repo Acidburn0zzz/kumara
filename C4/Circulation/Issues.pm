@@ -201,9 +201,24 @@ sub issueitem{
      } 
      if ($canissue == 1) {
        #check reserve
-       my $resbor;
-       $resbor = &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
-       if ($resbor ne "") {$canissue = 0;};
+       my ($resbor,$resrec) = 
+         &C4::Circulation::Main::checkreserve($env,$dbh,$item->{'itemnumber'});    
+       if ($resbor ne "") {
+         my $bquery = "select * from borrowers 
+	    where borrowernumber = '$resbor'";
+	 my $btsh = $dbh->prepare($bquery);
+	 $btsh->execute;
+	 my $resborrower = $btsh->fetchrow_hashref;
+	 my $msgtxt = "Res for $resborrower->{'cardnumber'},";
+         $msgtxt = $msgtxt." $resborrower->{'initials'} $resborrower->{'surname'}";
+         my $ans = msg_yn($env,$msgtxt,"Allow issue?");
+	 if ($ans eq "N") {
+	    # print a docket;
+	    printreserve($env,$resrec,$resborrower,$item);
+	    $canissue = 0;
+	 }
+	 $btsh->finish();
+       };
      }
      #if charge deal with it
         
@@ -214,7 +229,7 @@ sub issueitem{
        #now mark as issued
        $datedue=&updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);        
        #debug_msg("","date $datedue");
-       &UpdateStats($env,$env->{'branchcode'},'issue');
+       &UpdateStats($env,$env->{'branchcode'},'issue',$charge);
        if ($charge > 0) {
           createcharge($env,$dbh,$item->{'itemnumber'},$bornum,$charge);
        }	  
@@ -225,7 +240,7 @@ sub issueitem{
      error_msg($env,"$itemnum not found - rescan");
    }
    $sth->finish;
-   debug_msg($env,"date $datedue");
+   #debug_msg($env,"date $datedue");
    return($item,$charge,$datedue);
 }
 

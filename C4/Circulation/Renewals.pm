@@ -158,7 +158,7 @@ sub bulkrenew {
      $x++;
   }  
   if ($x < 1) { 
-     C4::InterfaceCDK::debug_msg($env,"no issues");
+     #C4::InterfaceCDK::debug_msg($env,"no issues");
      return;
   }   
   my $renews = C4::Interface::RenewalsCDK::renew_window($env,\@items,$borrower,$amount,$odues);

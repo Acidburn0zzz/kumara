@@ -105,7 +105,7 @@ sub findborrower  {
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
     my $odues;
     ($issuesallowed,$odues,$owing) = &checktraps($env,$dbh,$bornum,$borrower);
-    debug_msg ($env,"owing =  $owing");
+    #debug_msg ($env,"owing =  $owing");
   }
   #debug_msg ($env,"2 =  $env->{'IssuesAllowed'}");
   return ($bornum, $issuesallowed,$borrower,$reason,$owing);
