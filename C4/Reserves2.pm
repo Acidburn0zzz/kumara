@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&FindReserves &CreateReserve &updatereserves);
+@EXPORT = qw(&FindReserves &CreateReserve &updatereserves &getreservetitle);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -245,6 +245,21 @@ sub updatereserves{
   $dbh->disconnect;
 }
 
+sub getreservetitle {
+ my ($biblio,$bor,$date)=@_;
+ my $dbh=C4Connect;
+ my $query="Select * from reserveconstraints,biblioitems where
+ reserveconstraints.biblioitemnumber=biblioitems.biblioitemnumber
+ and reserveconstraints.biblionumber=$biblio and reserveconstraints.borrowernumber
+ = $bor and reserveconstraints.reservedate='$date'";
+ my $sth=$dbh->prepare($query);
+ $sth->execute;
+ my $data=$sth->fetchrow_hashref;
+ $sth->finish;
+ $dbh->disconnect;
+# print $query;
+ return($data);
+}
 
 
 

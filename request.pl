@@ -151,7 +151,8 @@ my $type=$reserves->[$i]{'constrainttype'};
 if ($type eq 'a'){
   $type='Next Available';
 } elsif ($type eq 'o'){
-  $type="This type only $reserves->[$i]{'biblioitemnumber'}";
+  my $res=getreservetitle($reserves->[$i]{'biblionumber'},$reserves->[$i]{'borrowernumber'},$reserves->[$i]{'reservedate'});
+  $type="This type only $res->{'volumeddesc'} $res->{'itemtype'}";
 #  my @data=ItemInfo(\$blah,$reserves->[$i]{'borrowernumber'});
   
 }
