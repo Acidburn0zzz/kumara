@@ -120,7 +120,7 @@ sub KeywordSearch {
     $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
     $i++;
   }
-  $query=$query.") group by title order by author,title";
+  $query=$query.") group by biblionumber order by author,title";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
