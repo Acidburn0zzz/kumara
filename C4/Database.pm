@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect);
+@EXPORT = qw(&C4Connect &sqlinsert);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -56,5 +56,25 @@ sub C4Connect  {
 
   return $dbh;
 }    
-			
+
+sub sqlinsert {
+  my ($table,%data)=@_;
+  my $dbh=C4Connect;
+  my $query="INSERT INTO $table \(";
+  while (my ($key,$value) = each %data){
+    if ($key ne 'type'){
+      $query=$query."$key,";
+    }
+  }
+  $query=$query." VALUES (";
+  while (my ($key,$value) = each %data){
+    if ($key ne 'type'){
+      $query=$query."$value,";
+    }
+  }
+  $query=~ s/\,$/\)/;
+  print $query;
+  $dbh->disconnect;
+}
+
 END { }       # module clean-up code here (global destructor)

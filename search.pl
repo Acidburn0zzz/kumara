@@ -10,7 +10,7 @@ use C4::Output;
 
 my $input = new CGI;
 print $input->header;
-#print $input->dump;
+print $input->dump;
 my $blah;
 my %search;
 #build hash of users input
@@ -26,6 +26,8 @@ my $itemnumber=$input->param('item');
 $search{'item'}=$itemnumber;
 my $isbn=$input->param('isbn');
 $search{'isbn'}=$isbn;
+my $date-before=$input->param('date-before');
+$search{'date-before'};
 my @results;
 my $offset=$input->param('offset');
 if ($offset eq ''){

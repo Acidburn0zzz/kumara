@@ -100,7 +100,23 @@ sub mkform{
   $string=$string.mktablehdr();
   my $key;
   while ( my ($key, $value) = each %inputs) {
-    $string=$string.mktablerow(2,'white',$key,"<input type=text name=$key value=\"$value\">");
+    my @data=split('\t',$value);
+    if ($data[0] eq 'hidden'){
+      $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
+    } else {
+      my $text;
+      if ($data[0] eq 'radio'){
+        $text="<input type=radio name=$key value=$data[1]>$data[1]
+	<input type=radio name=$key value=$data[2]>$data[2]";
+      }
+      if ($data[0] eq 'text'){
+        $text="<input type=$data[0] name=$key value=\"$data[1]\">";
+      }
+      if ($data[0] eq 'textarea'){
+        $text="<textarea name=$key>$data[1]</textarea>";
+      }
+      $string=$string.mktablerow(2,'white',$key,$text);
+    }
   }
   $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
   $string=$string.mktableft;

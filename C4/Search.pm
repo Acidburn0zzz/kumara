@@ -99,9 +99,9 @@ sub CatSearch  {
          and (catalogueentry.catalogueentry like '$search->{'author'}%') 
          and (entrytype = 'a'))";
          if ($search->{'title'} ne ''){
-	   $query= "Select biblionumber from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.author)
+	   $query= "Select biblionumber,title from biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.author)
             and (catalogueentry.catalogueentry like '$search->{'author'}%') 
-            and (entrytype = 'a')) intersect select biblionumber from
+            and (entrytype = 'a')) intersect select biblionumber,title from
             biblio,catalogueentry where ((catalogueentry.catalogueentry = biblio.title)
            and (catalogueentry.catalogueentry like '%$search->{'title'}%') 
            and (entrytype = 't'))";
@@ -143,7 +143,7 @@ sub CatSearch  {
 	and biblioitems.biblionumber=biblio.biblionumber";
       }
     }
-
+#print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $count2=0;
