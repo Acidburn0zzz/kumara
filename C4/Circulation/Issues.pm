@@ -15,6 +15,7 @@ use C4::Scan;
 use C4::Stats;
 use C4::Print;
 use C4::Format;
+use C4::Input;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Newt qw();
   
@@ -106,6 +107,7 @@ sub processitems {
   #process a users items
    my ($env,$bornum,$borrower,$items,$items2,$it2p,$amountdue,$odues)=@_;
    my $dbh=&C4Connect;  
+   $env->{'newborrower'} = "";
    my ($itemnum,$reason) = 
      issuewindow($env,'Issues',$dbh,$items,$items2,$borrower,fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
@@ -121,6 +123,7 @@ sub processitems {
    $dbh->disconnect;
    #check to see if more books to process for this user
    my @done;
+   if ($env->{'newborrower'} ne "") {$reason = "Finished user";} 
    if ($reason eq 'Finished user'){
      remoteprint($env,$items2,$borrower);
      if ($amountdue > 0) {
@@ -237,7 +240,17 @@ sub issueitem{
        debug_msg($env,"can't issue");
      }  
    } else {
-     error_msg($env,"$itemnum not found - rescan");
+     my $valid = checkdigit($env,$itemnum);
+     if ($valid ==1) {
+       if (substr($itemnum,0,1) = "V") {
+         #this is a borrower
+	 $env->{'newborrower'} = $itemnum;
+       } else {	  
+         error_msg($env,"$itemnum not found - rescan");
+       }
+     } else {
+       error_msg($env,"Invalid Number");
+     }  
    }
    $sth->finish;
    #debug_msg($env,"date $datedue");

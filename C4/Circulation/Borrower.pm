@@ -72,7 +72,14 @@ sub findborrower  {
   while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
     my $title = titlepanel($env,$env->{'sysarea'},"Borrower Entry");
-    ($borcode,$reason,$book)=&C4::Circulation::Main::scanborrower($env); 
+    if ($env->{'newborrower'} eq "") {
+      ($borcode,$reason,$book)=&C4::Circulation::Main::scanborrower($env); 
+    } else { 
+      $borcode = $env->{'newborrower'};
+      $reason = "";
+      $book = "";
+      $env->{'newborrower'}= "";
+    }  
     #C4::Circulation::Main
     if ($reason eq "") {
       if ($borcode ne '') {
