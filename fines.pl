@@ -26,7 +26,7 @@ for (my $i=0;$i<$count;$i++){
       }
 
       if ($borrower->{'description'} !~ /Staff/ && $borrower->{'description'} !~ /Branch/){
-          my ($amount)=CalcFine($data->[$i]->{'itemnumber'},$borrower->{'description'},$difference);      
+          my ($amount)=CalcFine($data->[$i]->{'itemnumber'},$borrower->{'categorycode'},$difference);      
 	  if ($amount > $max){
   	    $amount=25;
 	  }

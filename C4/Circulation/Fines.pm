@@ -72,26 +72,21 @@ sub Getoverdues{
 sub CalcFine {
   my ($itemnumber,$bortype,$difference)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from items,biblioitems,itemtypes where items.itemnumber=$itemnumber
+  my $query="Select * from items,biblioitems,itemtypes,categoryitem where items.itemnumber=$itemnumber
   and items.biblioitemnumber=biblioitems.biblioitemnumber and
-biblioitems.itemtype=itemtypes.itemtype";
+biblioitems.itemtype=itemtypes.itemtype and
+categoryitem.itemtype=itemtypes.itemtype and
+categoryitem.categorycode='$bortype'";
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
   my $data=$sth->fetchrow_hashref;
   $sth->finish;
   my $amount=0;
-  if ($data->{'itemtype'} eq 'NF'){
-    if ($difference >= 7){
-      my $temp=$difference % 7;
+  if ($difference >= $data->{'startcharge'}){
+      my $temp=$difference % $data->{'chargeperiod'};
       $difference=$difference - $temp;
-      $amount=($difference / 7) * 1.00;
-    }
-  } elsif ($data->{'itemtype'} eq 'VID'){
-    if ($difference > 2){
-      $difference=$difference-2;
-      $amount=.50 * difference;
-    }
+      $amount=($difference / $data->{'chargeperiod'}) * $data->{'fine'};
   }
   $dbh->disconnect;
   return($amount);
