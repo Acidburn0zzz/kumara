@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 #script to provide intranet (librarian) advanced search facility
 #modified 9/11/1999 by chris@katipo.co.nz
+#adding an extra comment to play with CVS (Si, 19/11/99)
 
 use strict;
 #use DBI;
