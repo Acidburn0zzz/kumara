@@ -18,7 +18,7 @@ print startmenu('acquisitions');
 
 print <<EOP
 <form action=updatesupplier.pl method=post>
-<input type=image  name=submit src=/images/save-changes.gif border=0 width=187 height=42 align=right>
+
 <input type=hidden name=id value=$id>
 <FONT SIZE=6><em>Update: $booksellers[0]->{'name'}</em></FONT>
 <P>
@@ -32,8 +32,8 @@ print <<EOP
 </tr>
 <TR VALIGN=TOP>
 <TD>Postal Address</td>
-<td><input type=text size=20 name=company_postal_address value="$booksellers[0]->{'postal'}" >
-</td>
+<td><textarea name=company_postal cols=20 rows=3>$booksellers[0]->{'postal'}
+</textarea></td>
 </tr>
 <TR VALIGN=TOP>
 <TD>Physical Address</td>
@@ -95,8 +95,10 @@ $booksellers[0]->{'address4'}
 <td><textarea name=notes cols=20 rows=4>$booksellers[0]->{'contnotes'}</textarea>
 </td>
 </tr>
+<tr valign=right><td><input type=image  name=submit src=/images/save-changes.gif border=0 width=187 height=42 align=right></td></tr>
 </table>
 <img src="/images/holder.gif" width=32 height=250 align=left>
+
 <table border=1 cellspacing=0 cellpadding=5 width="40%">
 <tr valign=top bgcolor=#99cc33><td background="/images/background-mem.gif" colspan=2><B>CURRENT STATUS</B></td></tr>
 <TR VALIGN=TOP>
@@ -237,6 +239,7 @@ print <<EOP
 <td><input type=text size=3 name=discount value=$booksellers[0]->{'discount'}> %
 </tr>
 </table>
+
 </form>
 </center>
 EOP
