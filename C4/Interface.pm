@@ -252,12 +252,17 @@ sub msg_yn {
   my $bpanel=Newt::Panel(2,4,"");
   my $ybutt=Newt::Button("Yes");
   my $nbutt=Newt::Button("No");
+  $ybutt->Tag("Y");
+  $nbutt->Tag("N");
   $bpanel->Add(0,0,$ybutt,NEWT_ANCHOR_LEFT);
   $bpanel->Add(1,0,$nbutt,NEWT_ANCHOR_RIGHT);
   $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
   $panel1->Add(0,1,$label2,NEWT_ANCHOR_TOP);
   $panel1->Add(0,2,$bpanel,NEWT_ANCHOR_TOP);
   my ($reason,$data) =$panel1->Run();
+  debug_msg("","Ybut $ybutt->get()");
+  debug_msg("","Nbut $nbutt->get()");
+    
   return($reason);
 }
 
