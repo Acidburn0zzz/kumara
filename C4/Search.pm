@@ -275,20 +275,20 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio,biblioitems
-         where biblioitems.biblionumber=biblio.biblionumber and
-(biblio.author like '%$key[0]%'";    
+         biblio
+         where 
+         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%')";    
 	 while ($i < $count){ 
-           $query=$query." and author like '%$key[$i]%'";   
+           $query=$query." and (author like '$key[$i]%' or author like '% $key[$i]%')";   
            $i++;       
 	 }   
 	 $query=$query.")";
          if ($search->{'title'} ne ''){ 
 	   $query=$query. " and title like '%$search->{'title'}%'";
 	 }
-	 if ($search->{'class'} ne ''){
-	   $query.=" and biblioitems.itemtype='$search->{'class'}'";
-	 }
+	 #if ($search->{'class'} ne ''){
+	 #  $query.=" and biblioitems.itemtype='$search->{'class'}'";
+	 #}
       } else {
           if ($search->{'title'} ne ''){
 	    my @key=split(' ',$search->{'title'});
@@ -612,7 +612,7 @@ sub itemissues {
   my @results;
   while (my $data=$sth->fetchrow_hashref){
     my $query2="select * from issues,borrowers where itemnumber=$data->{'itemnumber'}
-and returndate is NULL and issues.borrowernumber=borrowers.borrowernumber";
+    and returndate is NULL and issues.borrowernumber=borrowers.borrowernumber";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;
     if (my $data2=$sth2->fetchrow_hashref){
@@ -842,8 +842,9 @@ sub itemcount {
   my $lostcount=0;
   while (my $data=$sth->fetchrow_hashref){
     $count++;                     
-    my $query2="select * from issues where itemnumber=                          
-    '$data->{'itemnumber'}' and returndate is NULL and itemlost <> 1"; 
+    my $query2="select * from issues,items where issues.itemnumber=                          
+    '$data->{'itemnumber'}' and returndate is NULL
+    and items.itemnumber=issues.itemnumber and items.itemlost <>1"; 
     my $sth2=$dbh->prepare($query2);     
     $sth2->execute;         
     if (my $data2=$sth2->fetchrow_hashref){         
