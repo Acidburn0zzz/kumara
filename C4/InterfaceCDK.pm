@@ -466,7 +466,7 @@ sub borrowerbox {
 }
 
 sub returnwindow {
-  my ($env,$title,$item,$items,$borrower,$amountowing,$odues,$dbh)=@_;
+  my ($env,$title,$item,$items,$borrower,$amountowing,$odues,$dbh,$resp)=@_;
   #debug_msg($env,$borrower);
   my $titlepanel = titlepanel($env,"Returns","Scan Item");
   my @functs=("Payments","Renewal");
@@ -480,7 +480,14 @@ sub returnwindow {
   if ($borrower->{'cardnumber'} ne "") {    
     $borrbox = borrowerbox($env,$borrower,$amountowing);  
     $borrbox->draw();
-  }
+  } else {
+    if ($resp ne "") {
+      my @text;
+      @text[0] = $resp;
+      $borrbox = new Cdk::Label ('Message' =>\@text, 'Ypos'=>3, 'Xpos'=>"RIGHT");
+      $borrbox->draw();
+    }
+  }  
   my $bookentry  =  new Cdk::Entry('Label'=>" ",
      'Max'=>"11",'Width'=>"11",
      'Xpos'=>"2",'Ypos'=>"3",'Title'=>"Item Barcode",

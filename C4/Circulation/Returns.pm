@@ -73,15 +73,16 @@ sub Returns {
   my $amt_owing;
   my $odues;
   my $issues;
+  my $resp;
 # until (($reason eq "Circ") || ($reason eq "Quit")) {
   until ($reason ne "") {
     ($reason,$item) =  
       returnwindow($env,"Enter Returns",
-      $item,\@items,$borrower,$amt_owing,$odues,$dbh); #C4::Circulation
+      $item,\@items,$borrower,$amt_owing,$odues,$dbh,$resp); #C4::Circulation
     #debug_msg($env,"item = $item");
     #if (($reason ne "Circ") && ($reason ne "Quit")) {
     if ($reason eq "")  {
-      my $resp;
+      $resp = "";
       ($resp,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = 
          checkissue($env,$dbh,$item);
       if ($bornum ne "") {
@@ -93,17 +94,21 @@ sub Returns {
       }	
       if ($resp ne "") {
         #if ($resp eq "Returned") {
-	my $item = itemnodata($env,$dbh,$itemno);
-	my $fmtitem = C4::Circulation::Issues::formatitem($env,$item,"",$amt_owing);
-        unshift @items,$fmtitem;
+	if ($itemno ne "" ) {
+	  my $item = itemnodata($env,$dbh,$itemno);
+	  my $fmtitem = C4::Circulation::Issues::formatitem($env,$item,"",$amt_owing);
+          unshift @items,$fmtitem;
+	  if ($items[20] > "") {
+	    pop @items;
+	  }  
+	}
   	#} elsif ($resp ne "") {
 	#  error_msg($env,"$resp");
 	#}
-	if ($resp ne "Returned") {
-	  error_msg($env,"$resp");
-	  $bornum = ""; 
-	}
-	
+	#if ($resp ne "Returned") {
+	#  error_msg($env,"$resp");
+	#  $bornum = ""; 
+	#}
       }
     }
   }
@@ -128,6 +133,7 @@ sub checkissue {
   $sth->execute;
   if ($itemrec=$sth->fetchrow_hashref) {
      $sth->finish;
+     $itemno = $itemrec->{'itemnumber'};
      $query = "select * from issues
        where (itemnumber='$itemrec->{'itemnumber'}')
        and (returndate is null)";
