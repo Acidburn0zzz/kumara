@@ -182,16 +182,48 @@ sub checktraps {
   #check if borrower has overdue items
   #call overdue checker
   my $odues = &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
+  if ($odues > 0) {
+    push (@traps_set,"ODUES");
+  }  
   #check amountowing
   my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
+  if ($amount > 0) {
+    push (@traps_set,"FINES");
+  }  
   #check if borrower has any items waiting
   my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
+  if (@traps_set[0] ne "" ) {
+     $issuesallowed = 
+       process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set);
+  }
+	   
   #deal with any money still owing
   if ($amount > 0){
     &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
   }
+  
   return ($issuesallowed, $odues);
 }
+
+sub process_traps {
+  my ($env,$dbh,$bornum,$borrower,$amount,$odues,$traps_set) = @_;
+  my $issuesallowed = 0;
+  my $x = 0;
+  my %traps;
+  debug_msg($env,"In traps");
+  while (@$traps_set[$x] ne "") {
+    $traps{'@$traps_set[$x]'} = 1; 
+  }
+  my $trapact;
+  while ($trapact ne "NONE") {
+     $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
+     if ($trapact eq "FINES") {
+       &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
+     }
+  }
+  return ($issuesallowed);
+}
+
 
 sub Borenq {
   my ($env)=@_;

@@ -11,6 +11,7 @@ use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
 use C4::Circulation::Borrower;
 use C4::Reserves;
+use C4::Search;
 use C4::InterfaceCDK;
 use C4::Security;
 use C4::Format;
@@ -61,8 +62,8 @@ my $priv_func = sub {
 sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;
-  my $query1 = "select * from issues   where (borrowernumber=$bornum
-    and returndate is null) order by date_due";
+  my $query1 = "select * from issues  where (borrowernumber=$bornum)
+    and (returndate is null) order by date_due";
   my $sth=$dbh->prepare($query1);
   $sth->execute;
   #my $sth=$dbh->prepare("Select * from issues,items,biblio,biblioitems
@@ -81,7 +82,7 @@ sub pastitems{
   $items[0]=" "x72;
   $items2[0]=" "x72;
   while (my $data1=$sth->fetchrow_hashref) {
-    my $data = itemnodata($env,$dbh,$data1->{'itemnumber'});
+    my $data = itemnodata($env,$dbh,$data1->{'itemnumber'}); #C4::Search
     my $line = C4::Circulation::Issues::formatitem($env,$data,$data1->{'date_due'},"");
     $items[$i]=$line;
     $i++;

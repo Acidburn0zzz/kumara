@@ -315,7 +315,7 @@ sub itemnodata {
   my $query="Select * from biblio,items,biblioitems
     where itemnumber = '$itemnumber'
     and biblio.biblionumber = items.itemnumber
-    and biblioitems.biblio = items.biblionumber";
+    and biblioitems.biblionumber = items.biblionumber";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;
