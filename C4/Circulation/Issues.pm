@@ -176,7 +176,7 @@ sub issueitem{
        # if borrower allowed {
        #  $canissue = 1
        # } else {
-       #  $canissue = 0
+       $canissue = 0
        # }
      } 
      #check if item is on issue already

@@ -109,18 +109,20 @@ sub previousissue {
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
       my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
-      my $resp = &msg_yn("Book is issued to this borrower", "Renew?");
-      if ($resp == "y") {
+      my $resp = &msg_yn($env,"Book is issued to this borrower", "Renew?");
+      if ($resp eq "Y") {
         &renewbook($env,$dbh,$bornum,$itemnum);
-	my $canissue = "R";
-      }	 
+	$canissue = "R";
+      } else {
+        $canissue = "N"
+      }    
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
-      my $resp = &msg_yn($text,"Mark as returned?");
-      if ($resp == "y") {
+      my $resp = &msg_yn($env,$text,"Mark as returned?");
+      if ( $resp eq "Y") {
         &returnrecord($env,$dbh,$borrower->{'borrowernumber'},$itemnum);
       }	else {
-        my $canissue = "N";
+        $canissue = "N";
       }
     }
   } 

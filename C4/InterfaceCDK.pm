@@ -161,7 +161,7 @@ sub titlepanel{
   }
 
 sub msg_yn {
-  my ($text1,$text2)=@_;
+  my ($env,$text1,$text2)=@_;
   # Cdk::init();
   # Create the dialog buttons.
   my @buttons = ("Yes", "No");
@@ -170,7 +170,7 @@ sub msg_yn {
   my $dialog = new Cdk::Dialog ('Message' => \@mesg, 'Buttons' => \@buttons);
   my $resp = $dialog->activate();
   my $response = "Y";
-  if ($resp = "1") {
+  if ($resp == 1) {
      $response = "N";
   }
   return $response;
