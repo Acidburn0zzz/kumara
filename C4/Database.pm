@@ -60,7 +60,6 @@ sub C4Connect  {
 sub sqlinsert {
   my ($table,%data)=@_;
   my $dbh=C4Connect;
-  my $updtype = "I";
   my $query="INSERT INTO $table \(";
   while (my ($key,$value) = each %data){
     if ($key ne 'type'){
@@ -88,18 +87,18 @@ sub sqlupdate {
   my $query="UPDATE $table SET ";
   my @sets;
   while (my ($key,$value) = each %data){
-    if ($key ne 'type'){
+    if (($key ne 'type')&&($key ne 'updtype')){
       my $temp = " ".$key."='".$value."' "; 
       push(@sets,$temp);
     }
   }
   my $fsets = join(",", @sets);
   $query=$query.$fsets." WHERE $keyfld = '$keyval'";
-  $query=~ s/\,$/\)/;
+#  $query=~ s/\,$/\)/;
   print $query;
-  my $sth=$dbh->prepare($query);
-  $sth->execute;
-  $sth->finish;
+#  my $sth=$dbh->prepare($query);
+#  $sth->execute;
+#  $sth->finish;
   $dbh->disconnect;
 }
 

@@ -8,23 +8,24 @@ use strict;
 use CGI;
 use C4::Output;
 use C4::Database;
+use C4::Search;
+
 my $input = new CGI;
 print $input->header;
 my $data;
 my $cardnumber;
 my $action=$input->param('act');
+$action="M";
 if ($action eq "M") {
-  $cardnumber =$input->param('item');
+  $cardnumber=$input->param('item');
   $cardnumber =uc $cardnumber;
   $data=borrdata($cardnumber);
   if ($data->{borrowernumber} eq "") {
     $action = "A";
   }
-}  
+} 
 print startpage();
 print startmenu();
-print "Action $action<br>";
-print "Cardnumber  $cardnumber<br>";
 my %inputs;
 my $catlist=makelist("categories","categorycode","description");
 $inputs{'cardnumber'}   ="1\tR\tCard Number\ttext\t$data->{'cardnumber'}";
@@ -39,7 +40,7 @@ $inputs{'phone'}        ="9\tR\tTelephone\ttext\t$data->{'phone'}";
 $inputs{'emailaddress'} ="10\t\tEmail\ttext\t$data->{'emailaddress'}";
 $inputs{'faxnumber'}    ="11\t\tFax Number\ttext\t$data->{'faxnumber'}";
 $inputs{'altstreetaddress'}="12\tR\tAlt Address\ttext\t$data->{'altstreetaddress'}";
-$inputs{'altsuburb'}    ="13\t\tAlt Areat\ttext\t$data->{'altsuburb'}";
+$inputs{'altsuburb'}    ="13\t\tAlt Area\ttext\t$data->{'altsuburb'}";
 $inputs{'altcity'}      ="14\t\tAlt Town\ttext\t$data->{'altcity'}";
 $inputs{'altphone'}     ="15\tR\tAlt Phone\ttext\t$data->{'altphone'}";
 $inputs{'categorycode'} ="16\t\tCategory\tselect\t$data->{'categorycode'}".$catlist;
@@ -49,8 +50,8 @@ $inputs{'borrowernotes'}="19\t\tNotes\ttextarea\t$data->{'borrowernotes'}";
 $inputs{'type'}         ="20\t\t\thidden\tborrowers";
 $inputs{'updtype'}      ="I";
 if ($action eq "M") {
-  $inputs{'updtype'} = "M";
-  $inputs{'borrowernumber'} ="20\t\t\thidden\t$data->{'borrowernumber'}";
+  $inputs{'updtype'} = "\21\t\t\thidden\tM";
+  $inputs{'borrowernumber'} ="22\t\t\thidden\t$data->{'borrowernumber'}";
 }  
 print mkform2('/cgi-bin/kumara/insertdata.pl',%inputs);
 #print mktablehdr();

@@ -15,10 +15,13 @@ print $input->dump;
 #get all the data into a hash
 my @names=$input->param;
 my %data;
+my $keyfld;
 my $problems;
 foreach my $key (@names){
   $data{$key}=$input->param($key);
 }
+my $updtype = $data{'updtype'};
+
 if ($data{'type'} eq 'biblio'){
   $data{'serial'}=~ s/No/0/;
   $data{'serial'}=~ s/Yes/1/;
@@ -30,7 +33,7 @@ if ($data{'type'} eq 'biblio'){
   # required fields
   my @reqflds = ("cardnumber","surname","firstname",
     "streetaddress","phone","altstreetaddress","altphone","dateofbirth","contactname");       
-  $problems = checkflds(\@reqflds,\%data); 
+  #  $problems = checkflds(\@reqflds,\%data); 
   if ($updtype eq "M") {
     $keyfld = "borrowernumber";
   } else {
@@ -41,9 +44,11 @@ if ($data{'type'} eq 'biblio'){
     $data{'branchcode'}="L";
   }
 }
-if {$updtype eq "M"}
-  &sqlupdate($data{'type'},$keyfld,$data{keyfld},%data);
-} else {  
+
+
+if ($updtype eq "M") {
+  &sqlupdate($data{'type'},$keyfld,$data{$keyfld},%data);
+} else {
   &sqlinsert($data{'type'},%data);
 }
 

@@ -15,7 +15,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
-&itemdata &bibdata &GetItems); 
+&itemdata &bibdata &GetItems &borrdata); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -365,7 +365,7 @@ sub BornameSearch  {
 
 sub borrdata {
   my ($cardnumber)=@_;
-  $cardnumber = uc $cardnumber
+  $cardnumber = uc $cardnumber;
   my $dbh=C4Connect;
   my $query="Select * from borrowers where cardnumber='$cardnumber'";
   #  print $query;
