@@ -120,6 +120,7 @@ print <<printend
 
 <p>
 <form action="renewscript.pl" method=post>
+<input type=hidden name=bornum value=$bornum>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 
 <TR VALIGN=TOP>
@@ -156,7 +157,7 @@ for (my $i=0;$i<$count;$i++){
   } else {
     print "<td> &nbsp; </td>";
   }
-  print "<TD><input type=radio name=\"renew_item->[$i]{'itemnumber'}\" value=y>Y
+  print "<TD><input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=y>Y
   <input type=radio name=\"renew_item_$issue->[$i]{'itemnumber'}\" value=n>N</td>
   </tr>
 ";
