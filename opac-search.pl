@@ -47,10 +47,11 @@ while ( my ($key, $value) = each %search) {
 }
 print " $count results found";
 my $offset2=$num+$offset;
-print "<br> Results $offset to $offset2 displayed";
+my $disp=$offset+1;
+print "<br> Results $disp to $offset2 displayed";
 print mktablehdr;
 
-print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>',' &nbsp;');
+print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'));
 
 my $count2=@results;
 my $i=0;
@@ -65,21 +66,21 @@ while ($i < $count2){
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
-      my $url="/cgi-bin/koha/search.pl?author=$word&type=a";
+      my $url="/cgi-bin/koha/search.pl?author=$word&type=opac";
       $stuff[0]=mklink($url,$stuff[0]);
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
       if ($nacount > 0){
-        $stuff[4]=$stuff[4]."N/A=$nacount";
+        $stuff[4]=$stuff[4]."On Loan $nacount";
       }
       if ($lcount > 0){
-        $stuff[4]=$stuff[4]."L=$lcount";
+        $stuff[4]=$stuff[4]."L$lcount";
       }
       if ($fcount > 0){
-        $stuff[4]=$stuff[4]."F=$fcount";
+        $stuff[4]=$stuff[4]."F$fcount";
       }
       if ($scount > 0){
-        $stuff[4]=$stuff[4]."S=$scount";
+        $stuff[4]=$stuff[4]."S$scount";
       }
     if ($colour == 1){
       print mktablerow(4,'#efe5ef',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
@@ -95,7 +96,7 @@ print mktablerow(4,'#99cccc',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset&keyword=$keyword";
-    my $stuff=mklink("/cgi-bin/koha/opac-search.pl?$search",'More');
+    my $stuff=mklink("/cgi-bin/koha/opac-search.pl?$search",'Next');
     print $stuff;
 }
 

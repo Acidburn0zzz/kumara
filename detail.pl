@@ -37,7 +37,7 @@ my @items=ItemInfo(\$blah,$bib,$title);
 my $dat=bibdata($bib);
 my $count=@items;
 my @temp=split('\t',$items[0]);
-print mkheadr(3,"$title ($dat->{'author'}) $temp[4]");
+print mkheadr(3,"$dat->{'title'} ($dat->{'author'}) $temp[4]");
 print <<printend
 
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width="220">
@@ -62,6 +62,10 @@ print <<printend
 <TD>
 <br>
 <FONT SIZE=2  face="arial, helvetica">
+printend
+;
+if ($type ne 'opac'){
+print <<printend
 Subtitle: $dat->{'subtitle'}<br>
 Author: $dat->{'author'}<br>
 Additional Author: <br>
@@ -77,6 +81,40 @@ Total Number of Items: $count
 <p>
 printend
 ;
+}
+else {
+if ($dat->{'subtitle'} ne ''){
+  print "Subtitle: $dat->{'subtitle'}<br>";
+}
+if ($dat->{'author'} ne ''){
+  print "Author: $dat->{'author'}<br>";
+}
+#Additional Author: <br>
+if ($dat->{'seriestitle'} ne ''){
+  print "Seriestitle: $dat->{'seriestitle'}<br>";
+}
+if ($dat->{'subject'} ne ''){
+  print "Subject: $dat->{'subject'}<br>";
+}
+if ($dat->{'copyrightdate'} ne ''){
+  print "Copyright:$dat->{'copyrightdate'}<br>";
+}
+if ($dat->{'notes'} ne ''){
+  print "Notes: $dat->{'notes'}<br>";
+}
+if ($dat->{'unititle'} ne ''){
+  print "Unititle: $dat->{'unititle'}<br>";
+}
+#Analytical Author: <br>
+#Analytical Title: <br>
+if ($dat->{'serial'} ne '0'){
+ print "Serial: Yes<br>";
+}
+print "Total Number of Items: $count
+<p>
+";
+
+}
 if ($type ne 'opac'){
   print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
 }
@@ -131,5 +169,6 @@ while ($i < $count){
 }
 print endcenter();
 print mktableft();
+print "<br clear=all>";
 print endmenu($type);
 print endpage();

@@ -74,9 +74,9 @@ sub CalcFine {
   my $dbh=C4Connect;
   my $query="Select * from items,biblioitems,itemtypes,categoryitem where items.itemnumber=$itemnumber
   and items.biblioitemnumber=biblioitems.biblioitemnumber and
-biblioitems.itemtype=itemtypes.itemtype and
-categoryitem.itemtype=itemtypes.itemtype and
-categoryitem.categorycode='$bortype' and items.itemlost <> 1";
+  biblioitems.itemtype=itemtypes.itemtype and
+  categoryitem.itemtype=itemtypes.itemtype and
+  categoryitem.categorycode='$bortype' and items.itemlost <> 1";
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
@@ -99,18 +99,20 @@ sub UpdateFine {
   my $dbh=C4Connect;
   my $query="Select * from accountlines where itemnumber=$itemnum and
   borrowernumber=$bornum and (accounttype='FU' or accounttype='O' or
-accounttype='F')";
+  accounttype='F' or accounttype='M')";
   my $sth=$dbh->prepare($query);
 #  print "$query\n";
   $sth->execute;
   if (my $data=$sth->fetchrow_hashref){
     print "in accounts ...";
-    if ($data->{'amount'} != $amount && ($data->{'accounttype'} ne 'F'){
+    if ($data->{'amount'} != $amount){
       print "updating";
       my $diff=$amount - $data->{'amount'};
       my $out=$data->{'amountoutstanding'}+$diff;
       my $query2="update accountlines set date=now(), amount=$amount,
-      amountoutstanding=$out,accounttype='FU' where accountno=$data->{'accountno'}";
+      amountoutstanding=$out,accounttype='FU' where
+borrowernumber=$data->{'borrowernumber'} and itemnumber=$data->{'itemnumber'}
+and (accounttype='FU' or accounttype='O');";
       my $sth2=$dbh->prepare($query2);
       $sth2->execute;
       $sth2->finish;      

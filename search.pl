@@ -56,7 +56,11 @@ if ($num eq ''){
 }
 print startpage();
 print startmenu($type);
-print mkheadr(1,'Catalogue Search Results');
+if ($type ne 'opac'){
+  print mkheadr(1,'Catalogue Search Results');
+} else {
+  print mkheadr(1,'Opac Search Results');
+}
 print center();
 my $count;
 my @results;
@@ -83,7 +87,8 @@ while ( my ($key, $value) = each %search) {
 }
 print " $count results found";
 my $offset2=$num+$offset;
-print "<br> Results $offset to $offset2 displayed";
+my $dispnum=$offset+1;
+print "<br> Results $dispnum to $offset2 displayed";
 print mktablehdr;
 if ($type ne 'opac'){
   if ($subject ne ''){
