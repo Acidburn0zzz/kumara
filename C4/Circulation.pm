@@ -66,7 +66,7 @@ sub Start_circ{
     clearscreen();
     my ($reason,$data) = menu('console','Circulation', 
     ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-
+    debug_msg($env,"data = $data");
     if ($data eq 'Issues') {  
       $donext=Issue($env); #C4::Circulation::Issues
       debug_msg("","do next $donext");
@@ -75,7 +75,7 @@ sub Start_circ{
     } elsif ($data eq 'Borrower Enquiries'){
       $donext=Borenq($env); #C4::Circulation::Borrower
     } elsif ($data eq 'Reserves'){
-      $donext=EnterReserves($env); #C4::Circulation::Reserves
+      $donext=EnterReserves($env); #C4::Reserves
     } elsif ($data eq 'Log In') {
       &endint($env);
       &Login($env);   #C4::Security
@@ -100,11 +100,14 @@ sub pastitems{
   my $i=0;
   my @items;
   my @items2;
-  $items[0]=" "x29;
-  $items2[0]=" "x29;
+  #$items[0]=" "x29;
+  #$items2[0]=" "x29;
+  $items[0]=" "x72;
+  $items2[0]=" "x72;
   while (my $data=$sth->fetchrow_hashref) {
      my $line = "$data->{'date_due'} $data->{'title'}";
-     $items[$i]=fmtstr($env,$line,"L29");
+     # $items[$i]=fmtstr($env,$line,"L29");
+     $items[$i]=fmtstr($env,$line,"L72");
      $i++;
   }
   return(\@items,\@items2);

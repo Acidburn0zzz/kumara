@@ -73,14 +73,17 @@ sub findborrower  {
     if ($borcode ne '') {
       #  output(1,1,$borcode);
       my $ucborcode = uc $borcode;
-      $sth=$dbh->prepare("Select * from borrowers where cardnumber='$ucborcode'");
+      $sth=$dbh->prepare("Select * from borrowers 
+        where cardnumber='$ucborcode'");
       $sth->execute;
       if ($borrower=$sth->fetchrow_hashref) {
         $bornum=$borrower->{'borrowernumber'};
         $sth->finish;
       } else {
         $sth->finish;
-	my $borquery = "Select * from borrowers where surname ~* '$borcode'";
+	my $borquery = "Select * from borrowers 
+	  where surname ~* '$borcode'
+	  order by surname";
 	my $sthb =$dbh->prepare($borquery);
 	$sthb->execute;
 	my $cntbor = 0;

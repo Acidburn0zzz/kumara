@@ -112,17 +112,17 @@ sub processitems {
    my $amountdue = 0;
 #   my @date;
    my ($itemnum,$reason) = issuewindow($env,'Issues',$items,$items2,$borrower,
-      fmtdec($env,$amountdue,"32"));
+     fmtdec($env,$amountdue,"32"));
    if ($itemnum ne ""){
       my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($item) {
         debug_msg("","date $datedue");
         
-        $items2->[$it2p] = 
-    	(fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")." ".$datedue); 	
-        $row2++;	     
-	$it2p++;
-	$i++;
+         # $items2->[$it2p] = 
+         # (fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")." ".$datedue); 	
+         $items2->[$it2p] = $datedue." ".
+            fmtstr($env,$item->{'title'},"L55")." ".fmtdec($env,$charge,"22");
+  	$i++;
      	$amountdue += $charge;
      }  
    }

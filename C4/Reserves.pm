@@ -53,11 +53,17 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub EnterReserves{
-  my ($env)=@_;
-  my @flds = ("Barcode","Title","Keywords","Author","Subject","ISBN");
-  my ($itemnumber,$title,$keyword,$author,$subject,$isbn) =
-     FindBiblioScreen($env,"Reserves",@flds);
+  my ($env)=@_;  
+  titlepanel($env,"Reserves","Enter Selection");
+  my @flds = ("No of entries","Barcode","ISBN","Title","Keywords","Author","Subject");
+  my @fldlens = ("5","15","15","50","50","50","50");
+  my ($reason,$num,$itemnumber,$isbn,$title,$keyword,$author,$subject) =
+     FindBiblioScreen($env,"Reserves",7,\@flds,\@fldlens);
   my %search;
+  #debug_msg($env,"ti $title");
+  #debug_msg($env,"key $keyword");
+  #debug_msg($env,"au $author");
+  #debug_msg($env,"su $subject");
   $search{'title'}= $title;
   $search{'keyword'}=$keyword;
   $search{'author'}=$author;
@@ -66,8 +72,11 @@ sub EnterReserves{
   $search{'isbn'}=$isbn;
   my @results;
   my $count;
-  my $num = 30;
+  if ($num < 1 ) {
+    $num = 30;
+  }
   my $offset = 0;
+  titlepanel($env,"Reserves","Searching");
   if ($itemnumber ne '' || $isbn ne ''){
     ($count,@results)=&CatSearch($env,'precise',\%search,$num,$offset);
   } else {
@@ -76,13 +85,45 @@ sub EnterReserves{
     } else {
       if ($keyword ne ''){
         ($count,@results)=&KeywordSearch($env,'intra',\%search,$num,$offset);
-      } else {
+      } else { 
         ($count,@results)=&CatSearch($env,'loose',\%search,$num,$offset);
       }
     }
   }
-  my $biblionumber  =  SelectBiblio($env,$count,@results);
-  debug_msg($env,$biblionumber);
+  my $no_ents = @results;
+  my $biblionumber;
+  if ($no_ents > 1) {
+    my %biblio_xref;
+    my @bibtitles;
+    my $i = 0;
+    while ($i < $no_ents) {
+       my @ents = split("\t",@results[$i]);
+       my $line;
+       my $totlen = length(@ents[1]) + length(@ents[2]);
+       if ($totlen < 60) {
+         $line = join(": ",@ents[1],@ents[2]);
+       } else {
+	 my $len2 = length(@ents[2]);
+	 if ($len2 > 20) {
+	   $line = join(": ",substr(@ents[1],0,40),@ents[2]);
+	 } else {
+	   $line = join(": ",substr(@ents[1],1,(59-$len2)),@ents[2])
+         }
+         $line = substr($line,0,60);
+       }
+       @bibtitles[$i]=$line;	 
+       $biblio_xref{$line}=@ents[0];
+       $i++;
+     }
+     titlepanel($env,"Reserves","Select Title");
+     my ($results,$bibres)  =  SelectBiblio($env,$count,\@bibtitles);
+     debug_msg($env,$bibres);
+     $biblionumber = $biblio_xref{$bibres};
+   } elsif ($no_ents = 1) {
+     my @ents = split("\t",@results[0]);
+     $biblionumber  = @ents[0];
+   } 
+  
 }
 
 			
