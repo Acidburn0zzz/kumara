@@ -58,21 +58,19 @@ sub Start_circ{
   #connect to database
   #start interface
   &startint($env,'Circulation');
-  my ($reason,$data)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
-  my $donext;
-  if ($data eq 'Issues'){  
-    $donext=Issue($env);
-  } elsif ($data eq 'Returns') {
-    $donext=Returns($env);
-  } else {
-    &endint($env);
+  my $donext = 'Circ';
+  while ($donext eq 'Circ') {
+    my ($reason,$data)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
+    if ($data eq 'Issues') {  
+      $donext=Issue($env);
+    } elsif ($data eq 'Returns') {
+      $donext=Returns($env);
+    } elsif ($data eq 'Quit') { 
+      $donext = $data;
+    }  
+    debug_msg($env,"donext -  $donext");
   }
-  debug_msg($env,"donext -  $donext");
-  if ($donext eq 'Circ'){
-    Start_circ($env);
-  } else {
-    &endint($env);
-  }
+  &endint($env)  
 }
 
 sub pastitems{
@@ -89,7 +87,7 @@ sub pastitems{
   my @items2;
   $items[0]=" "x40;
   $items2[0]=" "x36;
-  while (my $data=$sth->fetchrow_hashref){
+  while (my $data=$sth->fetchrow_hashref) {
      my $line = "$data->{'date_due'} $data->{'title'}";
      $items[$i]=fmtstr($env,$line,"L40");
      $i++;

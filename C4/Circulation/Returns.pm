@@ -56,8 +56,61 @@ my $priv_func = sub {
 
 sub Returns {
   my ($env)=@_;
-  returnwindow($env);
+  my $dbh=&C4Connect;  
+  my @items;
+  $items[0]="."x50;
+  my $itcnt=0;
+  my $reason;
+  my $item;
+  my $reason;
+  my $borrower;
+  my $itemno;
+  my $itemrec;
+  my $bornum;
+  until (($reason eq "Circ") || ($reason eq "Quit") {
+    ($reason,$item) = returnwindow($env,"Enter Returns",\@items);
+    if (($reason ne "Circ") || ($reason eq "Quit")) {
+      ($reason,$bornum,$borrower,$itemno,$itemrec) = checkissue($env,$dbh,$item);
+      if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
+        debug_msg($env,$reason);
+      }
+    }
   }
+  $dbh->disconnect;
+  return($reason);
+  }
+  
+sub checkissue {
+  my ($env,$dbh, $item) = @_;
+  my $reason='Circ';
+  my $bornum;
+  my $borrower;
+  my $itemno;
+  my $itemrec;
+  my $query = "select * from items where barcode = '$item'";
+  my $sth=$dbh->prepare($query); 
+  $sth->execute;
+  if ($itemrec=$sth->fetchrow_hashref) {
+     $sth->finish;
+     $query = "select * from issues where
+        (itemnumber='$itemrec->{'itemnumber'}') and (returndate is null)";
+     my $sth=$dbh->prepare($query);
+     $sth->execute;
+     if (my $issuerec=$sth->fetchrow_hashref) {
+     $sth->finish;
+       $reason = "Issued to $issuerec->{'borrowernumber'}";
+     } else {
+       $sth->finish;
+       $reason = "Item not issued";
+     }       
+  } else {
+     $sth->finish;
+     $reason = "Item not found";
+  }   
+  return ($reason,$bornum,$borrower,$itemno,$itemrec);
+  # end checkissue
+  }
+  
 sub returnrecord {
   # mark items as returned
   my ($env,$dbh,$bornum,$itemno)=@_;
@@ -67,7 +120,6 @@ sub returnrecord {
   debug_msg($env,"before return");
   my $query = "update issues set returndate = '$dateret', branchcode ='$env->{'branchcode'}' where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
   and (returndate is null)";  
-  #output(1,10,$query);
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;

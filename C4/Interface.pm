@@ -76,7 +76,7 @@ sub menu {
   my ($type,$title,@items)=@_;
   if ($type eq 'console'){
 #  my ($reason,$data)=list($title,@items);
- my ($reason,$data)=menu2($title,@items);
+  my ($reason,$data)=menu2($title,@items);
  
   return($reason,$data);
   # end of menu
@@ -199,6 +199,11 @@ sub returnwindow {
   my $fee      = Newt::Label(fmtdec($env,$amountowing,"$32"));
   my $l1       = Newt::Label("Returned"); 
   my $li1      = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER);
+  my $i = 0;
+  while ($items->[$i]) {
+    $li1->Add($items->[$i]);
+    $i++;
+  }
   $panel->Add(0,0,$entry,NEWT_ANCHOR_TOP);
   $panel->Add(0,1,$accchk,NEWT_ANCHOR_TOP);
   $panel->Add(1,0,$la1);
@@ -212,15 +217,12 @@ sub returnwindow {
     if ($data eq NEWT_KEY_F11) {
       $reason="Circ";
     }
-    if ($data eq NEWT_KEY_F10) {
-      $reason="Finished issues";
-    }
     if ($data eq NEWT_KEY_F12){
       $reason="Quit"
     }
   }
   my $stuff=$entry->Get();
-  return($stuff,$reason);
+  return($reason,$stuff);
 }
   
   
