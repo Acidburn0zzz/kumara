@@ -202,10 +202,14 @@ sub Getpaidbranch{
 
 sub unfilledreserves {
   my $dbh=C4Connect;
-  my $query="select *,biblio.title from reserves,biblio,borrowers where found <> 'F' and cancellationdate
-is NULL and biblio.biblionumber=reserves.biblionumber and
-reserves.borrowernumber=borrowers.borrowernumber order by
-biblio.title,reservedate";
+  my $query="select *,biblio.title from reserves,reserveconstraints,biblio,borrowers,biblioitems where found <> 'F' and cancellationdate
+is NULL and biblio.biblionumber=reserves.biblionumber 
+and (reserves.biblionumber=reserveconstraints.biblionumber
+and reserves.borrowernumber=reserveconstraints.borrowernumber)
+and
+reserves.borrowernumber=borrowers.borrowernumber and
+biblioitems.biblioitemnumber=reserveconstraints.biblioitemnumber order by
+biblio.title,reserves.reservedate";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;

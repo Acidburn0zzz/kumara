@@ -20,7 +20,7 @@ print mktablehdr();
 my ($count,$data)=unfilledreserves();
 print $count;
 for (my $i=0;$i<$count;$i++){
-  print mktablerow(3,'white',"$data->[$i]->{'surname'}\, $data->[$i]->{'firstname'}",$data->[$i]->{'reservedate'},$data->[$i]->{'title'});
+  print mktablerow(4,'white',"$data->[$i]->{'surname'}\, $data->[$i]->{'firstname'}",$data->[$i]->{'reservedate'},$data->[$i]->{'title'},"$data->[$i]->{'classification'}$data->[$i]->{'dewey'}");
 }
 print mktableft();
 print endmenu('report');
