@@ -47,7 +47,7 @@ if ($dewey < 100 && $dewey > 10){$dewey='0'.$dewey;}
 if ($dewey <= 0){                                                                  
   $dewey='';                                                                       
 } 
-
+$dewey=~ s/\.$//;
 $inputs{'Class'}="text\t$data->{'classification'}$dewey$data->{'subclass'}\t2";
 $inputs{'Item Type'}="text\t$data->{'itemtype'}\t3";
 $inputs{'Subject'}="textarea\t$sub\t4";

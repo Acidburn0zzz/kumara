@@ -47,6 +47,7 @@ if ($dewey < 100 && $dewey > 10){$dewey='0'.$dewey;}
 if ($dewey <= 0){
   $dewey='';                                                                   
 }               
+$dewey=~ s/\.$//;
 print <<printend
 <br>
 <a href=/cgi-bin/koha/request.pl?bib=$bib><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>

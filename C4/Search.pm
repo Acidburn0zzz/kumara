@@ -495,6 +495,7 @@ sub ItemInfo {
     if ($dewey <= 0){
       $dewey='';
     }
+    $dewey=~ s/\.$//;
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
