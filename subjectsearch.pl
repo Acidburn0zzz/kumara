@@ -14,7 +14,7 @@ print $input->header;
 print startpage();
 print startmenu();
 my $blah;
-
+my $env;
 my $subject=$input->param('subject');
 #my $title=$input->param('title');
 
@@ -24,7 +24,7 @@ my $count=@items;
 my $i=0;
 print center();
 print mktablehdr;
-print mktablerow(2,'#cccc99','Title','Author'); 
+print mktablerow(4,'#99cc33',bold('TITLE'),bold('AUTHOR'),bold('COUNT'),bold('LOCATION'),"/images/background-mem.gif"); 
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
@@ -33,11 +33,25 @@ while ($i < $count){
   $word=~ s/ //g;
   $word=~ s/\,/\,%20/;
   $results[1]=mklink("/cgi-bin/kumara/search.pl?author=$word",$results[1]);
+  my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$results[2]);                                                                     
+  $results[3]=$count;                                                                                                                           
+  if ($nacount > 0){                                                                                                                          
+    $results[4]=$results[4]."On Loan 1";                                                                                                          
+  }                                                                                                                                           
+  if ($lcount > 0){                                                                                                                           
+    $results[4]=$results[4]." L$lcount";                                                                                                          
+  }                                                                                                                                           
+  if ($fcount > 0){                                                                                                                           
+    $results[4]=$results[4]." F$fcount";                                                                                                          
+  }                                                                                                                                           
+  if ($scount > 0){                                                                                                                           
+    $results[4]=$results[4]." S$scount";                                                                                                          
+  }             
   if ($colour == 1){                                                                          
-    print mktablerow(2,'#ffffcc',@results);                                        
-    $colour=0;                                                                                
-  } else{                                                                                     
-    print mktablerow(2,'white',@results);                                          
+    print mktablerow(4,'#ffffcc',$results[0],$results[1],$results[3],$results[4]);                                        
+    $colour=0;                                                                   
+  } else{                                                                        
+    print mktablerow(4,'white',$results[0],$results[1],$results[3],$results[4]);                                     
     $colour=1;                                                                                
   }
    $i++;
