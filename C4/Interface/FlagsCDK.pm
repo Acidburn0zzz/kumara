@@ -68,7 +68,7 @@ sub trapscreen {
   }   
   undef $titlepanel;
   undef $flagsset;
-  undef $borpabel;
+  undef $borpanel;
   return($action);
 }
 
