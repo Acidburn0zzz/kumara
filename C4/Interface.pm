@@ -218,7 +218,8 @@ sub returnwindow {
   $panel->AddHotKey(NEWT_KEY_F11);
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
-     if ($data eq NEWT_KEY_F11){
+    debug_msg($env, "Hotkey");
+    if ($data eq NEWT_KEY_F11){
        $reason="Quit";
      } elsif ($data eq NEWT_KEY_F10) {
        $reason="Circ";
@@ -228,9 +229,12 @@ sub returnwindow {
        $reason="Returns";
      }
   } else {
-    my $stuff=$entry->Get();
+    debug_msg($env, "Not Hot");  
+    $stuff=$entry->Get();
     $reason="";
   }
+  #debug_msg($env, "reas $reason");
+  #debug_msg($env, "stuff $stuff");  
   return($reason,$stuff);
 }
 

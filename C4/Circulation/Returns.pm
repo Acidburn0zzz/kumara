@@ -10,6 +10,7 @@ use C4::Database;
 use C4::Accounts;
 use C4::Interface;
 use C4::Circulation;
+use C4::Format;
 use C4::Scan;
 use C4::Stats;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -69,8 +70,10 @@ sub Returns {
   my $amt_owing;
 # until (($reason eq "Circ") || ($reason eq "Quit")) {
   until ($reason ne "") {
-    ($reason,$item) =  returnwindow($env,"Enter Returns",$item,\@items,$borrower,$amt_owing);
-    #debug_msg($env,"R1. $reason");
+    ($reason,$item) =  
+      returnwindow($env,"Enter Returns",
+      $item,\@items,$borrower,$amt_owing); #C4::Circulation
+    #debug_msg($env,"item = $item");
     #if (($reason ne "Circ") && ($reason ne "Quit")) {
     if ($reason eq "")  {
       ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
@@ -83,7 +86,7 @@ sub Returns {
 	  error_msg($env,"$reason");
 	  $reason = "";
 	} else {
-          debug_msg($env,"R2. $reason");
+          #debug_msg($env,"R2. $reason");
 	}
       #}
     }
