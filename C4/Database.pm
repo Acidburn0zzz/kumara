@@ -86,6 +86,9 @@ sub sqlupdate {
   my $dbh=C4Connect;
   my $query="UPDATE $table SET ";
   my @sets;
+  my @keyarr = split("\t",$keyfld);
+  my @keyvalarr = split("\t",$keyval);
+  my $numkeys = @keyarr;
   while (my ($key,$value) = each %data){
     if (($key ne 'type')&&($key ne 'updtype')){
       my $temp = " ".$key."='".$value."' "; 
@@ -93,7 +96,14 @@ sub sqlupdate {
     }
   }
   my $fsets = join(",", @sets);
-  $query=$query.$fsets." WHERE $keyfld = '$keyval'";
+  $query=$query.$fsets." WHERE $keyarr[0] = '$keyvalarr[0]'";
+  if ($numkeys > 1) {
+    my $i = 1;
+    while ($i < $numkeys) {
+      $query=$query." AND $keyarr[$i] = '$keyvalarr[$i]'";
+      $i++;
+    }
+  }  
 #  $query=~ s/\,$/\)/;
   print $query;
   my $sth=$dbh->prepare($query);

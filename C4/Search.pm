@@ -355,7 +355,7 @@ sub BornameSearch  {
   or lower(firstname)  like '%$searchstring%' 
   or lower(othernames) like '%$searchstring%'
   order by lower(surname),lower(firstname)";
-  print $query,"\n";
+  #print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -389,13 +389,16 @@ sub getacctlist {
    my $dbh=C4Connect;
    my @acctlines;
    my $numlines;
-   my $query = "Select borrowernumber, date, amount, description,
-     dispute, accounttype, amountoutstanding, barcode, title
-     from accountlines,items,biblio   
-     where borrowernumber=$params->{'borrowernumber'} 
-     and accountlines.itemnumber = items.itemnumber
-     and items.biblionumber = biblio.biblionumber
-     and accountlines.amountoutstanding<>0";
+   my $query = "Select borrowernumber, accountno, date, amount, description,
+      dispute, accounttype, amountoutstanding, barcode, title
+      from accountlines,items,biblio   
+      where borrowernumber = $params->{'borrowernumber'} ";
+   if ($params->{'acctno'} ne "") {
+      my $query = $query." and accountlines.accountno = $params->{'acctno'} ";
+      }
+   my $query = $query." and accountlines.itemnumber = items.itemnumber
+      and items.biblionumber = biblio.biblionumber
+      and accountlines.amountoutstanding<>0 order by date";
    my $sth=$dbh->prepare($query);
    $sth->execute;
    my $total=0;

@@ -18,6 +18,7 @@ print $input->dump;
 my @names=$input->param;
 my %data;
 my $keyfld;
+my $keyval;
 my $problems;
 my $env;
 foreach my $key (@names){
@@ -58,11 +59,18 @@ if ($data{'type'} eq 'biblio'){
       $data{'branchcode'}="L";
     }
   }  
+} elsif ($data{'type'} eq "accountlines") {
+  $keyfld = "accountno\tborrowernumber";
+  $keyval = $data{'accountno'}."\t".$data{'borrowernumber'};
 }
 
 if ($problems eq "") {
   if ($updtype eq "M") {
-    &sqlupdate($data{'type'},$keyfld,$data{$keyfld},%data);
+    if ($keyval eq "") {
+       &sqlupdate($data{'type'},$keyfld,$data{$keyfld},%data);
+     } else {
+       &sqlupdate($data{'type'},$keyfld,$keyval,%data);
+     }	 
   } else {
     &sqlinsert($data{'type'},%data);
   }
