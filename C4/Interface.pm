@@ -3,11 +3,13 @@ package C4::Interface; #asummes C4/Interface
 #uses Newt
 
 use strict;
-use Newt qw(:keys :exits :anchors :flags :colorsets :entry :fd :grid :macros
-:textbox);
-#use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
-#NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F9 NEWT_KEY_F12
-#NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE);
+#use Newt qw(:keys :exits :anchors :flags :colorsets :entry :fd :grid :macros
+#:textbox);
+
+use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
+NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F9 NEWT_KEY_F12
+NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE 
+NEWT_ANCHOR_TOP NEWT_ANCHOR_RIGHT NEWT_FLAG_BORDER);
 #use C4::Circulation;
 
 require Exporter;
@@ -62,7 +64,7 @@ sub suspend_cb {
 }
       
 sub startint {
-  Newt::SetSuspendCallback(\&suspend_cb);
+  Newt::SetSuspendCallback(\&suspend_cb,'t');
   my ($env,$msg)=@_;
   Newt::Init();
   Newt::Cls();
