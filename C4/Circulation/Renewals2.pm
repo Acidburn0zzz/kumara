@@ -164,7 +164,8 @@ sub calc_charges {
   }                                   
   $sth1->finish;  
   $dbh->disconnect;
-  return ($charge);         
+#  print "item $item_type";
+  return ($charge,$item_type);         
 }       
 
 

@@ -170,8 +170,8 @@ for (my $i=0;$i<$count;$i++){
   print "$issue->[$i]{'title'} $issue->[$i]{'barcode'}</td>
   <TD>$issue->[$i]{'date_due'}</td>";
   #find the charge for an item
-  my $charge=calc_charges(\%env,$issue->[$i]{'itemnumber'},$bornum);
-  print "<TD>$charge</td>";
+  my ($charge,$itemtype)=calc_charges(\%env,$issue->[$i]{'itemnumber'},$bornum);
+  print "<TD>$charge $itemtype</td>";
 
   if ($datedue < $today){
     print "<td>Overdue</td>";
