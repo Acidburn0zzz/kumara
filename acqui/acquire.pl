@@ -25,7 +25,8 @@ my $gst=$input->param('gst');
 my ($count,@results)=ordersearch($search,$biblio);
 my ($count2,@booksellers)=bookseller($results[0]->{'booksellerid'}); 
 #print $count;
-
+my @date=split('-',$results[0]->{'entrydate'});
+my $date="$date[2]/$date[1]/$date[0]";
 
 if ($count == 1){
 
@@ -55,6 +56,7 @@ win.document.write("</font></body></html>");
 <input type=image  name=submit src=/images/save-changes.gif border=0 width=187 height=42 align=right>
 <FONT SIZE=6><em>$results[0]->{'ordernumber'} - Recieve Order</em></FONT><br>
 Shopping Basket For: $booksellers[0]->{'name'}
+<br> Order placed: $date
 <P>
 <CENTER>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width="40%">
