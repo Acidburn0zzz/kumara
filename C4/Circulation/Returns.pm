@@ -110,7 +110,7 @@ sub checkissue {
   my $itemrec;
   my $amt_owing;
   $item = uc $item;
-  my $query = "select * from items,biblio,biblioitems 
+  my $query = "select * from items,biblio 
     where barcode = '$item'
     and (biblio.biblionumber=items.biblionumber)";
   my $sth=$dbh->prepare($query); 
