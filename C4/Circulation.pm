@@ -175,7 +175,7 @@ sub scanborrower {
   my ($env,$interface)=@_;
   #scan barcode
 # my $number='V00126643';  
-  my ($number,$reason)=&Borr_dialog($env);
+  my ($number,$reason)=&borrower_dialog($env);
   $number=uc $number;
   return ($number,$reason);
 }

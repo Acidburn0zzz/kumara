@@ -124,7 +124,7 @@ sub list {
 }
 
 sub issuewindow {
-  my ($env,$title,$items1,$items2,$/borrower,$name)=@_;
+  my ($env,$title,$items1,$items2,$borrower,$name)=@_;
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label("book");
   my $panel = Newt::Panel(50,25, $title,5,5);
@@ -199,13 +199,17 @@ sub borrower_dialog {
   my $name = "Borrower";
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label($name);
+  my $entry2=Newt::Entry(40,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $label2=Newt::Label(" Book ");
   my $panel1=Newt::Panel(2,4,$name);
   $panel1->AddHotKey(NEWT_KEY_F11);
   $panel1->AddHotKey(NEWT_KEY_F10);  
   $panel1->AddHotKey(NEWT_KEY_F9);
   $panel1->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel1->Add(1,0,$entry,NEWT_ANCHOR_LEFT);
-  my ($reason,$data)=$panel1->Run();
+  $panel1->Add(2,0,$label2,NEWT_ANCHOR_LEFT);
+  $panel1->Add(3,0,$entry2,NEWT_ANCHOR_LEFT);
+  my ($reason,$data,$d1,$d2)=$panel1->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
       $reason="Finished user";         
