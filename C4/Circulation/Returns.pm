@@ -69,11 +69,12 @@ sub Returns {
   my $itemrec;
   my $bornum;
   my $amt_owing;
+  my $odues;
 # until (($reason eq "Circ") || ($reason eq "Quit")) {
   until ($reason ne "") {
     ($reason,$item) =  
       returnwindow($env,"Enter Returns",
-      $item,\@items,$borrower,$amt_owing); #C4::Circulation
+      $item,\@items,$borrower,$amt_owing,$odues,$dbh); #C4::Circulation
     #debug_msg($env,"item = $item");
     #if (($reason ne "Circ") && ($reason ne "Quit")) {
     if ($reason eq "")  {
@@ -149,7 +150,7 @@ sub checkissue {
 sub returnrecord {
   # mark items as returned
   my ($env,$dbh,$bornum,$itemno)=@_;
-  my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
+  #my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   my @datearr = localtime(time);
   my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
   my $query = "update issues set returndate = '$dateret', branchcode ='$env->{'branchcode'}' where 
@@ -158,7 +159,28 @@ sub returnrecord {
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;
-  # check for charge made for book
+  # check for overdue fine
+  my $oduecharge;
+  my $query = "select * from accountlines
+    where (borrowernumber = '$bornum')
+    and (itemnumber = '$itemno')
+    and (accounttype = 'F')";
+  my $sth = $dbh->prepare($query);
+    $sth->execute;
+    if (my $data = $sth->fetchrow_hashref) {
+       # alter fine to show that the book has been returned.
+       my $uquery = "update accountlines
+         set accounttype = 'FR'
+         where (borrowernumber = '$bornum')
+         and (itemnumber = '$itemno')
+         and (accountno = '$data->{'accountno'}') ";
+       my $usth = $dbh->prepare($uquery);
+       $usth->execute();
+       $usth->finish();
+       $oduecharge = $data->{'amountoutstanding'};
+    }
+    $sth->finish;
+  # check for charge made for lost book
   my $query = "select * from accountlines 
     where (borrowernumber = '$bornum') 
     and (itemnumber = '$itemno')
@@ -203,7 +225,7 @@ sub returnrecord {
   } 
   $sth->finish;
   UpdateStats($env,'branch','return','0');
-  return($amt_owing);
+  return($oduecharge);
 }
 
 sub calc_odues {

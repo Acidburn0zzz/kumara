@@ -325,22 +325,16 @@ sub actfmenu {
 }  
 sub actscroll1 {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  #$scroll1->preProcess ('Function' =>
-  #  sub{prescroll1(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   $scroll1->activate();
   return 1;
 }
 sub actscroll2 {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  #$scroll2->preProcess ('Function' =>
-  #  sub{prescroll2(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   $scroll2->activate();
   return 1;
 }
 sub actloanlength {
   my ($env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  #$loanlength->preProcess ('Function' =>
-  #  sub{preloanlen(@_,$env,$entryBox,$loanlength,$scroll1,$scroll2);});
   my $validdate = "N";
   while ($validdate eq "N") {
     my $loanlength = $loanlength->activate();
@@ -369,35 +363,11 @@ sub prebook {
   my ($input,$env,$dbh,$funcmenu,$entryBox,$loanlength,
     $scroll1,$scroll2,$borrower,$amountowing,$odues)= @_;
   if ($input eq $key_tab) {    
-#    actloanlength($env,$entryBox,$loanlength,$scroll1,$scroll2);
      actfmenu ($env,$dbh,$funcmenu,$entryBox,$loanlength,$scroll1,
        $scroll2,$borrower,$amountowing,$odues);
   return 0;
   }
   return 1;
-}
-
-sub prescroll1 {
-  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  if ($input eq $key_tab) {    
-    actscroll2($env,$entryBox,$loanlength,$scroll1,$scroll2);
-    return 0;	
-  }
-  return 1;
-}
-
-sub prescroll2 {
-  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_;
-  return 1;
-}
-
-sub preloanlen {
-  my ($input,$env,$entryBox,$loanlength,$scroll1,$scroll2) = @_; 
-  if ($input eq $key_tab) {                  
-    actscroll1($env,$entryBox,$loanlength,$scroll1,$scroll2);
-    return 0;
-  }                                     
-  return 1;                                                 
 }
 	  						  
 sub borrowerbox {
@@ -437,21 +407,27 @@ sub borrowerbox {
 }
 
 sub returnwindow {
-  my ($env,$title,$item,$items,$borrower,$amountowing)=@_;
+  my ($env,$title,$item,$items,$borrower,$amountowing,$odues,$dbh)=@_;
   #debug_msg($env,$borrower);
   my $titlepanel = titlepanel($env,"Returns","Scan book");
+  my @functs=("Payments","Issues","Renewal");
+  my $funcmenu = new Cdk::Scroll ('Title'=>"Function",
+     'List'=>\@functs,'Height'=>5,'Width'=>12,'Ypos'=>3,'Xpos'=>16);
   my $returnlist = new Cdk::Scroll ('Title'=>"Items Returned",
      'List'=>\@$items,'Height'=> 12,'Width'=>74,'Ypos'=>10,'Xpos'=>1);
   $returnlist->draw();
+  $funcmenu->draw();
   my $borrbox;
-  if ($borrower-{'cardnumber'} ne "") {    
+  if ($borrower->{'cardnumber'} ne "") {    
     $borrbox = borrowerbox($env,$borrower,$amountowing);  
     $borrbox->draw();
   }
-  my $bookentry  =  new Cdk::Entry('Label'=>"Book Barcode:  ",
+  my $bookentry  =  new Cdk::Entry('Label'=>" ",
      'Max'=>"11",'Width'=>"11",
-     'Xpos'=>"1",'Ypos'=>"4",
+     'Xpos'=>"2",'Ypos'=>"3",'Title'=>"Book Barcode",
      'Type'=>"UMIXED");
+  $bookentry->preProcess ('Function' =>sub{preretbook(@_,$env,$dbh,
+     $funcmenu,$bookentry,$borrower,$amountowing,$odues);});
   my $barcode = $bookentry->activate();
   my $reason;
   if (!defined $barcode) {
@@ -462,7 +438,37 @@ sub returnwindow {
   }
   return($reason,$barcode);
   }
-				    
+
+sub preretbook {
+  my ($input,$env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues)= @_;
+  if ($input eq $key_tab) {
+    actrfmenu ($env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues);
+    return 0;
+  }
+  return 1;
+  }
+
+sub actrfmenu {
+  my ($env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues) = @_;
+  my $funct =  $funcmenu->activate();
+  debug_msg($env,"funtion $funct");
+  if (!defined $funct) {
+  } elsif ($funct == 2 ) {
+    if ($borrower->{'borrowernumber'} ne "") {
+       C4::Circulation::Renewals::bulkrenew($env,$dbh,
+       $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
+       Cdk::refreshCdkScreen();
+    }
+  } elsif ($funct == 0 ) {
+    if ($borrower->{'borrowernumber'} ne "") {
+       C4::Accounts::reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},
+       $amountowing,$borrower,$odues);
+       Cdk::refreshCdkScreen();
+    }
+  }
+  
+  }
+  
 sub act {
   my ($obj) = @_;
   my $ans = $obj->activate();
