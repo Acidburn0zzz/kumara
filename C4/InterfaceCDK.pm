@@ -18,7 +18,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
 &selborrower &returnwindow &logondialog &borrowerwindow &titlepanel
-&borrbind &borrfill);
+&borrbind &borrfill &preeborr);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -44,7 +44,7 @@ my @more   = ();
 my $priv_var    = '';
 my %secret_hash = ();
 my $lastval = chr(18);
-			    
+#my $lastval = "?";			    
 # here's a file-private function as a closure,
 # callable as &$priv_func;  it cannot be prototyped.
 my $priv_func = sub {
@@ -171,8 +171,9 @@ sub borrower_dialog {
   my @coltitles = ("Borrower","Book");
   my @rowtitles = (" ");
   my @coltypes  = ("UMIXED","UMIXED");
-  my @colwidths = (10,10);
+  my @colwidths = (12,12);
   #Cdk::refreshCdkScreen();
+  Cdk::raw();
   my $matrix = new Cdk::Matrix (
      'ColTitles'=> \@coltitles,
      'RowTitles'=> \@rowtitles, 
@@ -186,7 +187,7 @@ sub borrower_dialog {
   debug_msg($env,$info->[0][0]);
   debug_msg($env,$info->[0][1]);
   
-  if (!defined $rows) { 
+  if ((!defined $rows) && ($info->[0][0] eq "")) { 
     $result = "Circ";
   } else {
     $borrower = $info->[0][0];
@@ -302,26 +303,31 @@ sub act {
 sub borrbind {
   my ($env,$entry) = @_; 
   my $lastborr = $env->{"bcard"};
-  if ($lastborr ne "" ) {
-    #debug_msg($env,"Binding $lastborr");
-    $entry->bind('Key'=>$lastval,'Function'=>sub {borfill($env,$entry);});
-  } else {
-    #debug_msg($env,"not Binding ");
-  } 
+  $entry->preProcess ('Function' => sub {preborr (@_, $env,$entry);});
 }
 
+sub preborr {
+  my ($input,$env, $entry) = @_;
+  if ($input eq $lastval) {
+    borfill($env,$entry);
+    return 0;
+  }
+  return 1;
+}  
+  
+  
 sub borfill {
   my ($env,$entry) = @_;
   #debug_msg("","hi there");
   my $lastborr = $env->{"bcard"};
-  my $i = 0;
+  my $i = 1;
+  $entry->inject('Input'=>$lastborr);
   while ($i < 9) {
     $entry->inject('Input'=>substr($lastborr,$i,1));
     $i++;
-    }
-  $entry->inject('Input'=>chr(13));
-     
   }
+   
+}
 			       
 END { }       # module clean-up code here (global destructor)
 

@@ -76,7 +76,7 @@ sub pastitems{
   $items[0]=" "x72;
   $items2[0]=" "x72;
   while (my $data=$sth->fetchrow_hashref) {
-     my $line = C4::Issues::formatitem($env,$data,$data->{'date_due'},"");
+     my $line = C4::Circulation::Issues::formatitem($env,$data,$data->{'date_due'},"");
      #my $line = "$data->{'date_due'} $data->{'title'}";
      # $items[$i]=fmtstr($env,$line,"L29");
      #$items[$i]=fmtstr($env,$line,"L72");

@@ -167,7 +167,7 @@ sub checktraps {
   my $issuesallowed = "1";
   #process borrower traps (could be function)
   #check first GNA trap (no address this is the 22nd item in the table)
-  @traps_set;
+  my @traps_set;
   if ($borrower->{'gonenoaddress'} == 1){
     #got to membership update and update member info
     push (@traps_set,"GNA");
