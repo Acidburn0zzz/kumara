@@ -156,6 +156,7 @@ sub mkform2{
   while ( my ($key, $value) = each %inputs) {
     my @data=split('\t',$value);
     my $posn = shift(@data);
+    my $ltext = shift(@data);
     if ($data[0] eq 'hidden'){
       $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
     } else {
@@ -181,7 +182,7 @@ sub mkform2{
 	$text=$text."</select>";
       }	
       #$string=$string.mktablerow(2,'white',$key,$text);
-      @order[$posn] =mktablerow(2,'white',$key,$text);
+      @order[$posn] =mktablerow(2,'white',$ltext,$text);
     }
   }
   $string=$string.join("\n",@order);
