@@ -115,11 +115,12 @@ sub previousissue {
   my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber,cardnumber,returndate
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
-  issues.borrowernumber=borrowers.borrowernumber");
+  issues.borrowernumber=borrowers.borrowernumber and issues.returndate is
+NULL");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
   $sth->finish;
-  if ($borrower->{'borrowernumber'} ne '' && $borrower->{'returndate'} eq ''){
+  if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
       # no need to issue
       my ($renewstatus) = &renewstatus($env,$dbh,$bornum,$itemnum);
