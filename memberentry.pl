@@ -28,7 +28,8 @@ if ($type ne 'Add'){
 my $data=borrdata('',$member);
 print <<printend
 <form action=/cgi-bin/koha/newmember.pl method=post>
-
+<input type=hidden name=joining value="$data->{'>
+<input type=hidden name=expiry
 <input type=hidden name=type value="borrowers">
 <input type=hidden name=borrowernumber="$member">
 printend
@@ -321,9 +322,21 @@ print <<printend
 <td  COLSPAN=4><textarea name=borrowernotes wrap=physical cols=70 rows=3>$data->{'borrowernotes'}</textarea></td></tr>
 <tr><td>&nbsp; </TD></TR>
 <tr valign=top bgcolor=white><td  COLSPAN=5 align=right >
-
-<A HREF="confirmation.html"><img src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></a></td>
-<td  align=right><input type=submit><BR></td></tr>
+printend
+;
+if ($type ne 'modify'){
+  print <<printend
+<input type=image src="/images/modify-mem.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
+printend
+;
+} else {
+print <<printend
+<input type=image src="/images/button-add-member.gif"  WIDTH=188  HEIGHT=44  ALT="Add New Member" border=0 ></td>
+printend
+;
+}
+print <<printend
+</tr>
 </TABLE>
 </table>
 																																																													</form>
