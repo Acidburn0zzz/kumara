@@ -12,7 +12,7 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
-&startmenu);
+&startmenu &endmenu);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -50,14 +50,22 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
  
 sub startpage{
-  my $string="<html><body bgcolor=white>\n";
+  my $string="<html>\n";
   return($string);
 }
 
 sub startmenu{
+  open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
+  my @string=<FILE>;
+  close FILE;
+  return @string;
 }
 
 sub endmenu{
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc');
+  my @string=<FILE>;
+  close FILE;
+  return @string;
 }
 
 sub mktablehdr {
