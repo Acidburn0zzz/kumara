@@ -184,7 +184,6 @@ sub checktraps {
   my $amount;
   while ($traps_done ne "DONE") {
     my @traps_set;
-    #debug_msg($env,"entering traps");
     $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
     if ($amount > 0) { push (@traps_set,"CHARGES");}  
     if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
@@ -201,15 +200,13 @@ sub checktraps {
       &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
     if ($nowaiting > 0) { push (@traps_set,"WAITING"); } 
     if (@traps_set[0] ne "" ) {
-       $issuesallowed,$traps_done = 
-          process_traps($env,$dbh,$bornum,$borrower,
-	  $amount,$odues,\@traps_set,$itemswaiting);
-       #debug_msg($env,"returned issuesallowed $env->{'IssuesAllowed'}");
+      ($issuesallowed,$traps_done,$amount,$odues) = 
+         process_traps($env,$dbh,$bornum,$borrower,
+	 $amount,$odues,\@traps_set,$itemswaiting);
     } else {
-       $traps_done = "DONE";
+      $traps_done = "DONE";
     }   
   }
-  #debug_msg($env,"returning issuesallowed $env->{'IssuesAllowed'}");
   return ($issuesallowed, $odues,$amount);
 }
 
@@ -220,31 +217,73 @@ sub process_traps {
   my %traps;
   while (@$traps_set[$x] ne "") {
     $traps{@$traps_set[$x]} = 1; 
-    #debug_msg($env,"set @$traps_set[$x]");
     $x++;
   }
   my $traps_done;
   my $trapact;
+  my $issues;
   while ($trapact ne "NONE") {
-     $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
-     if ($trapact eq "CHARGES") {
-       &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
-     } elsif ($trapact eq "WAITING") {
-       reserveslist($env,$borrower,$amount,$odues,$waiting);
-     } elsif ($trapact eq "ODUES") {
-       &bulkrenew($env,$dbh,$bornum,$amount,$borrower,$odues);
-     } elsif  ($trapact eq "NOTES") {
-       my $notes = trapsnotes($env,$bornum,$borrower,$amount);
-       if ($notes ne $borrower->{'borrowernotes'}) {   
-	  my $query = "update borrowers set borrowernotes = '$notes' 
-	    where borrowernumber = $bornum";
-	  my $sth = $dbh->prepare($query);
-	  $sth->execute();
-	  $sth->finish();
-          $borrower->{'borrowernotes'} = $notes;
-       }
-     }
-     $traps_done = "DONE";
+    $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
+    if ($trapact eq "CHARGES") {
+      &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
+      ($odues,$issues,$amount)=borrdata2($env,$bornum);          
+      if ($amount <= 0) {
+        $traps{'CHARGES'} = 0;
+        my @newtraps;
+	$x =0;
+        while ($traps_set->[$x] ne "") {
+	  if ($traps_set->[$x] ne "CHARGES") {
+            push @newtraps,$traps_set->[$x];
+	  }
+	  $x++;
+        }
+	$traps_set = \@newtraps;
+      }
+    } elsif ($trapact eq "WAITING") {
+      reserveslist($env,$borrower,$amount,$odues,$waiting);
+    } elsif ($trapact eq "ODUES") {
+      &bulkrenew($env,$dbh,$bornum,$amount,$borrower,$odues);
+      ($odues,$issues,$amount)=borrdata2($env,$bornum);
+      if ($odues == 0) {
+        $traps{'ODUES'} = 0;
+        my @newtraps;
+	$x =0;
+        while ($traps_set->[$x] ne "") {
+          if ($traps_set->[$x] ne "ODUES") {
+            push @newtraps,$traps_set->[$x];
+          }
+          $x++;
+        }
+        $traps_set = \@newtraps;
+      }
+    } elsif  ($trapact eq "NOTES") {
+      my $notes = trapsnotes($env,$bornum,$borrower,$amount);
+      if ($notes ne $borrower->{'borrowernotes'}) { 
+        my $query = "update borrowers set borrowernotes = '$notes' 
+	   where borrowernumber = $bornum";
+        my $sth = $dbh->prepare($query);
+	$sth->execute();
+	$sth->finish();
+        $borrower->{'borrowernotes'} = $notes;
+      }
+      if ($notes eq "") {
+        $traps{'NOTES'} = 0;
+	my @newtraps;
+	$x =0;
+	while ($traps_set->[$x] ne "") {
+	  if ($traps_set->[$x] ne "NOTES") {
+	    push @newtraps,$traps_set->[$x];
+	  }
+	  $x++;
+        }                 
+        $traps_set = \@newtraps;                                                     
+      }
+    }
+    my $notr = @$traps_set;
+    if ($notr == 0) {
+      $trapact = "NONE";
+    }
+    $traps_done = "DONE";
   }
   if ($traps{'GNA'} eq 1 ) {
     $issuesallowed=0;
@@ -256,7 +295,7 @@ sub process_traps {
       $issuesallowed=0;
     }
   }
-  return ($issuesallowed,$traps_done);
+  return ($issuesallowed,$traps_done,$amount,$odues);
 } # end of process_traps
 
 sub Borenq {

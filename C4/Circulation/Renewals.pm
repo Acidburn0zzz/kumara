@@ -97,7 +97,6 @@ sub renewbook {
   # mark book as renewed
   my ($env,$dbh,$bornum,$itemno,$datedue)=@_;
   if ($datedue eq "" ) {    
-    #debug_msg($env, "getting date");
     my $loanlength=21;
     my $query= "Select * from biblioitems,items,itemtypes
        where (items.itemnumber = '$itemno')
@@ -115,6 +114,8 @@ sub renewbook {
     my @datearr = localtime($datedu);
     $datedue = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   }
+  my @date = split("-",$datedue);
+  my $odatedue = (@date[2]+0)."-".(@date[1]+0)."-".@date[0];
   my $issquery = "select * from issues where borrowernumber='$bornum' and
     itemnumber='$itemno' and returndate is null";
   my $sth=$dbh->prepare($issquery);
@@ -122,7 +123,6 @@ sub renewbook {
   my $issuedata=$sth->fetchrow_hashref;
   $sth->finish;
   my $renews = $issuedata->{'renewals'} +1;
-  #debug_msg($env,"renewing $datedue");
   my $updquery = "update issues 
     set date_due = '$datedue', renewals = '$renews'
     where borrowernumber='$bornum' and
@@ -130,7 +130,7 @@ sub renewbook {
   my $sth=$dbh->prepare($updquery);
   $sth->execute;
   $sth->finish;
-  return();
+  return($odatedue);
 }
 
 sub bulkrenew {
@@ -146,9 +146,11 @@ sub bulkrenew {
   my @barcodes;
   while (my $issrec = $sth->fetchrow_hashref) {
      my $itemdata = C4::Search::itemnodata($env,$dbh,$issrec->{'itemnumber'});
-     my $line = $issrec->{'date_due'}." ";
-     my $line = $line.fmtdec($env,$issrec->{'renewals'},"20")." ";
-     my $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
+     my @date = split("-",$issrec->{'date_due'});
+     #my $line = $issrec->{'date_due'}." ";
+     my $line = @date[2]."-".@date[1]."-".@date[0]." ";
+     $line = $line.fmtdec($env,$issrec->{'renewals'},"20")." ";
+     $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
      $items[$x] = $line;
      #debug_msg($env,$line);
      $issues[$x] = $issrec;
@@ -170,7 +172,6 @@ sub bulkrenew {
   my $y = 0;
   my @renew_errors = "";
   while ($x < $isscnt) {
-    
     if (@$renews[$x] == 1) {
       my $issrec = $issues[$x];
       renewbook($env,$dbh,$issrec->{'borrowernumber'},$issrec->{'itemnumber'},"");
@@ -178,15 +179,5 @@ sub bulkrenew {
     $x++;
   }
   $sth->finish();
-  #if ($barcodes[0] ne "") {
-  #  my $errmsg = join(@barcodes,",");
-  #  if ($barcodes[1] eq "") {
-  #    $errmsg = $errmsg." has";
-  #  } else {
-  #    $errmsg = $errmsg." have";
-  #  }
-  #  $errmsg = $errmsg." been renewed before";
-  #  C4::InterfaceCDK::error_msg($env,$errmsg);
-  #}
 }
 END { }       # module clean-up code here (global destructor)

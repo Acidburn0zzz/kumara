@@ -90,6 +90,16 @@ sub trapsnotes {
   my $notes =  $notesbox->activate();
   if (!defined $notes) { 
     $notes = $borrower->{'borrowernotes'}; 
+  } else {
+    while (substr($notes,0,1) eq " ") {
+      my $temp;
+      if (length($notes) == 1) {
+        $temp = "";
+      } else {
+        $temp = substr($notes,1,length($notes)-1);
+      }
+      $notes = $temp;
+    }
   }
   undef $notesbox;
   undef $borpanel;

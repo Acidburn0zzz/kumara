@@ -69,10 +69,9 @@ sub Start_circ{
   my $data;
   while ($donext ne 'Quit') {
     if ($donext  eq "Circ") {
-      clearscreen();
-      #
       #($reason,$data) = menu($env,'console','Circulation', 
       #  ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
+      #&startint($env,"Menu");
       ($reason,$data) = menu($env,'console','Circulation',
         ('Issues','Returns','Select Branch','Select Printer')); 
     } else {
@@ -94,7 +93,7 @@ sub Start_circ{
       $donext = $data;
     }
   }
-  &endint($env)  
+  #&endint($env)  
 }
 
 
