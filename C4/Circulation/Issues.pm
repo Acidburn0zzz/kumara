@@ -14,6 +14,7 @@ use C4::Circulation::Borrower;
 use C4::Scan;
 use C4::Stats;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use Newt qw();
   
 # set the version for version checking
 $VERSION = 0.01;
@@ -66,11 +67,14 @@ sub Issue  {
     #deal with alternative loans
     #now check items 
     clearscreen();
-    my $items=pastitems($env,$bornum,$dbh);
-    my $items2;
-    my $done;
+    my ($items,$items2)=pastitems($env,$bornum,$dbh);
+   # my @items2;
+#    $items2[0]=" "x30;
+	 
+#    my @items2;
+#    $items2[0]=" "x30;
+    my $done = "No";
     my $row2=5;
-    ($done,$items2,$row2)=&processitems($env,$bornum,$borrower,$items,$items2,$row2);
     while ($done eq 'No'){
       ($done,$items2,$row2)=&processitems($env,$bornum,$borrower,$items,$items2,$row2);
     }    
@@ -88,39 +92,42 @@ sub processitems {
   #process a users items
 #  clearscreen();
 #  output(1,1,"Processing Items");
-  helptext("F11 Ends processing for current borrower  F10 ends issues");
-  my ($env,$bornum,$borrower,$items,$items2,$row2)=@_;
-  my $dbh=&C4Connect;  
-  my $row=5;
+   helptext("F11 Ends processing for current borrower  F10 ends issues");
+   my ($env,$bornum,$borrower,$items,$items2,$row2)=@_;
+   my $dbh=&C4Connect;  
+   my $row=5;
 #  my $count=$$items;
-  my $i=0;
-  while ($items->[$i]){
-    output (1,$row,$items->[$i]);
-    $i++;
-    $row++;
-  }
-  my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
-  if ($itemnum ne ""){ 
-    my ($item,$items2) = &issueitem($env,$dbh,$itemnum,$bornum,$items,$items2);
-    output(40,$row2,$item->{'title'});
-    $row2++;	      
-  }  
-  $dbh->disconnect;
-  #check to see if more books to process for this user
-  if ($reason eq 'Finished user'){
-    return('New borrower');
-  } else {
-    if ($reason ne 'Finished issues'){
-      #return No to let them no that we wish to process more Items for borrower
-      return('No',$items2,$row2);
-    } else  {
-      return('Circ');
-    }
-  }
+   my $i=0;
+   #  while ($items->[$i]){
+   #    output (1,$row,$items->[$i]);
+   #    $i++;
+   #    $row++;
+   #  }
+   my ($itemnum,$reason)=issuewindow($env,'Issues',$items,$items2,$borrower,"Borrower barcode");
+   if ($itemnum ne ""){
+      debug_msg($env,"borrower $bornum");
+      my ($item) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
+      output(40,$row2,$item->{'title'});
+      #unshift $items2,substr(($item->{'title'}.(" "x30)),0,30);
+      $items2[$row2-5]=substr(($item->{'title'}.(" "x30)),0,30); 
+      $row2++;	      
+   }  
+   $dbh->disconnect;
+   #check to see if more books to process for this user
+   if ($reason eq 'Finished user'){
+      return('New borrower');
+   } else {
+      if ($reason ne 'Finished issues'){
+         #return No to let them no that we wish to process more Items for borrower
+         return('No',$items2,$row2);
+      } else  {
+         return('Circ');
+      }
+   }
 }
 
 sub issueitem{
-   my ($env,$dbh,$itemnum,$bornum,$items,$items2)=@_;
+   my ($env,$dbh,$itemnum,$bornum,$items)=@_;
    $itemnum=uc $itemnum;
    my $canissue = 1;
  #  my ($itemnum,$reason)=&scanbook();
@@ -128,7 +135,8 @@ sub issueitem{
    my $sth=$dbh->prepare($query);  
    $sth->execute;
    my $item=$sth->fetchrow_hashref;  
-   $items2=$item;
+   #$items2=(substr($item.(" "x30),0,30));
+   #$items2->Append(substr($item.(" "x30),0,30));
    $sth->finish;
    #check if item is restricted
    if ($item->{'restricted'} == 1 ){
@@ -148,36 +156,37 @@ sub issueitem{
    }   
    if ($canissue == 1) {
      #now mark as issued
-     &debug_msg($env,"Issue $item->{'itemnumber'}
-$item->{'biblioitemnumber'} $bornum");
-     &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
-     &debug_msg($env,"stats");
+     &debug_msg($env,"Issue $item->{'itemnumber'} $item->{'biblioitemnumber'} $bornum");
+     &updateissues($env,$item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum)
      &UpdateStats($env,$env->{'branchcode'},'issue');
-     &debug_msg($env,"Done");
    }
-   return($item,$items2);
+   return($item);
 }
 
 sub updateissues{
   # issue the book
-   my ($env,$itemno,$bitno,$dbh,$bornum)=@_;
-   my $loanlength=21;
-   my $query="Select loanlength from biblioitems,itemtypes
-   where (biblioitems.biblioitemnumber='$bitno') 
-   and (biblioitems.itemtype = itemtypes.itemtype)";
-#   print "\n$query\n";
-   my $sth=$dbh->prepare($query);
-   $sth->execute;
-   if (my $data=$sth->fetchrow_hashref) {
-      $loanlength = $data->{'loanlength'}
-   }
-   $sth->finish;
-   # this ought to also insert the branch, but doen't do so yet.
-   $query = "Insert into issues (borrowernumber,itemnumber,date_due,branchcode)
-   values
-   ($bornum,$itemno,datetime('now'::abstime)+$loanlength,$env->{'branchcode'})";
-   my $sth=$dbh->prepare($query);
-#   print "\n$query\n";
+  my ($env,$itemno,$bitno,$dbh,$bornum)=@_;
+  my $loanlength=21;
+  my $query="Select loanlength from biblioitems,itemtypes
+  where (biblioitems.biblioitemnumber='$bitno') 
+  and (biblioitems.itemtype = itemtypes.itemtype)";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  if (my $data=$sth->fetchrow_hashref) {
+    $loanlength = $data->{'loanlength'}
+  }
+  $sth->finish;
+  my $datedue = time + $loanlength;
+  my @datearr = localtime($datedue);
+  my $dateduef = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
+  # this ought to also insert the branch, but doen't do so yet.
+  # $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
+  # values
+  # ($bornum,$itemno,datetime('now'::abstime) + $loanlength,$env->{'branchcode'})";
+  $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
+  values
+  ($bornum,$itemno,'$dateduef','$env->{'branchcode'}')";
+  my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
 }

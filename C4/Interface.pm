@@ -127,19 +127,21 @@ sub list {
 
 sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$name)=@_;
-  my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label("Book");
   my $panel = Newt::Panel(50,25, $title,5,5);
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
   my $l3  = Newt::Label("Borrower Info");
-  my $li1 = Newt::Listbox(5,
-    NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
-  my $li2 = Newt::Listbox(5,
+ # my $li1 = Newt::Listbox(10,
+ #   NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
+  my $li1 = Newt::Listbox(10,NEWT_FLAG_SCROLL);
+  my $li2 = Newt::Listbox(10,
     NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE | NEWT_FLAG_SCROLL);
   my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   $li1->Add($items1->[0],$items1->[1]);
-  $li2->Add($items2->{'title'});
+  # $li2->Add($items2->{'title'});
+  $li2->Add($items2); 
   $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
   "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);

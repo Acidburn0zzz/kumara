@@ -81,12 +81,15 @@ sub pastitems{
   $sth->execute;
   my $i=0;
   my @items;
+  my @items2;
+  $items[0]=" "x40;
+  $items2[0]=" "x30;
   while (my $data=$sth->fetchrow_hashref){
      my $line = "$data->{'date_due'} $data->{'title'}".(" "x30);
      $items[$i]=substr($line,0,40);
      $i++;
   }
-  return(\@items);
+  return(\@items,\@items2);
 }
 
 sub checkoverdues{
