@@ -197,8 +197,9 @@ sub KeywordSearch {
   my $count=@key;
   my $i=1;
   my @results;
-  my $query ="Select * from biblio,bibliosubtitle where
+  my $query ="Select * from biblio,bibliosubtitle,biblioitems where
   biblio.biblionumber=bibliosubtitle.biblionumber and
+  biblioitems.biblionumber=biblio.biblionumber and
   (((title like '$key[0]%' or title like '% $key[0]%')";
   while ($i < $count){
     $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%')";
@@ -212,9 +213,13 @@ sub KeywordSearch {
   for ($i=1;$i<$count;$i++){
     $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
   }
-  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[0]%')";
+  $query.= ") or ((biblio.notes like '$key[0]%' or biblio.notes like '% $key[0]%')";
   for ($i=1;$i<$count;$i++){
-    $query.=" and (notes like '$key[$i]%' or notes like '% $key[$i]%')";
+    $query.=" and (biblio.notes like '$key[$i]%' or biblio.notes like '% $key[$i]%')";
+  }
+  $query.= ") or ((biblioitems.notes like '$key[0]%' or biblioitems.notes like '% $key[0]%')";
+  for ($i=1;$i<$count;$i++){
+    $query.=" and (biblioitems.notes like '$key[$i]%' or biblioitems.notes like '% $key[$i]%')";
   }
   if ($search->{'keyword'} =~ /new zealand/i){
     $query.= "or (title like 'nz%' or title like '% nz %' or title like '% nz' or subtitle like 'nz%'
@@ -471,7 +476,8 @@ sub subsearch {
   my $dbh=C4Connect();
   my $query="Select * from biblio,bibliosubject where
   biblio.biblionumber=bibliosubject.biblionumber and
-  bibliosubject.subject='$subject'";
+  bibliosubject.subject='$subject' group by biblio.biblionumber
+  order by biblio.title";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
