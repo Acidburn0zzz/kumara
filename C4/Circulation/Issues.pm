@@ -86,6 +86,7 @@ sub Issue  {
     if ($borrower->{'gonenoaddress'} == 1){
       #got to membership update and update member info
       output(20,1,"Borrower has no address");
+      pause();
     }
     #check if member has a card reported as lost
     if ($borrower->{'lost'} ==1){
