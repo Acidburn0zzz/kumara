@@ -10,10 +10,10 @@ use C4::Acquisitions;
 #use Date::Manip;
 
 my $input = new CGI;
-print $input->header;
-print startpage();
-print startmenu('acquisitions');
-print $input->dump;
+#print $input->header;
+#print startpage();
+#print startmenu('acquisitions');
+#print $input->dump;
 my $existing=$input->param('existing');
 my $title=$input->param('title');
 $title=~ s/\'/\\\'/g;
@@ -51,9 +51,9 @@ if ($existing eq 'no'){
   modbiblio($bibnum,$title,$author,$copyright);
 
 }
-neworder($bibnum,$title,$ordnum,$basketno,$quantity,$listprice,$supplier,$who,$notes,$bookfund,$bibitemnum);
+neworder($bibnum,$title,$ordnum,$basketno,$quantity,$listprice,$supplier,$who,$notes,$bookfund,$bibitemnum,$rrp,$ecost,$gst);
 
-
+print $input->redirect("newbasket.pl?id=$supplier&basket=$basketno");
 #print $input->dump;
-print endmenu('acquisitions');
-print endpage();
+#print endmenu('acquisitions');
+#print endpage();

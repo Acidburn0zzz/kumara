@@ -349,16 +349,16 @@ sub newsubtitle {
 
 sub neworder {
   my ($bibnum,$title,$ordnum,$basket,$quantity,$listprice,$supplier,$who,
-  $notes,$bookfund,$bibitemnum)=@_;
+  $notes,$bookfund,$bibitemnum,$rrp,$ecost,$gst)=@_;
   my $dbh=C4Connect;
   my $query="insert into aqorders (biblionumber,title,ordernumber,basketno,
   quantity,listprice,booksellerid,entrydate,requisitionedby,authorisedby,notes,
-  biblioitemnumber) 
+  biblioitemnumber,rrp,ecost,gst) 
   values
   ($bibnum,'$title',$ordnum,$basket,$quantity,$listprice,'$supplier',now(),
-  '$who','$who','$notes',$bibitemnum)";
+  '$who','$who','$notes',$bibitemnum,'$rrp','$ecost','$gst')";
   my $sth=$dbh->prepare($query);
-  print $query;
+#  print $query;
   $sth->execute;
   $sth->finish;
   $query="insert into aqorderbreakdown (ordernumber,bookfundid) values

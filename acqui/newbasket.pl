@@ -17,8 +17,10 @@ print startpage;
 
 print startmenu('acquisitions');
 
-
-my $basket=newbasket();
+my $basket=$input->param('basket');
+if ($basket eq ''){
+  $basket=newbasket();
+}
 my $date=localtime(time);
 print <<printend
 
