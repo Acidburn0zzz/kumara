@@ -62,7 +62,7 @@ sub accountsdialog {
   new Cdk::Label ('Message' =>\@borinfo, 'Ypos'=>4, 'Xpos'=>"RIGHT");
   $borpanel->draw();
   my $acctlist = new Cdk::Scroll ('Title'=>"Outstanding Items",
-      'List'=>\@$accountlines,'Height'=>12,'Width'=>30,
+      'List'=>\@$accountlines,'Height'=>12,'Width'=>76,
       'Xpos'=>1,'Ypos'=>10);
   $acctlist->draw();
   my $amountentry = new Cdk::Entry('Label'=>"Amount:  ",

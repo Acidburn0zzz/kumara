@@ -2,7 +2,6 @@ package C4::InterfaceCDK; #asummes C4/InterfaceCDK
 
 #uses Newt
 use C4::Format;
-use C4::Interface::Funkeys;
 use strict;
 use Cdk;
 use Date::Manip;

@@ -7,6 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Format;
+use C4::Search;
 use C4::InterfaceCDK;
 use C4::Interface::AccountsCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -98,13 +99,17 @@ sub reconcileaccount {
   my $row=4;
   my $i=0;
   my $text;
-  output (1,2,"Account Info");
-  output (1,3,"Item\tDate      \tAmount\tDescription");
+  #output (1,2,"Account Info");
+  #output (1,3,"Item\tDate      \tAmount\tDescription");
   while (my $data=$sth->fetchrow_hashref){
     my $line=$i+1;
     my $amount=0+$data->{'amountoutstanding'};
-    $line= 
-     $data->{'date'}." ".fmtdec($env,$amount,"52")." ".fmtstr($data->{'description'},"L15");
+    my $itemdata = itemnodata($env,$dbh,$data->{'itemnumber'});
+    $line= $data->{'date'}." ".$data->{'accounttype'}." ";
+    my $title = $itemdata->{'title'};
+    if (length($title) > 15 ) {$title = substr($title,0,15);}
+    $line= $line.$itemdata->{'barcode'}." $title ".$data->{'description'};
+    $line = fmtstr($env,$line,"L65")." ".fmtdec($env,$amount,"52");
     push @accountlines,$line;
     $i++;
   }

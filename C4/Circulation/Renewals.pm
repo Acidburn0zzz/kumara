@@ -9,6 +9,8 @@ use DBI;
 use C4::Database;
 use C4::Accounts;
 use C4::InterfaceCDK;
+use C4::Interface::RenewalsCDK;
+use C4::Search;
 use C4::Scan;
 use C4::Stats;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -17,7 +19,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&renewstatus &renewbook);
+@EXPORT = qw(&renewstatus &renewbook &bulkrenew);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -131,4 +133,40 @@ sub renewbook {
   return();
 }
 
+sub bulkrenew {
+  my ($env,$dbh,$bornum,$amount,$borrower,$odues) = @_;
+  my $query = "select * from issues 
+    where borrowernumber = '$bornum' and returndate is null order by date_due";
+  my $sth = $dbh->prepare($query);
+  $sth->execute();
+  my @items;
+  my @issues;
+  my @renewdef;
+  my $x;
+  while (my $issrec = $sth->fetchrow_hashref) {
+     my $itemdata = itemnodata($env,$dbh,$issrec->{'itemnumber'});
+     my $line = $issrec->{'date_due'}." ".$issrec->{'renewals'}." ";
+     my $line = $line.$itemdata->{'barcode'}." ".$itemdata->{'title'};
+     $items[$x] = $line;
+     #debug_msg($env,$line);
+     $issues[$x] = $issrec;
+     my $rdef = 1;
+     if ($issrec->{'renewals'} > 0) {
+       $rdef = 0;
+     }
+     $renewdef[$x] = $rdef;
+     $x++;
+  }  
+  my $renews = renew_window($env,\@items,$borrower,$amount,$odues);
+  my $isscnt = $x;
+  $x =0;
+  while ($x < $isscnt) {
+     if (@$renews[$x] == 1) {
+        my $issrec = $issues[$x];
+	renewbook($env,$dbh,$issrec->{'borrowernumber'},$issrec->{'itemnumber'},"");
+     }	
+     $x++;
+  }
+  $sth->finish();
+}
 END { }       # module clean-up code here (global destructor)

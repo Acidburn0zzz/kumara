@@ -142,7 +142,7 @@ sub processitems {
 
 sub formatitem {
    my ($env,$item,$datedue,$charge) = @_;
-   my $line = $datedue." ".$item->{'title'}.", ".$item->{'author'};
+   my $line = $datedue." ".$item->{'barcode'}." ".$item->{'title'}.": ".$item->{'author'};
    my $iclass =  $item->{'itemtype'};
    if ($item->{'dewey'} > 0) {
      $iclass = $iclass.$item->{'dewey'}.$item->{'subclass'};

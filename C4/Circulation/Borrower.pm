@@ -12,6 +12,7 @@ use C4::InterfaceCDK;
 use C4::Interface::FlagsCDK;
 use C4::Circulation::Main;
 use C4::Circulation::Issues;
+use C4::Circulation::Renewals;
 use C4::Scan;
 use C4::Stats;
 use C4::Format;
@@ -217,6 +218,8 @@ sub process_traps {
      $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
      if ($trapact eq "FINES") {
        &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
+     } elsif ($trapact eq "ODUES") {
+       &bulkrenew($env,$dbh,$bornum,$amount,$borrower,$odues);
      } elsif  ($trapact eq "NOTES") {
        my $notes = trapsnotes($env,$bornum,$borrower,$amount);
        if ($notes ne $borrower->{'borrowernotes'}) {   

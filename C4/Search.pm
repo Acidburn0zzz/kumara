@@ -336,6 +336,7 @@ sub ItemInfo {
     my $class = $data->{'classification'};
     my $dewey = $data->{'dewey'};
     $dewey =~ s/0+$//;
+    if ($dewey eq "0.") { $dewey = "";};
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
@@ -371,10 +372,10 @@ sub GetItems {
       $isth->execute;
       while (my $idata = $isth->fetchrow_hashref) {
         my $iline = $idata->{'barcode'}."[".$idata->{'holdingbranch'}."[";
-	if ($idata->{'notforloan'} = 1) {
+	if ($idata->{'notforloan'} == 1) {
 	  $iline = $iline."NFL ";
 	}
-	if ($idata->{'itemlost'} = 1) {
+	if ($idata->{'itemlost'} == 1) {
 	  $iline = $iline."LOST ";
 	}        
         $line = $line."\t$iline"; 
