@@ -222,7 +222,7 @@ sub newbasket {
 sub bookfunds {
   my $dbh=C4Connect;
   my $query="Select * from aqbookfund,aqbudget where aqbookfund.bookfundid
-  =aqbudget.bookfundid group by aqbookfund.bookfundid";
+  =aqbudget.bookfundid group by aqbookfund.bookfundid order by bookfundname";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
