@@ -64,17 +64,25 @@ sub Issue  {
     helptext('');
     clearscreen();
     my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
-    #deal with alternative loans
-    #now check items 
-    clearscreen();
-    my ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
-    my $done = "No";
-    my $row2=5;
-    my $it2p=0;
-    while ($done eq 'No'){
-      ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
-    }    
-    $dbh->disconnect;  
+    my $done;
+    if ($reason eq "Finished issues") {
+      $dbh->disconnect;
+      clearscreen();
+      $done = "Circ";
+    } else {
+      debug_msg("","bornum = $bornum");  
+      #deal with alternative loans
+      #now check items 
+      clearscreen();
+      my ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
+      my $done = "No";
+      my $row2=5;
+      my $it2p=0;
+      while ($done eq 'No'){
+        ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
+      }    
+      $dbh->disconnect;  
+    }
     if ($done ne 'Circ'){
       Issue($env);
     }

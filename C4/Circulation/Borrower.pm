@@ -66,7 +66,7 @@ sub findborrower  {
   my $borcode = "";
   my $reason = "";
   my $book;
-  while ($bornum eq '') {
+  while (($bornum eq '') && ($reason ne "Finished issues")) {
     #get borrowerbarcode from scanner
     ($borcode,$reason,$book)=&scanborrower();
     if ($borcode ne '') {
@@ -118,12 +118,14 @@ sub findborrower  {
        } else {
          error_msg($env,"Item $book not found");
        } 
-    }
+    } 
   }
-  my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
-  output(1,1,$borrowers);
-  my $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
-  
+  my $issuesallowed;
+  if ($reason ne "Finished issues") {
+    my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
+    output(1,1,$borrowers);
+    $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
+  }
   return ($bornum, $issuesallowed,$borrower,$reason);
 }  
 
