@@ -51,7 +51,8 @@ if ($quantity ne '0'){
   } else {
     $bibnum=$input->param('biblio');
     $bibitemnum=$input->param('bibitemnum');
-    if ($bibitemnum eq ''){
+    my $oldtype=$input->param('oldtype');
+    if ($bibitemnum eq '' || $itemtype ne $oldtype){
       $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
     }
     modbiblio($bibnum,$title,$author,$copyright,$series);

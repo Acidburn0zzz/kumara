@@ -106,6 +106,7 @@ print <<printend
 <input type=hidden name=supplier value=$id>
 <input type=hidden name=biblio value=$biblio>
 <input type=hidden name=bibitemnum value=$data->{'biblioitemnumber'}>
+<input type=hidden name=oldtype value=$data->{'itemtype'}>
 <input type=hidden name=discount value=$booksellers[0]->{'discount'}>
 <input type=hidden name=listinc value=$booksellers[0]->{'listincgst'}>
 <input type=hidden name=currency value=$booksellers[0]->{'listprice'}>
