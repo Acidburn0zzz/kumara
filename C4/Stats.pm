@@ -148,16 +148,25 @@ sub TotalOwing{
 sub TotalPaid {
   my ($time)=@_;
   my $dbh=C4Connect;
-  my $query="Select sum(amount) from accountlines where accounttype='Pay'";
+  my $query="Select * from accountlines,borrowers where accounttype = 'Pay' 
+  and accountlines.borrowernumber = borrowers.borrowernumber";
   if ($time eq 'today'){
     $query=$query." and date = now()";
+  } else {
+    $query.=" and date='$time'";
   }
+  $query.=" order by timestamp";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-   my $total=$sth->fetchrow_hashref;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
    $sth->finish;
   $dbh->disconnect; 
-  return($total->{'sum(amount)'});
+  return(@results);
 }
 END { }       # module clean-up code here (global destructor)
   
