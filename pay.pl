@@ -50,6 +50,8 @@ printend
 ;
 for (my $i=0;$i<$numaccts;$i++){
 if ($accts->[$i]{'amountoutstanding'} > 0){
+$accts->[$i]{'amount'}+=0.00;
+$accts->[$i]{'amountoutstanding'}+=0.00;
 print <<printend
 <tr VALIGN=TOP  >
 <TD><input type=radio name=payfine$i value=no checked>Unpaid
@@ -61,7 +63,7 @@ print <<printend
 <input type=hidden name=bornum value=$bornum>
 <input type=hidden name=accountno$i value=$accts->[$i]{'accountno'}>
 </td>
-<TD>$accts->[$i]{'description'}</td>
+<TD>$accts->[$i]{'description'} $accts->[$i]{'title'}</td>
 <TD>$accts->[$i]{'accounttype'}</td>
 <td>$accts->[$i]{'amount'}</td>
 <TD>$accts->[$i]{'amountoutstanding'}</td>

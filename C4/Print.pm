@@ -103,7 +103,7 @@ sub printreserve {
   print PRINTER "$itemdata->{'author'}";
   print PRINTER "\r\n\r\n";
   if ($env->{'printtype'} eq "docket"){ 
-    print chr(27).char(105);
+    print chr(27).chr(105);
   }  
   close PRINTER;
   #system("lpr /tmp/$file");
