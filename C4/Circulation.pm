@@ -78,7 +78,7 @@ sub pastitems{
   my $i=0;
   my @items;
   while (my $data=$sth->fetchrow_hashref){
-     $items[$i]="$data->{'title'} $data->{'author'}";    
+     $items[$i]="$data->{'title'} $data->{'date_due'}";    
      $i++;
   }
   return(\@items);
