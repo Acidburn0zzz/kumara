@@ -94,7 +94,38 @@ sub renewstatus {
 
 sub renewbook {
   # mark book as renewed
-  my ($env,$dbh,$bornum,$itemno)=@_;
+  my ($env,$dbh,$bornum,$itemno,$datedue)=@_;
+  if ($datedue eq "" ) {    
+     my $loanlength=21;
+     my $query= "Select * from biblioitems,items,itemtypes
+       where (items.itemnumber = '$itemno')
+       and (biblioitems.biblioitemnumber = items.biblioitemnumber)
+       and (biblioitems.itemtype = itemtypes.itemtype)";
+     my $sth=$dbh->prepare($query);
+     $sth->execute;
+     if (my $data=$sth->fetchrow_hashref) {
+       $loanlength = $data->{'loanlength'}
+     }
+     $sth->finish;
+     my $ti = time;
+     my $datedue = time + ($loanlength * 86400);
+     my @datearr = localtime($datedue);
+     my $datedue = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
+  }
+  my $issquery = "select * from issues where borrowernumber='$bornum' and
+    itemnumber='$itemno' and returndate is null";
+  my $sth=$dbh->prepare($issquery);
+  $sth->execute;
+  my $issuedata=$sth->fetchrow_hashref;
+  $sth->finish;
+  my $renews = $issuedata->{'renewals'} +1;
+  my $updquery = "update issues 
+    set date_due = '$datedue', renewals = '$renews'
+    where borrowernumber='$bornum' and
+    itemnumber='$itemno' and returndate is null";
+  my $sth=$dbh->prepare($updquery);
+  $sth->execute;
+  $sth->finish;
   return();
 }
 
