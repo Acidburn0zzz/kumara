@@ -43,6 +43,7 @@ print <<printend
 <TR VALIGN=TOP>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Rank</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Member Number</b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Notes</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Date</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pickup</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Request</b></TD>
@@ -65,6 +66,7 @@ print <<printend
 </select>
 </td>
 <TD><input type=text size=20 name=member></td>
+<TD><input type=text size=20 name=notes></td>
 <TD>$date</td>
 <TD><select name=pickup>
 <option value=C>Levin
@@ -129,13 +131,14 @@ print <<printend
 
 <TR VALIGN=TOP>
 
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=6><B>MODIFY EXISTING REQUESTS </b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=7><B>MODIFY EXISTING REQUESTS </b></TD>
 </TR>
 <form action=modrequest.pl method=post>
 <TR VALIGN=TOP>
 
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Rank</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Member</b></TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Notes</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Date</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Pickup</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Request</b></TD>
@@ -176,6 +179,7 @@ print "<option value=del>Del";
 print "</select>
 </td>
 <TD><a href=/cgi-bin/koha/moremember.pl?bornum=$bor>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
+<td>$reserves->[$i]{'reservenotes'}</td>
 <TD>$date</td>
 <TD><select name=pickup>
 <option value=C";

@@ -17,6 +17,7 @@ my @bibitems=$input->param('biblioitem');
 my @reqbib=$input->param('reqbib');
 my $biblio=$input->param('biblio');
 my $borrower=$input->param('member');
+my $notes=$input->param('notes');
 my $branch=$input->param('pickup');
 my @rank=$input->param('rank-request');
 my $type=$input->param('type');
@@ -40,12 +41,12 @@ my $env;
 my $const;
 if ($input->param('request') eq 'any'){
   $const='a';
-  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi,$rank[0]);
+  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi,$rank[0],$notes);
 } elsif ($reqbib[0] ne ''){
   $const='o';
-  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@reqbib,$rank[0]);
+  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@reqbib,$rank[0],$notes);
 } else {
-  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,'a',\@realbi,$rank[0]);
+  CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,'a',\@realbi,$rank[0],$notes);
 }
 #print @realbi;
 
