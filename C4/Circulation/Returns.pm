@@ -295,10 +295,8 @@ sub find_reserves {
       $resfound = "y";
     } else {
       my $conquery = "select * from reserveconstraints
-        where borrowernumber = $resrec->{'borrowernumber'}
-	and reservedate = $resrec->{'reservedate'}
-	and biblionumber = $resrec->{'biblionumber'}
-	and biblioitemnumber = $itemdata->{'biblioitemnumber'}";
+        where borrowernumber = $resrec->{'borrowernumber'} and reservedate =
+$resrec->{'reservedate'} and biblionumber = $resrec->{'biblionumber'} and biblioitemnumber = $itemdata->{'biblioitemnumber'}";
       my $consth = $dbh->prepare($conquery);
       $consth->execute;
       if (my $conrec=$consth->fetchrow_hashref) {
@@ -312,7 +310,7 @@ sub find_reserves {
       }
       $consth->finish;
     }
-    if ($resfound = "y") {
+    if ($resfound eq "y") {
       my $updquery = "update reserves 
         set found = 'W',itemnumber='$itemno'
         where borrowernumber = $resrec->{'borrowernumber'}
