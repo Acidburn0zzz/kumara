@@ -336,9 +336,10 @@ sub CatSearch  {
     my $count=@key;
     my $i=1;
     $query="select distinct(subject) from bibliosubject where( subject like
-    '$key[0]%' or subject like '% $key[0]%')";
+    '$key[0]%' or subject like '% $key[0]%' or subject like '%($key[0])%')";
     while ($i<$count){
-      $query.=" and (subject like '$key[$i]]%' or subject like '% $key[$i]%')";
+      $query.=" and (subject like '$key[$i]]%' or subject like '% $key[$i]%'
+      or subject like '%($key[$i])%')";
       $i++;
     }
   }
@@ -486,6 +487,9 @@ sub ItemInfo {
     }
     if ($data->{'itemlost'} eq '1'){
         $datedue='Itemlost';
+    }
+    if ($data->{'wthdrawn'} eq '1'){
+      $datedue="Cancelled";
     }
     $isth->finish;
     my $class = $data->{'classification'};
