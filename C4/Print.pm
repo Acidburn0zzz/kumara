@@ -51,36 +51,47 @@ sub remoteprint {
   my ($env,$items,$borrower)=@_;
   #debug_msg($env,"In print");
   my $file=time;
-  open (FILE,">/tmp/$file");
+  my $queue = $env->{'queue'};
+  open(PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";  
+  #open (FILE,">/tmp/$file");
   my $i=0;
-  print FILE "$borrower->{'cardnumber'}\n$borrower->{'firstname'} $borrower->{'surname'}\n";
+  print PRINTER "$borrower->{'cardnumber'}\r\n";
+  print PRINTER "$borrower->{'firstname'} $borrower->{'surname'}\r\n";
   while ($items->[$i]){
-    print FILE "$items->[$i]\n";
+    print PRINTER "$items->[$i]\r\n";
     $i++;
   }
-  print FILE "\n\n\n\n\n\n\n\n\n\n";
-  close FILE;
-  system("lpr /tmp/$file");
+  print PRINTER "\r\n\r\n";
+  if ($env->{'printtype'} eq "docket"){
+    print chr(7);
+  }
+  close PRINTER;
+  #system("lpr /tmp/$file");
 }
 
 sub printreserve {
   my($env,$resrec,$rbordata,$itemdata)=@_;
   my $file=time;
-  open (FILE,">/tmp/$file");
-  print FILE "Collect at $resrec->{'branchcode'}\n\n";
-  print FILE "$rbordata->{'surname'}; $rbordata->{'firstname'}\n";
-  print FILE "$rbordata->{'cardnumber'}\n";
-  print FILE "Phone: $rbordata->{'phone'}\n";
-  print FILE "$rbordata->{'streetaddress'}\n";
-  print FILE "$rbordata->{'suburb'}\n";
-  print FILE "$rbordata->{'town'}\n";   
-  print FILE "$rbordata->{'emailaddress'}\n\n";
-  print FILE "$itemdata->{'barcode'}\n";
-  print FILE "$itemdata->{'title'}\n";
-  print FILE "$itemdata->{'author'}";
-  print FILE "\n\n\n\n\n\n\n\n\n\n";
-  close FILE;
-  system("lpr /tmp/$file");
+  my $queue = $env->{'queue'};
+  open(PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";
+  #open (FILE,">/tmp/$file");
+  print PRINTER "Collect at $resrec->{'branchcode'}\r\n\r\n";
+  print PRINTER "$rbordata->{'surname'}; $rbordata->{'firstname'}\r\n";
+  print PRINTER "$rbordata->{'cardnumber'}\r\n";
+  print PRINTER "Phone: $rbordata->{'phone'}\r\n";
+  print PRINTER "$rbordata->{'streetaddress'}\r\n";
+  print PRINTER "$rbordata->{'suburb'}\r\n";
+  print PRINTER "$rbordata->{'town'}\r\n";   
+  print PRINTER "$rbordata->{'emailaddress'}\r\n\r\n";
+  print PRINTER "$itemdata->{'barcode'}\r\n";
+  print PRINTER "$itemdata->{'title'}\r\n";
+  print PRINTER "$itemdata->{'author'}";
+  print PRINTER "\r\n\r\n";
+  if ($env->{'printtype'} eq "docket"){ 
+    print chr(7);
+  }  
+  close PRINTER;
+  #system("lpr /tmp/$file");
 }
 END { }       # module clean-up code here (global destructor)
   

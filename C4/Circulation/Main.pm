@@ -71,6 +71,20 @@ sub getbranch {
   }
   brmenu ($env,\@branches);
 }
+
+sub getprinter {
+  my ($env) = @_;
+  my $dbh = C4Connect;
+  my $query = "select * from printers order by printername";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  my @printers;
+  while (my $data = $sth->fetchrow_hashref) {
+    push @printers,$data;
+  }
+  prmenu ($env,\@printers);
+  }
+		      
 sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;

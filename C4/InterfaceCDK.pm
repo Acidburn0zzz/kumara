@@ -20,7 +20,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
 &selborrower &returnwindow &logondialog &borrowerwindow &titlepanel
-&borrbind &borrfill &preeborr &borrowerbox &brmenu);
+&borrbind &borrfill &preeborr &borrowerbox &brmenu &prmenu);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -223,6 +223,33 @@ sub brmenu {
     my $brrec = @$brrecs[$menuItem];
     $env->{'branchcode'} = $brrec->{'branchcode'};
     $env->{'branchname'} = $brrec->{'branchname'};
+  }
+  return();
+  
+}
+
+sub prmenu {
+  my ($env,$prrecs)=@_;
+  $env->{'sysarea'}="Menu";
+  my $titlebar=titlepanel($env,"Library System","Select printer");
+  my @mitems;
+  my $x = 0;
+  while (@$prrecs[$x] ne "") {
+    my $prrec =@$prrecs[$x]; 
+    $mitems[$x]=fmtstr($env,$prrec->{'printernam'},"L20");
+    $x++;
+  }  
+  my $menu = new Cdk::Scroll ('Title'=>"  ",
+      'List'=>\@mitems,
+      'Height'=> 16,
+      'Width'=> 30);
+  # Activate the object.         
+  my ($menuItem) = $menu->activate();
+  # Check the results.
+  if (defined $menuItem) {      
+    my $prrec = @$prrecs[$menuItem];
+    $env->{'queue'} = $prrec->{'printqueue'};
+    $env->{'printtype'} = $prrec->{'printtype'};
   }
   return();
   
@@ -499,9 +526,8 @@ sub actrfmenu {
        $amountowing,$borrower,$odues);
        Cdk::refreshCdkScreen();
     }
-  }
-  
-  }
+  } 
+}
   
 sub act {
   my ($obj) = @_;
