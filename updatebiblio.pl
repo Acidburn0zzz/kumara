@@ -21,7 +21,7 @@ my $unititle=checkinp($input->param('Unititle'));
 my $notes=checkinp($input->param('Notes'));
 
 modbiblio($bibnum,$title,$author,$copyright,$seriestitle,$serial,$unititle,$notes);
-
+#print $title;
 my $bibitemnum=checkinp($input->param('bibitemnum'));
 my $itemtype=checkinp($input->param('Item'));
 my $isbn=checkinp($input->param('ISBN'));

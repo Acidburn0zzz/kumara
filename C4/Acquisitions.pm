@@ -283,8 +283,8 @@ sub newbiblio {
 sub modbiblio {
   my ($bibnum,$title,$author,$copyright,$seriestitle,$serial,$unititle,$notes)=@_;
   my $dbh=C4Connect;
-  $title=~ s/\'/\\\'/g;
-  $author=~ s/\'/\\\'/g;
+#  $title=~ s/\'/\\\'/g;
+#  $author=~ s/\'/\\\'/g;
   my $query="update biblio set title='$title',
   author='$author',copyrightdate='$copyright',
   seriestitle='$seriestitle',serial='$serial',unititle='$unititle',notes='$notes'
