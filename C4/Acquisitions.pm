@@ -113,7 +113,14 @@ sub ordersearch {
   my $query="Select * from aqorders,biblioitems
   where aqorders.biblioitemnumber=
   biblioitems.biblioitemnumber 
-  and (aqorders.title like '%$search%' or biblioitems.isbn='$search' 
+  and ((";
+  my @data=split(' ',$search);
+  my $count=@data;
+  for (my $i=0;$i<$count;$i++){
+    $query.= "(aqorders.title like '$data[$i]%' or aqorders.title like '% $data[$i]%') or ";
+  }
+  $query=~ s/ or $//;
+  $query.=" ) or biblioitems.isbn='$search' 
   or aqorders.ordernumber='$search') 
   group by aqorders.ordernumber";
   my $sth=$dbh->prepare($query);
