@@ -67,7 +67,7 @@ for (my$i=0;$i<$count;$i++){
 <tr valign=top bgcolor=#ffffcc>
 <td></td>
 <td>$results[$i]->{'isbn'}</td>
-<td><a href="acquire.pl?recieve=$results[$i]->{'ordernumber'}&invoice=$invoice&gst=$gst&freight=$freight">$results[$i]->{'title'}</a></td>
+<td><a href="acquire.pl?recieve=$results[$i]->{'ordernumber'}&biblio=$results[$i]->{'biblionumber'}&invoice=$invoice&gst=$gst&freight=$freight">$results[$i]->{'title'}</a></td>
 <td>$results[$i]->{'author'}</td>
 <td>\$$results[$i]->{'unitprice'}</td>
 <td></td>

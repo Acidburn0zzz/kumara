@@ -57,8 +57,9 @@ sub getorders {
   my $dbh=C4Connect;
   my $query = "Select count(*),authorisedby,entrydate,basketno from aqorders where 
   booksellerid='$supplierid' and (datereceived = '0000-00-00' or
-datereceived is NULL) and (cancelledby is NULL or cancelledby = '')";
+  datereceived is NULL) and (cancelledby is NULL or cancelledby = '')";
   $query.=" group by basketno order by entrydate";
+#  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;

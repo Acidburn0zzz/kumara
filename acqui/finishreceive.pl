@@ -55,6 +55,9 @@ if ($barcode =~ /\,/){
   @barcodes=split('|',$barcode);
 } else {
   $barcodes[0]=$barcode;
+#  print $input->header;
+#  print @barcodes;
+#  print $barcode;
 }
 my ($error)=makeitems($quantrec,$bibitemno,$biblio,$replacement,$cost,$bookseller,$branch,@barcodes);
 if ($error eq ''){

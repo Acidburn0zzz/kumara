@@ -41,6 +41,7 @@ for (my $i=0; $i<$count; $i++) {
    $toggle=0;
  }
  my ($ordcount,$orders)=getorders($suppliers[$i]->{'id'});
+# print $ordcount;
  print <<printend
  <tr valign=top bgcolor=$colour>
  <td><a href="newbasket.pl?id=$suppliers[$i]->{'id'}"><img src="/images/new-basket-short.gif" alt="New Basket" width=77 height=32 border=0 ></a> 
