@@ -105,7 +105,7 @@ while ($i < $count2){
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
-      my $url="/cgi-bin/koha/search.pl?author=$word&type=a";
+      my $url="/cgi-bin/koha/search.pl?author=$word&type=$type";
       $stuff[0]=mklink($url,$stuff[0]);
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
