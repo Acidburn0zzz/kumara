@@ -57,46 +57,57 @@ sub KeywordSearch {
   my @key=split(' ',$search->{'keyword'});
   my $count=@key;
   my $i=1;
-  my $query ="Select count(*) from biblio where 
-  (author like
-  '%$key[0]%' ";
-   while ($i < $count){ 
-     $query=$query." and author like '%$key[$i]%'";   
-     $i++;       
-   }   
-   $i=1;
-  $query=$query.") or
+  my @results;
+  my $query ="Select * from biblio where 
   (title like '%$key[0]%'";
   while ($i < $count){
     $query=$query." and title like '%$key[$i]%'";
     $i++;
   }
-  $query=$query.")";
+  $query=$query.") order by author,title";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  my $count2=$sth->fetchrow_arrayref;
-  $sth->finish;  
-  my $i=0;
-  my $count=$count2->[0];
-  my @results;
-  $query=~ s/count\(\*\)/\*/;
-  if ($type ne 'intra'){
-    $query=$query." order by title limit $offset,$num";
-  } else {
-    $query=$query." order by author limit $offset,$num";
-  }
-  $sth=$dbh->prepare($query);
-#      print $query;
-  $sth->execute;
-#
+  $i=0;
   while (my $data=$sth->fetchrow_hashref){
-
-    $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
+    $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
         $i++;
   }
   $sth->finish;
+  $sth=$dbh->prepare("Select biblionumber from bibliosubject where subject
+  like '%$search->{'keyword'}%'");
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    my $sth2=$dbh->prepare("Select * from biblio where
+    biblionumber=$data->{'biblionumber'}");
+    $sth2->execute;
+    while (my $data2=$sth2->fetchrow_hashref){
+      $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}";
+      $i++;   
+    }
+    $sth2->finish;
+  }    
+  my $i2=1;
+  @results=sort @results;
+  my @res;
+  my $count=@results;
+  $i=1;
+  $res[0]=$results[0];
+  while ($i2 < $count){
+    if ($results[$i2] ne $res[$i-1]){
+      $res[$i]=$results[$i2];
+      $i++;
+    }
+    $i2++;
+  }
+  $i2=0;
+  my @res2;
+  while ($i2 < $num){
+    $res2[$i2]=$res[$i2+$offset];
+    $i2++;
+  }
+  $sth->finish;
   $dbh->disconnect;
-  return($count,@results);
+  return($i,@res2);
 }
 
 sub CatSearch  {
@@ -107,14 +118,24 @@ sub CatSearch  {
   my $title = lc($search->{'title'}); 
   if ($type eq 'loose') {
       if ($search->{'author'} ne ''){
+        my @key=split(' ',$search->{'author'});
+	my $count=@key;
+	my $i=1;
         $query="select count(*) from
          biblio
-         where biblio.author like '%$search->{'author'}%'";     
+         where (biblio.author like '%$key[0]%'";    
+	 while ($i < $count){ 
+           $query=$query." and author like '%$key[$i]%'";   
+           $i++;       
+	 }   
+	 $query=$query.")";
          if ($search->{'title'} ne ''){ 
 	   $query=$query. " and title like '%$search->{'title'}%'";
 	 }
       } else {
           if ($search->{'title'} ne ''){
+	    my @key=split(' ',$search->{'title'});
+	    my $count=@key;
             $query="select count(*) from biblio
 	    where title like '%$search->{'title'}%'";	 
 	 }
@@ -146,7 +167,8 @@ sub CatSearch  {
 	   my $sth=$dbh->prepare($query);
 	   $sth->execute;
 	   my $data=$sth->fetchrow_hashref;
-           $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
+
+$results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
            $i2++; 
 	   $sth->finish;
 	}
@@ -176,7 +198,8 @@ sub CatSearch  {
   if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
     while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
       if ($i >= $offset){
-        $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
+
+$results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
         $i2++;
       }
       $i++;
@@ -184,12 +207,12 @@ sub CatSearch  {
   } else {
     while (my $data=$sth->fetchrow_hashref){
      if ($type ne 'subject'){
-      $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
-      $data->{'author'}";
+      $results[$i]="$data->{'author'}\t$data->{'title'}\t
+      $data->{'biblionumber'}";
      } elsif ($search->{'isbn'} ne ''){
      } else {  
-      $results[$i]="$data->{'biblionumber'}\t$data->{'subject'}\t
-      $data->{'author'}";
+      $results[$i]="$data->{'author'}\t$data->{'subject'}\t
+      $data->{'biblionumber'}";
      }
      $i++;
     }

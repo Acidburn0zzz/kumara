@@ -83,14 +83,14 @@ while ($i < $count2){
     my $title2=$stuff[1];
     $title2=~ s/ /%20/g;
     if ($subject eq ''){
-      $stuff[1]=mklink("/cgi-bin/kumara/detail.pl?bib=$stuff[0]&title=$title2",$stuff[1]);
-      my $word=$stuff[2];
+      $stuff[1]=mklink("/cgi-bin/kumara/detail.pl?bib=$stuff[2]&title=$title2",$stuff[1]);
+      my $word=$stuff[0];
       $word=~ s/ //g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
       my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
-      $stuff[2]=mklink($url,$stuff[2]);
-      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[0]);
+      $stuff[0]=mklink($url,$stuff[0]);
+      my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
       $stuff[3]=$count;
       if ($nacount > 0){
         $stuff[4]=$stuff[4]."N/A=$nacount";
@@ -110,10 +110,10 @@ while ($i < $count2){
       $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
     }
     if ($colour == 1){
-      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[2],$stuff[3],$stuff[4]);
+      print mktablerow(4,'#ffffcc',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
       $colour=0;
     } else{
-      print mktablerow(4,'white',$stuff[1],$stuff[2],$stuff[3],$stuff[4]);
+      print mktablerow(4,'white',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
       $colour=1;
     }
     $i++;
