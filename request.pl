@@ -26,18 +26,18 @@ my ($count,$reserves)=FindReserves($bib);
 
 
 print <<printend
-
-<FONT SIZE=6><em>Requesting: <a href=/cgi-bin/koha/detail.pl?bib=$bib>$dat->{'title'}</a> ($dat->{'author'})</em></FONT><P>
-<p>
 <form action="placerequest.pl" method=post>
 <INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=187 BORDER=0 src="/images/place-request.gif" align=right >
 <input type=hidden name=biblio value=$bib>
 <input type=hidden name=type value=str8>
+<FONT SIZE=6><em>Requesting: <a href=/cgi-bin/koha/detail.pl?bib=$bib>$dat->{'title'}</a> ($dat->{'author'})</em></FONT><P>
+<p>
+
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left >
 
 <!----------------BIBLIO RESERVE TABLE-------------->
 
-<p align=right>
+
 
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 <TR VALIGN=TOP>
