@@ -40,12 +40,27 @@ if (my $data=$sth->fetchrow_hashref){
   initials='$data{'initials'}',streetaddress='$data{'address'}',ethnicity='$data{'ethnicity'}'
   where borrowernumber=$data{'borrowernumber'}";
 #  print $query;
+
+}else{
+  $data{'dateofbirth'}=ParseDate($data{'dateofbirth'});
+  $data{'dateofbirth'}=UnixDate($data{'dateofbirth'},'%Y-%m-%d');
+  $data{'joining'}=ParseDate($data{'joining'});
+  $data{'joining'}=UnixDate($data{'joining'},'%Y-%m-%d');
+  $query="insert into borrowers (title,expiry,cardnumber,sex,ethnotes,streetaddress,faxnumber,
+  firstname,altnotes,dateofbirth,contactname,emailaddress,dateenrolled,streetcity,
+  altrelationship,othernames,phoneday,categorycode,city,area,phone,borrowernotes,altphone,surname,
+  initials,ethnicity,borrowernumber) values ('$data{'title'}','$data{'expiry'}','$data{'cardnumber'}',
+  '$data{'sex'}','$data{'ethnotes'}','$data{'address'}','$data{'faxnumber'}',
+  '$data{'firstname'}','$data{'altnotes'}','$data{'dateofbirth'}','$data{'contactname'}','$data{'emailaddress'}',
+  '$data{'joining'}','$data{'streetcity'}','$data{'altrelationship'}','$data{'othernames'}',
+  '$data{'phoneday'}','$data{'categorycode'}','$data{'city'}','$data{'area'}','$data{'phone'}',
+  '$data{'borrowernotes'}','$data{'altphone'}','$data{'surname'}','$data{'initials'}',
+  '$data{'ethnicity'}','$data{'borrowernumber'}')";
+}
+#print $query;
   my $sth2=$dbh->prepare($query);
   $sth2->execute;
   $sth2->finish;
-}else{
-}
-
 $sth->finish;
 $dbh->disconnect;
 print $input->redirect("/cgi-bin/koha/moremember.pl?bornum=$data{'borrowernumber'}");
