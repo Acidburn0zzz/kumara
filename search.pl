@@ -89,13 +89,13 @@ if ($type ne 'opac'){
   if ($subject ne ''){
    print mktablerow(1,$main,'<b>SUBJECT</b>','/images/background-mem.gif');
   } else {
-   print mktablerow(5,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('LOCATION'),'/images/background-mem.gif');
+   print mktablerow(6,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('LOCATION'),'','/images/background-mem.gif');
   }
 } else {
   if ($subject ne ''){
    print mktablerow(1,$main,'<b>SUBJECT</b>');
   } else {
-   print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'));
+   print mktablerow(6,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('LOCATION'),'');
   }
 }
 my $count2=@results;
@@ -119,38 +119,39 @@ while ($i < $count2){
       my $url="/cgi-bin/koha/search.pl?author=$word&type=$type";
       $stuff[0]=mklink($url,$stuff[0]);
       my ($count,$lcount,$nacount,$fcount,$scount)=itemcount($env,$stuff[2]);
-      $stuff[3]=$count;
+      $stuff[4]=$count;
       if ($nacount > 0){
-        $stuff[4]=$stuff[4]."On Loan 1";
+        $stuff[5]=$stuff[5]."On Loan 1";
       }
       if ($lcount > 0){
-        $stuff[4]=$stuff[4]." L$lcount";
+        $stuff[5]=$stuff[5]." L$lcount";
       }
       if ($fcount > 0){
-        $stuff[4]=$stuff[4]." F$fcount";
+        $stuff[5]=$stuff[5]." F$fcount";
       }
       if ($scount > 0){
-        $stuff[4]=$stuff[4]." S$scount";
+        $stuff[5]=$stuff[5]." S$scount";
       }
     } else {
       my $word=$stuff[1];
       $word=~ s/ /%20/g;
       $stuff[1]=mklink("/cgi-bin/koha/subjectsearch.pl?subject=$word",$stuff[1]);
     }
+    $stuff[6]=mklink("/cgi-bin/koha/request.pl?bib=$stuff[2]","Request");
     if ($colour == 1){
-      print mktablerow(4,$secondary,$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
+      print mktablerow(6,$secondary,$stuff[1],$stuff[0],$stuff[3],$stuff[4],$stuff[5],$stuff[6]);
       $colour=0;
     } else{
-      print mktablerow(4,'white',$stuff[1],$stuff[0],$stuff[3],$stuff[4]);
+      print mktablerow(6,'white',$stuff[1],$stuff[0],$stuff[3],$stuff[4],$stuff[5],$stuff[6]);
       $colour=1;
     }
     $i++;
 }
 $offset=$num+$offset;
 if ($type ne 'opac'){
- print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;','/images/background-mem.gif');
+ print mktablerow(6,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;','','','/images/background-mem.gif');
 } else {
- print mktablerow(4,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp; ');
+ print mktablerow(6,$main,' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp; ','','');
 }
 print mktableft();
 if ($offset < $count){

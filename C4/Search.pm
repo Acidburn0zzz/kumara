@@ -120,7 +120,8 @@ sub KeywordSearch {
   $sth->execute;
   $i=0;
   while (my $data=$sth->fetchrow_hashref){
-    $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
+
+$results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
 #      print $results[$i];
 $i++;
   }
@@ -133,7 +134,8 @@ $i++;
     biblionumber=$data->{'biblionumber'}");
     $sth2->execute;
     while (my $data2=$sth2->fetchrow_hashref){
-      $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}";
+
+$results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$data->{'copyrightdate'}";
 #      print $results[$i];
       $i++;   
     }
@@ -281,10 +283,10 @@ sub CatSearch  {
 #  } else {
     while (my $data=$sth->fetchrow_hashref){
      if ($type ne 'subject'){
-      $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
+$results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
      } elsif ($search->{'isbn'} ne ''){
      } else {  
-      $results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}";
+$results[$i]="$data->{'author'}\t$data->{'subject'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
      }
      $i++;
     }
@@ -427,9 +429,12 @@ sub itemdata {
 }
 
 sub bibdata {
-  my ($title)=@_;
+  my ($bibnum)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from biblio where title='$title'";
+  my $query="Select * from biblio,biblioitems,bibliosubject,bibliosubtitle where biblio.biblionumber=$bibnum
+  and biblioitems.biblionumber=$bibnum and
+(bibliosubject.biblionumber=$bibnum or bibliosubject.biblionumber=1) and
+(bibliosubtitle.biblionumber=$bibnum or bibliosubtitle.biblionumber=1)";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
