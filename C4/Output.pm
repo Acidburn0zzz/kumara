@@ -12,7 +12,8 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
-&startmenu &endmenu &mkheadr &center &endcenter &mkform &mkform2 &bold);
+&startmenu &endmenu &mkheadr &center &endcenter &mkform &mkform2 &bold
+&gotopage);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -54,20 +55,28 @@ sub startpage{
   return($string);
 }
 
+sub gotopage{
+  my ($target) = @_;
+  print "<br>goto target = $target<br>";
+  my $string = "<META HTTP-EQUIV=Refresh CONTENT=\"0;URL=http:$target\">";
+  return $string;
+}
+
+
 sub startmenu{
   my ($type)=@_;
-  if ($type eq 'issue'){
-      open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc');
+  if ($type eq 'issue') {
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc');
   } else {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
   }
   my @string=<FILE>;
   close FILE;
   my $count=@string;
-#  $string[$count]="<BLOCKQUOTE>";
+  #  $string[$count]="<BLOCKQUOTE>";
   return @string;
-  
 }
+
 
 sub endmenu{
   my ($type)=@_;
@@ -92,7 +101,11 @@ sub mktablerow {
   my $i=0;
   my $string="<tr valign=top bgcolor=$colour>";
   while ($i <$cols){
-    $string=$string."<td>$data[$i]</td>";
+    if ($data[$i] eq "") {
+      $string=$string."<td>&nbsp;</td>";
+    } else {
+      $string=$string."<td>$data[$i]</td>";
+    } 
     $i++;
   }
   $string=$string."</tr>\n";

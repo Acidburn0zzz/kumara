@@ -15,7 +15,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
-&itemdata &bibdata &GetItems &borrdata); 
+&itemdata &bibdata &GetItems &borrdata &getacctlist); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -355,7 +355,7 @@ sub BornameSearch  {
   or lower(firstname)  like '%$searchstring%' 
   or lower(othernames) like '%$searchstring%'
   order by lower(surname),lower(firstname)";
-  #print $query,"\n";
+  print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -375,7 +375,7 @@ sub borrdata {
   $cardnumber = uc $cardnumber;
   my $dbh=C4Connect;
   my $query="Select * from borrowers where cardnumber='$cardnumber'";
-  #  print $query;
+  #print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;
@@ -384,7 +384,29 @@ sub borrdata {
   return($data);
 }
 		  
-			   
+sub getacctlist {
+   my ($env,$params) = @_;
+   my $dbh=C4Connect;
+   my @acctlines;
+   my $numlines;
+   my $query = "Select borrowernumber, date, amount, description,
+     dispute, accounttype, amountoutstanding, barcode, title
+     from accountlines,items,biblio   
+     where borrowernumber=$params->{'borrowernumber'} 
+     and accountlines.itemnumber = items.itemnumber
+     and items.biblionumber = biblio.biblionumber
+     and accountlines.amountoutstanding<>0";
+   my $sth=$dbh->prepare($query);
+   $sth->execute;
+   my $total=0;
+   while (my $data=$sth->fetchrow_hashref){
+      $acctlines[$numlines] = $data;
+      $numlines++;
+      $total = $total+ $data->{'amountoutstanding'};
+   }
+   return ($numlines,\@acctlines,$total);
+}
+				      
 END { }       # module clean-up code here (global destructor)
 
 

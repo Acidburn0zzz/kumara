@@ -10,7 +10,6 @@ use C4::Output;
 use C4::Input;
 use C4::Database;
 use C4::Search;
-
 my $input = new CGI;
 print $input->header;
 my $data;
@@ -19,7 +18,13 @@ my $bcnt;
 my $results;
 my $cardnumber;
 my $action=$input->param('act');
-$action="M";
+my $target=$input->param('target');
+if ($action eq "") {
+  $action="M";
+  }
+if ($target eq "") {
+  $target = "addborrower.pl";
+  }
 if ($action eq "M") {
   $cardnumber=$input->param('item');
   $cardnumber =uc $cardnumber;
