@@ -55,7 +55,12 @@ sub Start_circ{
   #connect to database
   #start interface
   startint('Circulation');
-  Issue();
+  my ($data,$reason)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
+#  output (1,1,$data);
+#  pause();
+  if ($data eq '1'){  
+    Issue();
+  }
   &endint();
 }
 
@@ -206,6 +211,7 @@ sub scanborrower {
   #scan barcode
 #  my $number='V00126643';  
   my ($number,$reason)=&dialog("Borrower Barcode:");
+  $number=uc $number;
   return ($number);
 }
 

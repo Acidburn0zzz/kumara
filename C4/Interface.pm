@@ -16,7 +16,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&list &textbox);
+&textbox &menu);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -64,7 +64,14 @@ sub startint {
   Newt::Cls();
   Newt::PushHelpLine('F11 escapes');
   Newt::DrawRootText(0,0,$msg);
-#  Newt::Finished();
+}
+
+sub menu {
+  my ($type,$title,@items)=@_;
+  if ($type eq 'console'){
+    my ($data,$reason)=list($title,@items);
+    return($reason,$data);
+  } 
 }
 
 sub clearscreen{
@@ -97,9 +104,9 @@ sub helptext {
 }
 
 sub list {
-  my (@items)=@_;
+  my ($title,@items)=@_;
   my $numitems=@items;
-  my $panel = Newt::Panel(70, 4, "");
+  my $panel = Newt::Panel(70, 4, $title);
   my $li = Newt::Listbox($numitems, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   $li->Add(@items);
   $panel->Add(0,0,$li,NEWT_ANCHOR_LEFT);
