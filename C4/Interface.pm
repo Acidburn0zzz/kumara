@@ -116,20 +116,9 @@ sub pause {
   Newt::WaitForKey();
 }
 
-
-sub output {
-  my($left,$top,$msg)=@_;
-  Newt::DrawRootText($left,$top,$msg);
-}
-
-#sub textbox {
-#  my ($width,$height,$text,$title,$top,$left)=@_;
-#  my $panel = Newt::Panel(5, 4, "$title",$top,$left);
-#  my $box = Newt::Textbox($width,$height, NEWT_FLAG_SCROLL |
-#  NEWT_FLAG_RETURNEXIT | NEWT_FLAG_WRAP,$text);
-#  $panel->Add(0,0,$box,NEWT_ANCHOR_LEFT);
-#  $panel->AddHotKey(NEWT_KEY_F11);
-#  my ($reason,$data)=$panel->Draw();
+#sub output {
+#  my($left,$top,$msg)=@_;
+#  Newt::DrawRootText($left,$top,$msg);
 #}
 
 sub helptext {
@@ -137,20 +126,20 @@ sub helptext {
   Newt::PushHelpLine($text);
 }
 
-sub list {
-  my ($title,@items)=@_;
-  my $numitems=@items;
-  my $panel = Newt::Panel(1, 4, $title);
-  my $li = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT |  NEWT_FLAG_MULTIPLE);
-  $li->Add(@items);
-  $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
-  $panel->AddHotKey(NEWT_KEY_F11);
-  my ($reason,$data)=$panel->Run();
-  my @stuff=$li->Get();
-  $data=$stuff[0];
-  return($reason,$data);
+#sub list {
+#  my ($title,@items)=@_;
+#  my $numitems=@items;
+#  my $panel = Newt::Panel(1, 4, $title);
+#  my $li = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT |  NEWT_FLAG_MULTIPLE);
+#  $li->Add(@items);
+#  $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
+#  $panel->AddHotKey(NEWT_KEY_F11);
+#  my ($reason,$data)=$panel->Run();
+#  my @stuff=$li->Get();
+#  $data=$stuff[0];
+#  return($reason,$data);
   # end of list
-}
+#}
 
 
 sub selborrower {
@@ -172,13 +161,6 @@ sub selborrower {
   debug_msg("",@stuff[0]);
   my $data=(0,9,$stuff[0]);
   my $borrnum = substr($data,0,9);
-#     my $query = "select * from borrowers where cardnumber = '$bornum'";
-#     my $sth = $dbh->prepare($query);
-#     $sth->execute;
-#     if ($bdata =$sth->fetchrow_hashref) {
-#        $data = $bdata->{'borrowernumber'}; 
-#     }
-#  }   
   return($borrnum);
   # end of selborrower
 }
@@ -219,9 +201,11 @@ sub returnwindow {
   my $stuff=$entry->Get();
   return($reason,$stuff);
 }
+
 sub borrowerwindow {
   my ($env,$borrower)=@_;
-  my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $bt=Newt::Button("Modify Borrower");
+  my $bt2=Newt::Button("New borrower");
   my $label=Newt::Label("Borrower");
   my $l1=Newt::Label("$borrower->{'firstname'} $borrower->{'surname'}");
   my $l2=Newt::Label("Street Address: $borrower->{'streetaddress'}");
@@ -233,11 +217,13 @@ sub borrowerwindow {
   $panel->Add(0,1,$l1);
   $panel->Add(0,2,$l2);
   $panel->Add(0,3,$l3);
-    $panel->Add(0,4,$l4);
-      $panel->Add(0,5,$l5);
-  $panel->Add(0,6,$entry);
+  $panel->Add(0,4,$l4);
+  $panel->Add(0,5,$l5);
+  $panel->Add(0,6,$bt1);
+  $panel->Add(1,6,$bt2);  
   my ($reason,$data)=$panel->Run();
-  
+  $stuff=$data->Tag()
+  return($stuff);
 }  
   
 sub issuewindow {
@@ -300,9 +286,6 @@ sub issuewindow {
   return($stuff,$reason);
 }
 
-
-
-
 sub dialog {
   my ($name)=@_;
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
@@ -329,8 +312,6 @@ sub dialog {
   return($stuff,$reason);
 }
 
-
-  
 sub logondialog {
    my ($env,$title,$branches)=@_;
    my $entry1=Newt::Entry(10,NEWT_FLAG_SCROLL  | NEWT_FLAG_RETURNEXIT);
