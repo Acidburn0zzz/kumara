@@ -51,7 +51,7 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub Issue  {
-  my ($bornum,$itemnum)=@_;
+  my ($bornum)=@_;
   my $dbh=&C4Connect;  
   my $sth=$dbh->prepare("Select * from borrowers where borrowernumber=$bornum");
   $sth->execute;
@@ -76,20 +76,83 @@ sub Issue  {
   }
   #check if borrower has overdue items
   #call overdue checker
-  &checkoverdues($borrnum);
+  &checkoverdues($bornum);
   #check amountowing
-  &checkaccount($borrnum)
-  $sth=$dbh->prepare("Select * from items where itemnumber = $itemnum");
-  $sth->execute;
-  my @item=$sth->fetchrow_array;
-  $sth->finish;
+  my $amount=checkaccount($bornum);    #from C4::Accounts
+  #check if borrower has any items waiting
+  &checkwaiting;
+  #deal with any money still owing
+  if ($amount > 0){
+    &reconcileamount($bornum);
+  }
+  #deal with alternative loans
+  #now check items
   $dbh->disconnect;
   return (@borrower);
 }    
 
+sub processitems { 
+  my ($bornum)=@_;
+  my $itemnum=&scan;
+  my $dbh=&C4Connect;  
+  my $sth=$dbh->prepare("Select * from items where barcode = '$itemnum'");
+  $sth->execute;
+  my @item=$sth->fetchrow_array;  
+  $sth->finish;
+  #check if item is restricted
+  if ($item[23] ==1 ){
+    print "whoop whoop restricted\n";
+    #check borrowers status to take out restricted items
+    # if borrower allowed {
+    #  book issued
+    # } else {
+    #  next item
+    # }
+  }
+  #check if item is on issue already
+  my $status=&previousissue($item[0],$dbh,$bornum);
+  if ($status eq 'out'){
+    #book is already out, deal with it
+    #if its out to another deal with it
+    #if its out the person ask if they want to renew it etc
+  }
+  #check reserve
+  &checkreserve;
+  #if charge deal with it
+  #now mark as issued
+  &updateissues;
+  $dbh->disconnect;
+}
+
+sub updateissues{
+}
 sub checkoverdues{
   #pop up list of overdue books if some are overdue
 }
 
-			
+sub previousissue {
+  my ($itemnum,$dbh)=@_;
+  my $sth=$dbh->prepare("Select borrowernumber from issues where itemnumber='$itemnum'");
+  $sth->execute;
+  my @borrower=$sth->fetchrow_array;
+  $sth->finish;
+  if ($borrower[0] ne ''){
+    print "book is issued to borrower $borrower[0]\n";
+    return("out");
+  } 
+}
+
+sub checkreserve{
+}
+sub checkwaiting{
+
+}
+
+sub scan {
+  #scan barcode
+  my $number=12;
+  return ($number);
+}
+
+
 END { }       # module clean-up code here (global destructor)

@@ -1,4 +1,4 @@
-package C4::Database; #asummes C4/Database
+package C4::Accounts; #asummes C4/Accounts
 
 #requires DBI.pm to be installed
 #uses DBD:Pg
@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect);
+@EXPORT = qw(&checkaccount &reconcileaccount);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -50,11 +50,13 @@ my $priv_func = sub {
 
 
 
-sub C4Connect  {
-  my $dbname="c4"; 
-  my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", "chris", "");
-
-  return $dbh;
+sub checkaccount  {
+  #take borrower number
+  #check accounts and list amounts owing
 }    
+
+sub reconcileaccount {
+
+}
 			
 END { }       # module clean-up code here (global destructor)
