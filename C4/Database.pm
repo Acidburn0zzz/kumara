@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect &sqlinsert);
+@EXPORT = qw(&C4Connect &sqlinsert &getmax);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -66,15 +66,31 @@ sub sqlinsert {
       $query=$query."$key,";
     }
   }
+  $query=~ s/\,$/\)/;
   $query=$query." VALUES (";
   while (my ($key,$value) = each %data){
     if ($key ne 'type'){
-      $query=$query."$value,";
+      $query=$query."'$value',";
     }
   }
   $query=~ s/\,$/\)/;
   print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
   $dbh->disconnect;
 }
+
+sub getmax {
+  my ($table,$item)=@_;
+  my $dbh=C4Connect;
+  my $sth=$dbh->prepare("Select max($item) from $table");
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
+}
+  
 
 END { }       # module clean-up code here (global destructor)

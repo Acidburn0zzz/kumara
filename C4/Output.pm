@@ -113,7 +113,7 @@ sub mkform{
         $text="<input type=$data[0] name=$key value=\"$data[1]\">";
       }
       if ($data[0] eq 'textarea'){
-        $text="<textarea name=$key>$data[1]</textarea>";
+        $text="<textarea name=$key wrap=physical cols=40 rows=4>$data[1]</textarea>";
       }
       $string=$string.mktablerow(2,'white',$key,$text);
     }

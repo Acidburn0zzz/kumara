@@ -14,12 +14,12 @@ print startpage();
 print startmenu();
 my %inputs;
 
-$inputs{'Title'}="text\t";
-$inputs{'Unititle'}="text\t";
-$inputs{'Notes'}="textarea\t";
-$inputs{'Author'}="text\t";
-$inputs{'Serial'}="radio\tYes\tNo";
-$inputs{'Series Title'}="text\t";
+$inputs{'title'}="text\t";
+$inputs{'unititle'}="text\t";
+$inputs{'notes'}="textarea\t";
+$inputs{'author'}="text\t";
+$inputs{'serial'}="radio\tYes\tNo";
+$inputs{'seriestitle'}="text\t";
 $inputs{'type'}="hidden\tbiblio";
 print mkform('/cgi-bin/kumara/insertdata.pl',%inputs);
 #print mktablehdr();

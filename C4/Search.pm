@@ -14,7 +14,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch); 
+@EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
+&itemdata &bibdata); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -240,6 +241,33 @@ $results[$i]="$data->{'title'}\t$data->{'itemnumber'}\t$datedue\t$data->{'branch
   $sth->finish;
   $dbh->disconnect;
   return(@results);
+}
+
+sub itemdata {
+  my ($barcode)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from items,biblioitems where barcode='$barcode'
+  and items.biblioitemnumber=biblioitems.biblioitemnumber";
+#  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
+}
+
+sub bibdata {
+  my ($title)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from biblio where title='$title'";
+#  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
 }
 
 sub BornameSearch  {
