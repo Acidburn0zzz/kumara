@@ -114,6 +114,7 @@ sub menu {
     # Activate the object.         
     my ($menuItem) = $menu->activate();
     # Check the results.
+    undef $menu;
     if (!defined $menuItem) {      
       $data = "Quit";
     }
@@ -123,7 +124,6 @@ sub menu {
   }
   return($reason,$data);
   # end of menu
-  
 }
 
   
@@ -155,7 +155,8 @@ sub titlepanel{
   my ($env,$title,$title2)=@_;
   my @header;
   @header[0] = fmtstr($env,$title,"L26");
-  @header[0] = @header[0].fmtstr($env,$env->{'branchname'},"C20");
+  @header[0] = @header[0].fmtstr($env,
+    $env->{'branchname'}."-".$env->{'queue'},"C20");
   @header[0] = @header[0].fmtstr($env,$title2,"R26");
   my $label = new Cdk::Label ('Message' =>\@header,
      'Ypos'=>0);
@@ -174,8 +175,9 @@ sub msg_yn {
   my $resp = $dialog->activate();
   my $response = "Y";
   if ($resp == 1) {
-     $response = "N";
+    $response = "N";
   }
+  undef $dialog;
   return $response;
 }
 
@@ -245,6 +247,7 @@ sub prmenu {
       'Width'=> 30);
   # Activate the object.         
   my ($menuItem) = $menu->activate();
+  undef $menu;
   # Check the results.
   if (defined $menuItem) {      
     my $prrec = @$prrecs[$menuItem];
@@ -283,7 +286,8 @@ sub borrower_dialog {
     $borrower = $info->[0][0];
     $book     = $info->[0][1];
   }
-  $matrix->erase();
+  #$matrix->erase();
+  undef $matrix;
   return ($borrower,$result,$book);
 }
 
@@ -299,6 +303,7 @@ sub selborrower {
   } else {  
     $result = substr(@$borrows[$returnValue],0,9);
   }
+  undef $scroll;
   return $result;
 }
 
@@ -341,12 +346,20 @@ sub issuewindow {
   if (!defined $barcode) {
     $reason="Finished user"
   }
-  $borrbox->erase();
-  $entryBox->erase();
-  $scroll2->erase();
-  $scroll1->erase();
-  $funcmenu->erase();
-  $loanlength->erase(); 
+ # $borrbox->erase();
+ # $entryBox->erase();
+ # $scroll2->erase();
+ # $scroll1->erase();
+ # $funcmenu->erase();
+ # $loanlength->erase();
+  undef $titlepanel;
+  undef $borrbox;
+  undef $entryBox;
+  undef $scroll2;
+  undef $scroll1;
+  undef $funcmenu;
+  undef $loanlength;
+  Cdk::refreshCdkScreen();
   #debug_msg($env,"exiting");    
   return $barcode,$reason;
 }  
