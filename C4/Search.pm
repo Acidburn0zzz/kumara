@@ -327,11 +327,12 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio,biblioitems
+         biblio,biblioitems 
+	 left join additionalauthors on biblio.biblionumber=additionalauthors.biblionumber
          where biblioitems.biblionumber=biblio.biblionumber 
-	 and
+	 and biblio.author ne '' and
          ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%'
-	 	 )";    
+	   )";    
 	 while ($i < $count){ 
            $query=$query." and (biblio.author like '$key[$i]%' or biblio.author like '% $key[$i]%'
 	   )";
@@ -476,7 +477,7 @@ sub CatSearch  {
 	$sth1->finish;
       }
   }
-#print $query;
+print $query;
 
 
   my $sth=$dbh->prepare($query);

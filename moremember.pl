@@ -43,7 +43,7 @@ if ($data->{'ethnicity'}eq 'asian'){
 print <<printend
 <FONT SIZE=6><em>$data->{'firstname'} $data->{'surname'}</em></FONT><P>
 <p>
-<form action=/cgi-bin/koha/wmemberentry.pl method=post>
+<form action=/cgi-bin/koha/jmemberentry.pl method=post>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=270>
 <TR VALIGN=TOP>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>MEMBERSHIP RECORD</TD></TR>
@@ -51,6 +51,7 @@ print <<printend
 <TD>
 <p align=right><INPUT TYPE="image" name="submit"  VALUE="add-child" height=42  WIDTH=120 BORDER=0 src="/images/add-child.gif"> 		
 <input type=hidden name=type value=Add>
+<input type=hidden name=bornum value=$data->{'borrowernumber'}>
 </form>
 </P><br>
 <FONT SIZE=2  face="arial, helvetica">$data->{'title'} $data->{'othernames'}  $data->{'surname'} ($data->{'firstname'}, $data->{'initials'})<p>

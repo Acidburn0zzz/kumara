@@ -175,8 +175,8 @@ sub debug_msg {
   my ($env,$text)=@_;
   if ($env->{'telnet'} eq "Y") {
     popupLabel (["Debug </R>$text"]);
-  } else {
-    print "****DEBUG $text****";
+#  } else {
+#    print "****DEBUG $text****";
   }  
   return();
 }
@@ -600,7 +600,9 @@ sub borrbind {
 sub preborr {
   my ($input,$env, $entry) = @_;
   if ($env->{"bcard"} ne "") {
+#     error_msg($env,"hi there");  
     if ($input eq $lastval) {
+#        error_msg($env,"its a ctrl-r");  
       borfill($env,$entry);
       return 0;
     }
@@ -611,12 +613,13 @@ sub preborr {
   
 sub borfill {
   my ($env,$entry) = @_;
-  #debug_msg("","hi there");
+  error_msg($env,"in borfill: $env->{'bcard'}");
   my $lastborr = $env->{"bcard"};
   my $i = 1;
   $entry->inject('Input'=>$lastborr);
   while ($i < 9) {
-    $entry->inject('Input'=>substr($lastborr,$i,1));
+#    my $temp=substr($lastborr,$i,1);
+#    $entry->inject('Input'=>$temp);
     $i++;
   }
    

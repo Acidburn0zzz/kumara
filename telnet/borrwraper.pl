@@ -10,11 +10,12 @@ use C4::Circulation::Borrower;
 # my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}");
 my %env = (
   branchcode => $ARGV[0], usercode => $ARGV[1], proccode => "lgon", borrowernumber => "",
-  logintime  => "", lasttime => "", tempuser => "", debug => "9",
-  telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5]
+  logintime  => "", lasttime => $ARGV[6], tempuser => "", debug => "9",
+  telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5], bcard=>$ARGV[7]
       );
 my ($env) = \%env;                                                                  
-  startint();
+
+startint();
   helptext('');                                                                    
 my $done;                                                                        
 my ($items,$items2,$amountdue);                                                  
@@ -24,10 +25,10 @@ $done = "Issues";
 my $i=0;
 my $dbh=&C4Connect;                                                              
   my ($bornum,$issuesallowed,$borrower,$reason,$amountdue) = C4::Circulation::Borrower::findborrower($env,$dbh);
-    my $time=localtime(time);                                                     
-    open (FILE,">>/tmp/$<_$ARGV[6]");                                             
-    print FILE "borrower found $bornum";
-    close FILE;
+#    my $time=localtime(time);                                                     
+#    open (FILE,">>/tmp/$<_$ARGV[6]");                                             
+#    print FILE "borrower found $bornum";
+#    close FILE;
   $env->{'loanlength'}="";                                                       
   if ($reason ne "") {                                                           
     $done = $reason;                                                             

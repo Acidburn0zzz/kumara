@@ -74,7 +74,7 @@ sub checkdigit {
     my $temp1 = $weightings[$i-1];
     my $temp2 = substr($infl,$i,1);
     $sum = $sum + ($temp1*$temp2);
-   # print "$sum $temp1 $temp2<br>";
+#    print "$sum $temp1 $temp2<br>";
     $i++;
   }
   my $rem = ($sum%11);

@@ -161,10 +161,12 @@ my $bor=$reserves->[$i]{'borrowernumber'};
 my @temp=split('-',$reserves->[$i]{'reservedate'});
 $date="$temp[2]/$temp[1]/$temp[0]";
 my $type=$reserves->[$i]{'constrainttype'};
+#print "test";
 if ($type eq 'a'){
   $type='Next Available';
 } elsif ($type eq 'o'){
-  my $res=getreservetitle($reserves->[$i]{'biblionumber'},$reserves->[$i]{'borrowernumber'},$reserves->[$i]{'reservedate'});
+# print "test";
+  my $res=getreservetitle($reserves->[$i]{'biblionumber'},$reserves->[$i]{'borrowernumber'},$reserves->[$i]{'reservedate'},$reserves->[$i]{'timestamp'});
   $type="This type only $res->{'volumeddesc'} $res->{'itemtype'}";
 #  my @data=ItemInfo(\$blah,$reserves->[$i]{'borrowernumber'});
   

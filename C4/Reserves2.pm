@@ -268,12 +268,13 @@ sub updatereserves{
 }
 
 sub getreservetitle {
- my ($biblio,$bor,$date)=@_;
+ my ($biblio,$bor,$date,$timestamp)=@_;
  my $dbh=C4Connect;
  my $query="Select * from reserveconstraints,biblioitems where
  reserveconstraints.biblioitemnumber=biblioitems.biblioitemnumber
  and reserveconstraints.biblionumber=$biblio and reserveconstraints.borrowernumber
- = $bor and reserveconstraints.reservedate='$date'";
+ = $bor and reserveconstraints.reservedate='$date' and
+ reserveconstraints.timestamp=$timestamp";
  my $sth=$dbh->prepare($query);
  $sth->execute;
  my $data=$sth->fetchrow_hashref;

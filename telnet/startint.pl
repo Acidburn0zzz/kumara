@@ -46,14 +46,14 @@ while ($donext ne 'Quit') {
     $data = $donext;                                                              
   }                                                                               
   if ($data eq 'Issues') {                                                        
-   my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}",$$);
+   my @args=('issuewrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}","$env{'lasttime'}");
   open (FILE,">>/tmp/$<_$$");
    my $time=localtime(time);
    print FILE "Start issues $time \n";
    close FILE;
    system(@args);
   } elsif ($data eq 'Returns') {                                                  
-   my @args=('returnswrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}",$$);
+   my @args=('returnswrapper.pl',"$env{'branchcode'}","$env{'usercode'}","$env{'telnet'}","$env{'queue'}","$env{'printtype'}","$env{'brdata'}");
    open (FILE,">>/tmp/$<_$$");
    my $time=localtime(time);
    print FILE "Start returns $time \n";

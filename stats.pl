@@ -50,13 +50,13 @@ for (my $i=0;$i<$count;$i++){
   my $time="$hour:$min:$sec";
   $payments[$i]{'amount'}*=-1;
   $total+=$payments[$i]{'amount'};
-  my @charges=getcharges($payments[$i]{'borrowernumber'},$payments[$i]{'timestamp'});
-  my $count=@charges;
-  for (my $i2=0;$i2<$count;$i2++){
-    print mktablerow(6,'red',$charges[$i2]->{'description'},$charges[$i2]->{'accounttype'},
-    '',
-    $charges[$i2]->{'amount'},$charges[$i2]->{'amountoutstanding'});
-  }
+#  my @charges=getcharges($payments[$i]{'borrowernumber'},$payments[$i]{'timestamp'});
+#  my $count=@charges;
+#  for (my $i2=0;$i2<$count;$i2++){
+#    print mktablerow(6,'red',$charges[$i2]->{'description'},$charges[$i2]->{'accounttype'},
+#    '',
+#    $charges[$i2]->{'amount'},$charges[$i2]->{'amountoutstanding'});
+#  }
   my $time2="$payments[$i]{'date'} $time";
   my $branch=Getpaidbranch($time2);
   
@@ -68,18 +68,18 @@ print mktableft;
 print endcenter;
 print "<p><b>$total</b>";
 
-my $issues=Count('issue','C',$date,$date2);
-print "<p>Issues Levin: $issues";
-$issues=Count('issue','F',$date,$date2);
-print "<br>Issues Foxton: $issues";
-$issues=Count('issue','S',$date,$date2);
-print "<br>Issues Shannon: $issues";
-my $returns=Count('return','C',$date,$date2);
-print "<p>Returns Levin: $returns";
-$returns=Count('return','F',$date,$date2);
-print "<br>Returns Foxton: $returns";
-$returns=Count('return','S',$date,$date2);
-print "<br>Returns Shannon: $returns";
+#my $issues=Count('issue','C',$date,$date2);
+#print "<p>Issues Levin: $issues";
+#$issues=Count('issue','F',$date,$date2);
+#print "<br>Issues Foxton: $issues";
+#$issues=Count('issue','S',$date,$date2);
+#print "<br>Issues Shannon: $issues";
+#my $returns=Count('return','C',$date,$date2);
+#print "<p>Returns Levin: $returns";
+#$returns=Count('return','F',$date,$date2);
+#print "<br>Returns Foxton: $returns";
+#$returns=Count('return','S',$date,$date2);
+#print "<br>Returns Shannon: $returns";
 
 print endmenu('report');
 print endpage;
