@@ -121,8 +121,9 @@ sub Issue  {
     #check if borrower has any items waiting
     &checkwaiting;
     #deal with any money still owing
+#    output(30,1,$amount);
     if ($amount > 0){
-      &reconcileaccount($dbh,$bornum);
+      &reconcileaccount($dbh,$bornum,$amount);
     }
     #deal with alternative loans
     #now check items 

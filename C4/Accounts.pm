@@ -49,26 +49,29 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
-
+sub displayaccounts{
+}
 
 sub checkaccount  {
   #take borrower number
   #check accounts and list amounts owing
   my ($bornumber,$dbh)=@_;
-  my $sth=$dbh->prepare("Select * from accountlines where
+  my $sth=$dbh->prepare("Select sum(amount) from accountlines where
   borrowernumber=$bornumber");
   $sth->execute;
   my $total=0;
   while (my $data=$sth->fetchrow_hashref){
-    $total=$total+$data->{'amount'};
+    $total=$total+$data->{'sum'};
   }
   $sth->finish;
+#      output(1,2,"borrower owes $total");
   if ($total > 0){
     output(1,2,"borrower owes $total");
     if ($total > 5){
       reconcileaccount($dbh,$bornumber,$total);
     }
   }
+#  pause();
   return($total);
 }    
 
@@ -103,7 +106,7 @@ sub reconcileaccount {
   &recordpayment($bornumber,$dbh,$data);
   #Check if the boorower still owes
 #  pause();
-#  $total=&checkaccount($bornumber,$dbh);
+  $total=&checkaccount($bornumber,$dbh);
   
   return($total);
 
