@@ -211,11 +211,9 @@ sub returnwindow {
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
       $reason="Circ";
-      $panel->Hide;
     }
     if ($data eq NEWT_KEY_F12){
       $reason="Quit";
-      $panel->Hide;
     }
   }
   my $stuff=$entry->Get();
@@ -255,8 +253,8 @@ sub issuewindow {
   my $b1  = Newt::Label("$borrower->{title} $borrower->{'firstname'}");
   my $b2  = Newt::Label("$borrower->{'streetaddres'}");
   my $b3  = Newt::Label("$borrower->{'city'}");
-  my $li1 = Newt::Listbox(12,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
-  my $li2 = Newt::Listbox(12,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
+  my $li1 = Newt::Listbox(10,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
+  my $li2 = Newt::Listbox(10,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
   #my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $i = 0;
   while ($items1->[$i]) {
