@@ -14,7 +14,7 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&UpdateStats &statsreport &Count &Overdues &TotalOwing
-&TotalPaid &getcharges &Getpaidbranch);
+&TotalPaid &getcharges &Getpaidbranch &unfilledreserves);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -198,6 +198,25 @@ sub Getpaidbranch{
   $sth->finish;
   $dbh->disconnect;
   return($data->{'branch'});
+}
+
+sub unfilledreserves {
+  my $dbh=C4Connect;
+  my $query="select *,biblio.title from reserves,biblio,borrowers where found <> 'F' and cancellationdate
+is NULL and biblio.biblionumber=reserves.biblionumber and
+reserves.borrowernumber=borrowers.borrowernumber order by
+biblio.title,reservedate";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $i=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@results);
 }
 
 END { }       # module clean-up code here (global destructor)

@@ -285,8 +285,8 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio
-         where 
+         biblio,biblioitems
+         where (biblio.biblionumber=biblioitems.biblionumber) and 
          ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%')";    
 	 while ($i < $count){ 
            $query=$query." and (author like '$key[$i]%' or author like '% $key[$i]%')";   
@@ -296,17 +296,18 @@ sub CatSearch  {
          if ($search->{'title'} ne ''){ 
 	   $query=$query. " and title like '%$search->{'title'}%'";
 	 }
-	 #if ($search->{'class'} ne ''){
-	 #  $query.=" and biblioitems.itemtype='$search->{'class'}'";
-	 #}
+	 if ($search->{'class'} ne ''){
+	   $query.=" and biblioitems.itemtype='$search->{'class'}'";
+	 }
       } else {
           if ($search->{'title'} ne ''){
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
-            $query="select count(*) from biblio,bibliosubtitle
+            $query="select count(*) from biblio,bibliosubtitle,biblioitems
 	    where
-            (biblio.biblionumber=bibliosubtitle.biblionumber) and
+            (biblio.biblionumber=bibliosubtitle.biblionumber and 
+	    biblioitems.biblionumber=biblio.biblionumber) and
 	    (((title like '$key[0]%' or title like '% $key[0]%')";
 	    while ($i<$count){
 	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%')";
@@ -321,9 +322,9 @@ sub CatSearch  {
 	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
 	    }
 	    $query=$query."))";
-#	    if ($search->{'class'} ne ''){
-#	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
-#	    }
+	    if ($search->{'class'} ne ''){
+	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
+	    }
 	  } elsif ($search->{'class'} ne ''){
 	     $query="select count(*) from biblioitems,biblio where itemtype =
 '$search->{'class'}' and biblio.biblionumber=biblioitems.biblionumber";
@@ -354,7 +355,7 @@ sub CatSearch  {
         my $search2=uc $search->{'isbn'};
         my $query1 = "select * from biblioitems where isbn='$search2'";
 	my $sth1=$dbh->prepare($query1);
-	print $query1;
+#	print $query1;
 	$sth1->execute;
         my $i2=0;
 	while (my $data=$sth1->fetchrow_hashref) {
