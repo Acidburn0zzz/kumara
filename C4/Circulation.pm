@@ -85,11 +85,11 @@ sub pastitems{
   my $i=0;
   my @items;
   my @items2;
-  $items[0]=" "x40;
-  $items2[0]=" "x36;
+  $items[0]=" "x29;
+  $items2[0]=" "x29;
   while (my $data=$sth->fetchrow_hashref) {
      my $line = "$data->{'date_due'} $data->{'title'}";
-     $items[$i]=fmtstr($env,$line,"L40");
+     $items[$i]=fmtstr($env,$line,"L29");
      $i++;
   }
   return(\@items,\@items2);

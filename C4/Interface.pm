@@ -126,7 +126,7 @@ sub output {
 
 sub textbox {
   my ($width,$height,$text,$title,$top,$left)=@_;
-  my $panel = Newt::Panel(70, 4, "$title",$top,$left);
+  my $panel = Newt::Panel(5, 4, "$title",$top,$left);
   my $box = Newt::Textbox($width,$height, NEWT_FLAG_SCROLL |
   NEWT_FLAG_RETURNEXIT | NEWT_FLAG_WRAP,$text);
   $panel->Add(0,0,$box,NEWT_ANCHOR_LEFT);
@@ -232,7 +232,7 @@ sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$amountowing)=@_;
   my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label("Book");
-  my $panel = Newt::Panel(50,25, $title,5,5);
+  my $panel = Newt::Panel(10,10, $title);
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
   my $l3  = Newt::Label("Borrower Info");
@@ -241,8 +241,8 @@ sub issuewindow {
   my $b1  = Newt::Label("$borrower->{title} $borrower->{'firstname'}");
   my $b2  = Newt::Label("$borrower->{'streetaddres'}");
   my $b3  = Newt::Label("$borrower->{'city'}");
-  my $li1 = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
-  my $li2 = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
+  my $li1 = Newt::Listbox(12,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
+  my $li2 = Newt::Listbox(12,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
   #my $li3 = Newt::Listbox(5, NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $i = 0;
   while ($items1->[$i]) {
@@ -259,7 +259,7 @@ sub issuewindow {
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
   $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,45);
+  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,30);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
   $panel->Add(1,1,$l4,NEWT_ANCHOR_RIGHT);
   $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);

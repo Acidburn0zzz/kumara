@@ -101,7 +101,7 @@ sub processitems {
       my ($item,$charge) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
       if ($item) {
         $items2->[$it2p] = 
-    	(fmtstr($env,$item->{'title'},"L30")." ".fmtdec($env,$charge,"22")); 	
+    	(fmtstr($env,$item->{'title'},"L23")." ".fmtdec($env,$charge,"22")); 	
         $row2++;	     
 	$it2p++;
 	$amountdue += $charge;
