@@ -17,7 +17,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
-&getboracctrecord &ItemType); 
+&getboracctrecord &ItemType &itemissues); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -474,8 +474,9 @@ sub bibdata {
 sub bibitemdata {
   my ($bibitem)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from biblio,biblioitems where biblio.biblionumber=
-  biblioitems.biblionumber and biblioitemnumber=$bibitem";
+  my $query="Select * from biblio,biblioitems,itemtypes where biblio.biblionumber=
+  biblioitems.biblionumber and biblioitemnumber=$bibitem and
+biblioitems.itemtype=itemtypes.itemtype";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -483,6 +484,36 @@ sub bibitemdata {
   $sth->finish;
   $dbh->disconnect;
   return($data);
+}
+
+sub itemissues {
+  my ($bibitem)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from items where 
+  items.biblioitemnumber=$bibitem";
+  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $i=0;
+  my @results;
+  while (my $data=$sth->fetchrow_hashref){
+    my $query2="select * from issues,borrowers where itemnumber=$data->{'itemnumber'}
+and returndate is NULL and issues.borrowernumber=borrowers.borrowernumber";
+    my $sth2=$dbh->prepare($query2);
+    $sth2->execute;
+    if (my $data2=$sth2->fetchrow_hashref){
+      $data->{'date_due'}=$data2->{'date_due'};
+      $data->{'card'}=$data2->{'cardnumber'};
+    } else {
+      $data->{'date_due'}='Available';
+    }
+    $sth2->finish;
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return(@results);
 }
 
 sub itemnodata {
