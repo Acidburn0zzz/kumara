@@ -51,7 +51,7 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub CatSearch  {
-  my ($env,$searchstring,$type)=@_;
+  my ($env,$searchstring,$type,$num,$offset)=@_;
   my $dbh = &C4Connect;
   my $query = '';
   SWITCH: {
@@ -106,6 +106,7 @@ sub CatSearch  {
     '%$searchstring%' and entrytype like '%$type%'";
     last SWITCH;
   }
+  $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
 #  print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -114,14 +115,15 @@ sub CatSearch  {
   while (my $data=$sth->fetchrow_hashref){
 #   print "$data->{'catalogueentry'}
 #   $data->{'biblionumber'} \n";
-    $results[$i]=ItemInfo($env,$data->{'biblionumber'}); 
+#    $results[$i]=ItemInfo($env,$data->{'biblionumber'}); 
+    $results[$i]="$data->{'biblionumber'}\t<a href=/cgi-bin/stuff>$data->{'catalogueentry'}</a>";
     $i++;
   }
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
   return(@results);
-}    
+}
 
 sub ItemInfo {
   my ($env,$biblionumber)=@_;
@@ -145,7 +147,7 @@ sub ItemInfo {
     $isth->execute;
     $isth->finish;
 #    print "$data->{'itemnumber'} $datedue\n";
-     $results[$i]="$data->{'itemnumber'}\t$datadue";
+     $results[$i]="$data->{'itemnumber'}\t$datedue";
      $i++;
   }
   $sth->execute;

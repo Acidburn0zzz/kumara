@@ -11,7 +11,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&startpage);
+@EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -49,8 +49,41 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
  
 sub startpage{
-  my $string="hello"
-  reutrn($string);
+  my $string="<html><body bgcolor=white>\n";
+  return($string);
+}
+
+sub startmenu{
+}
+
+sub endmenu{
+}
+
+sub mktablehdr {
+  my $string="<table cellpadding=0 cellspacing=2 border=0>\n";
+  return($string);
+}
+
+sub mktablerow {
+  my ($cols,@data)=@_;
+  my $i=0;
+  my $string="<tr valign=top>";
+  while ($i <$cols){
+    $string=$string."<td>$data[$i]</td>";
+    $i++;
+  }
+  $string=$string."</tr>\n";
+  return($string);
+}
+
+sub mktableft {
+  my $string="</table>\n";
+  return($string);
+}
+
+sub endpage{
+  my $string="</body></html>\n";
+  return($string);
 }
     
 END { }       # module clean-up code here (global destructor)
