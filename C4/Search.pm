@@ -15,7 +15,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
-&itemdata &bibdata &GetItems &borrdata &getacctlist); 
+&itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -308,6 +308,19 @@ sub bibdata {
   $sth->finish;
   $dbh->disconnect;
   return($data);
+}
+
+sub itemnodata {
+  my ($env,$dbh,$itemnumber) = @_;
+  my $query="Select * from biblio,items,biblioitems
+    where itemnumber = '$itemnumber'
+    and biblio.biblionumber = items.itemnumber
+    and biblioitems.biblio = items.biblionumber";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;    
+  return($data);	       
 }
 
 sub BornameSearch  {
