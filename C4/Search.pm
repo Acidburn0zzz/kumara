@@ -327,17 +327,14 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio,biblioitems,additionalauthors
+         biblio,biblioitems
          where biblioitems.biblionumber=biblio.biblionumber 
-	 and biblio.biblionumber=additionalauthors.biblionumber and
-         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%' or
-	 additionalauthors.author like '$key[0]%' or
-	 additionalauthors.author like '% $key[0]%' 
-	 )";    
+	 and
+         ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%'
+	 	 )";    
 	 while ($i < $count){ 
            $query=$query." and (biblio.author like '$key[$i]%' or biblio.author like '% $key[$i]%'
-	   or additionalauthors.author like '$key[$i]%' or
-	   additionalauthors.author like '% $key[$i]%')";   
+	   )";
            $i++;       
 	 }   
 	 $query=$query.")";
