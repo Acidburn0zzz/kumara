@@ -118,6 +118,7 @@ sub pastitems{
      $i++;
   }
   return(\@items,\@items2);
+  $sth->finish;
 }
 
 sub checkoverdues{
@@ -167,6 +168,7 @@ NULL");
     }
   } 
   return($borrower->{'borrowernumber'});
+  $sth->finish;
 }
 
 
@@ -185,6 +187,7 @@ sub checkreserve{
     $resbor = $data->{'borrowernumber'}; 
   }
   return ($resbor);
+  $sth->finish;
 }
 
 sub checkwaiting{
@@ -200,6 +203,7 @@ sub checkwaiting{
     push @itemswaiting,$data->{'itemnumber'}; 
   }
   return (\@itemswaiting);
+  $sth->finish;
 }
 
 sub scanbook {

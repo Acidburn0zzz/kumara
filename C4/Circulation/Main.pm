@@ -223,6 +223,7 @@ sub checkreserve{
       $csth->finish();
     }     
   }
+  $sth->finish;
   return ($resbor,$resrec);
 }
 
@@ -240,6 +241,7 @@ sub checkwaiting{
     @itemswaiting[$cnt] =$data;
     $cnt ++
   }
+  $sth->finish;
   return ($cnt,\@itemswaiting);
 }
 

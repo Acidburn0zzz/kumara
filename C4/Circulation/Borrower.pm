@@ -353,7 +353,7 @@ sub NewBorrowerNumber {
   $sth->finish;
   $data->{'max(borrowernumber)'}++;
   return($data->{'max(borrowernumber)'});
-
+  $dbh->disconnect;
 }
 
 END { }       # module clean-up code here (global destructor)

@@ -61,6 +61,7 @@ sub NewBorrowerNumber {
   my $data=$sth->fetchrow_hashref;                                  
   $sth->finish;                   
   $data->{'max(borrowernumber)'}++;         
+  $dbh->disconnect;
   return($data->{'max(borrowernumber)'}); 
 }    
 

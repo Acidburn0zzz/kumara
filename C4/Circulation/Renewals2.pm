@@ -163,6 +163,7 @@ sub calc_charges {
     $sth2->{'finish'};                              
   }                                   
   $sth1->finish;  
+  $dbh->disconnect;
   return ($charge);         
 }       
 
