@@ -575,10 +575,12 @@ sub borrbind {
 
 sub preborr {
   my ($input,$env, $entry) = @_;
-  if ($input eq $lastval) {
-    borfill($env,$entry);
-    return 0;
-  }
+  if ($env->{"bcard"} ne "") {
+    if ($input eq $lastval) {
+      borfill($env,$entry);
+      return 0;
+    }
+  } 
   return 1;
 }  
   
