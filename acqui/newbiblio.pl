@@ -257,13 +257,14 @@ BUDGETED TOTAL</B></td>
 </table>
 </form>
 </center>
-<B>HELP</B><br>
+<table>
+<tr><td bgcolor=#cccc99  background="/images/background-mem.gif"><B>HELP</B><br>
 <UL>
 <LI>If ordering more than one copy of an item you will be prompted to  choose additional bookfunds, and put in additional barcodes at the next screen<P>
 <LI><B>Bold</B> fields must be filled in to create a new bibilo and item.<p>
-<LI>Shaded fields can be used to do a "quick" recieve, when items have been purchased locally or gifted. In this case the quantity "ordered" will also  be entered into the database as the quantity recieved.
+<LI>Shaded fields can be used to do a "quick" receive, when items have been purchased locally or gifted. In this case the quantity "ordered" will also  be entered into the database as the quantity received.
 </UL>
-
+</td></tr></table>
 <p> &nbsp; </p>
 printend
 ;
