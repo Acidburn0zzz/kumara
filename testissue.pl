@@ -10,5 +10,5 @@ my $num=$ARGV[0];
 
 my @data=Issue($num,3);
 my $data=join(' ',@data);
-resultout('console',$data);
+#resultout('console',$data);
 print "\n$data[21]\n";
