@@ -1,18 +1,19 @@
-package C4::Database; #asummes C4/Database
+package C4::Circulation; #asummes C4/Circulation
 
-#requires DBI.pm to be installed
-#uses DBD:Pg
+#package to deal with circulation 
 
 use strict;
 require Exporter;
 use DBI;
+use C4::Database;
+
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect);
+@EXPORT = qw(&Issue);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -48,13 +49,20 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
-
-
-sub C4Connect  {
-  my $dbname="c4"; 
-  my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", "chris", "");
-
-  return $dbh;
+sub Issue  {
+  my ($bornum,$itemnum)=@_;
+  my $dbh=&C4Connect;  
+  my $sth=$dbh->prepare("Select * from borrowers where borrowernumber=$bornum");
+  $sth->execute;
+  my @borrower=$sth->fetchrow_array;
+  $sth->finish;
+  $sth=$bh->prepare("Select * from items where itemnumber = $itemnum);
+  my @item=$sth->fetchrow_array;
+  $sth->finish;
+  $dbh->disconnect;
+  return (@data);
 }    
+
+
 			
 END { }       # module clean-up code here (global destructor)
