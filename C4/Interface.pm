@@ -22,7 +22,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
-&selborrower &fmtstr &fmtdec);
+&selborrower &fmtstr &fmtdec &returnwindow);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -163,8 +163,7 @@ sub selborrower {
   if ($numbors>15) {
     $numbors = 15;
   }
-  #my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE );
-  my $li = Newt::Listbox($numbors );
+  my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE );
   $li->Add(@borrows);
   my $bdata;
   my $butt = Newt::Button("Okay");
@@ -186,7 +185,41 @@ sub selborrower {
   }   
   return($data,$bdata);
 }
-	      
+
+sub returnwindow {
+  my ($env,$title,$item,$items,$odueitems,$borrower,$amountowing)=@_;
+  my $panel    = Newt::Panel(5,10,$title);
+  my $entry    = Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $accchk   = Newt::Checkbox("Accumulate", " ", " NY");
+  my $la1      = Newt::Label("Total Amount");
+  my $fee      = Newt::Label(fmtdec($env,$amountowing,"$32"));
+  my $l1       = Newt::Label("Returned"); 
+  my $li1      = Newt::Listbox(15,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER);
+  $panel->Add(0,0,$entry,NEWT_ANCHOR_TOP);
+  $panel->Add(0,1,$accchk,NEWT_ANCHOR_TOP);
+  $panel->Add(1,0,$la1);
+  $panel->Add(2,0,$fee);
+  $panel->Add(1,1,$l1);
+  $panel->Add(2,1,$li1);
+  $panel->AddHotKey(NEWT_KEY_F11);
+  $panel->AddHotKey(NEWT_KEY_F10);
+  my ($reason,$data)=$panel->Run();
+  if ($reason eq NEWT_EXIT_HOTKEY) {
+    if ($data eq NEWT_KEY_F11) {
+      $reason="Finished user";
+    }
+    if ($data eq NEWT_KEY_F10) {
+      $reason="Finished issues";
+    }
+    if ($data eq NEWT_KEY_F12){
+      $reason="Quit"
+    }
+  }
+  my $stuff=$entry->Get();
+  return($stuff,$reason);
+}
+  
+  
 sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$amountowing)=@_;
   my $entry=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
