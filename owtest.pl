@@ -3,7 +3,6 @@
 use strict;
 use C4::Security;
 use C4::Circmain;
-
 # set up environment array
 # branchcode - logged on branch
 # usercode - current user

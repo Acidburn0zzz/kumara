@@ -23,7 +23,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&pastitems &checkoverdues &previousissue 
-&checkreserve &checkwaiting &scanbook &scanborrower );
+&checkreserve &checkwaiting &scanbook &scanborrower &getbranch);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -59,6 +59,18 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
+sub getbranch {
+  my ($env) = @_;
+  my $dbh = C4Connect;
+  my $query = "select * from branches order by branchcode";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  my @branches;
+  while (my $data = $sth->fetchrow_hashref) {
+    push @branches,$data;
+  }
+  brmenu ($env,\@branches);
+}
 sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;
@@ -138,7 +150,7 @@ sub checkreserve{
   my $query = "select * from reserves,items 
     where (items.itemnumber = '$itemnum')
     and (items.biblionumber = reserves.biblionumber)
-    and (reserves.found is null) order by priority";
+    and (reserves.found <> 'F') order by priority";
   my $sth = $dbh->prepare($query);
   $sth->execute();
   my $resrec;

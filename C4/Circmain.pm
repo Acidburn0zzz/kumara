@@ -62,15 +62,19 @@ sub Start_circ{
   #connect to database
   #start interface
   &startint($env,'Circulation');
+  getbranch($env);
   my $donext = 'Circ';
   my $reason;
   my $data;
   while ($donext ne 'Quit') {
     if ($donext  eq "Circ") {
-      &startint($env,'Circulation');
+      #&startint($env,'Circulation');
       clearscreen();
+      #
+      #($reason,$data) = menu($env,'console','Circulation', 
+      #  ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
       ($reason,$data) = menu($env,'console','Circulation', 
-        ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
+        ('Issues','Returns','Select Branch'));
       #debug_msg($env,"data = $data");
       #my $response = msg_yn("data",$data);
       #debug_msg($env,"Resp $response");
@@ -87,7 +91,9 @@ sub Start_circ{
       #&startint($env,'Circulation');
       $donext=Returns($env); #C4::Circulation::Returns 
       #&endint($env);
-    } elsif ($data eq 'Borrower Enquiries'){
+    } elsif ($data eq "Select Branch") {
+      getbranch($env);
+    } elsif ($data eq 'Borrower Enquiries') {
       #&startint($env,'Circulation');     
 #  $donext=Borenq($env); #C4::Circulation::Borrower - conversion
       #&endint($env);

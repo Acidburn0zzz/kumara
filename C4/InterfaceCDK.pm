@@ -20,7 +20,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
 &textbox &menu &issuewindow &msg_yn &borrower_dialog &debug_msg &error_msg
 &selborrower &returnwindow &logondialog &borrowerwindow &titlepanel
-&borrbind &borrfill &preeborr &borrowerbox);
+&borrbind &borrfill &preeborr &borrowerbox &brmenu);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -154,7 +154,9 @@ sub helptext {
 sub titlepanel{
   my ($env,$title,$title2)=@_;
   my @header;
-  @header[0] = fmtstr($env,$title,"L36").fmtstr($env,$title2,"R36");
+  @header[0] = fmtstr($env,$title,"L26");
+  @header[0] = @header[0].fmtstr($env,$env->{'branchname'},"C20");
+  @header[0] = @header[0].fmtstr($env,$title2,"R26");
   my $label = new Cdk::Label ('Message' =>\@header,
      'Ypos'=>0);
   $label->draw();
@@ -196,6 +198,36 @@ sub error_msg {
 sub endint {
   Cdk::end();
 }
+
+
+sub brmenu {
+  my ($env,$brrecs)=@_;
+  $env->{'sysarea'}="Menu";
+  my $titlebar=titlepanel($env,"Library System","Select branch");
+  my @mitems;
+  my $x = 0;
+  while (@$brrecs[$x] ne "") {
+    my $brrec =@$brrecs[$x]; 
+    $mitems[$x]=fmtstr($env,$brrec->{'branchcode'},"L6");
+    $mitems[$x]=$mitems[$x].fmtstr($env,$brrec->{'branchname'},"L20");
+    $x++;
+  }  
+  my $menu = new Cdk::Scroll ('Title'=>"  ",
+      'List'=>\@mitems,
+      'Height'=> 16,
+      'Width'=> 30);
+  # Activate the object.         
+  my ($menuItem) = $menu->activate();
+  # Check the results.
+  if (defined $menuItem) {      
+    my $brrec = @$brrecs[$menuItem];
+    $env->{'branchcode'} = $brrec->{'branchcode'};
+    $env->{'branchname'} = $brrec->{'branchname'};
+  }
+  return();
+  
+}
+
 
 sub borrower_dialog {
   my ($env)=@_;
@@ -251,7 +283,7 @@ sub issuewindow {
     'List'=>\@$items1,'Height'=> 8,'Width'=>78,'Ypos'=>18);
   my $scroll1 = new Cdk::Scroll ('Title'=>"Current Issues",
     'List'=>\@$items2,'Height'=> 8,'Width'=>78,'Ypos'=>9);
-  my $funcmenu = new Cdk::Scroll ('Title'=>"Function",
+  my $funcmenu = new Cdk::Scroll ('Title'=>"",
     'List'=>\@functs,'Height'=>5,'Width'=>12,'Ypos'=>3,'Xpos'=>28);
   my $loanlength = new Cdk::Entry('Label'=>"Due Date:      ",
     'Max'=>"30",'Width'=>"11",
@@ -373,6 +405,7 @@ sub prebook {
 sub borrowerbox {
   my ($env,$borrower,$amountowing,$odues) = @_;
   my @borrinfo;
+  my $amountowing = fmtdec($amountowing,"42");
   #debug_msg($env,"borrbox");
   my $line = "$borrower->{'cardnumber'} ";
   $line = $line."$borrower->{'surname'}, ";
@@ -410,8 +443,8 @@ sub returnwindow {
   my ($env,$title,$item,$items,$borrower,$amountowing,$odues,$dbh)=@_;
   #debug_msg($env,$borrower);
   my $titlepanel = titlepanel($env,"Returns","Scan Item");
-  my @functs=("Payments","Issues","Renewal");
-  my $funcmenu = new Cdk::Scroll ('Title'=>"Function",
+  my @functs=("Payments","Renewal");
+  my $funcmenu = new Cdk::Scroll ('Title'=>"",
      'List'=>\@functs,'Height'=>5,'Width'=>12,'Ypos'=>3,'Xpos'=>16);
   my $returnlist = new Cdk::Scroll ('Title'=>"Items Returned",
      'List'=>\@$items,'Height'=> 12,'Width'=>74,'Ypos'=>10,'Xpos'=>1);
@@ -451,9 +484,9 @@ sub preretbook {
 sub actrfmenu {
   my ($env,$dbh,$funcmenu,$bookentry,$borrower,$amountowing,$odues) = @_;
   my $funct =  $funcmenu->activate();
-  debug_msg($env,"funtion $funct");
+  #debug_msg($env,"funtion $funct");
   if (!defined $funct) {
-  } elsif ($funct == 2 ) {
+  } elsif ($funct == 1 ) {
     if ($borrower->{'borrowernumber'} ne "") {
        C4::Circulation::Renewals::bulkrenew($env,$dbh,
        $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
