@@ -11,7 +11,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow);
+@EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -85,6 +85,12 @@ sub endpage{
   my $string="</body></html>\n";
   return($string);
 }
-    
+
+sub mklink {
+  my ($url,$text)=@_;
+  my $string="<a href=$url>$text</a>";
+  return ($string);
+}
+
 END { }       # module clean-up code here (global destructor)
     

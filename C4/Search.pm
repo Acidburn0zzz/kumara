@@ -80,14 +80,14 @@ sub CatSearch  {
       last SWITCH;
     };
     if ($type eq 'a') {
-      $query="Select * from biblio,catalogueentry 
+      $query="Select count(*) from biblio,catalogueentry 
       where (catalogueentry.catalogueentry = biblio.author)
       and (catalogueentry.catalogueentry like '%$searchstring%') 
       and (entrytype like '$type%')";
       last SWITCH;
     };
     if ($type eq 't') {
-      $query="Select * from biblio,catalogueentry
+      $query="Select count(*) from biblio,catalogueentry
       where (catalogueentry.catalogueentry = biblio.title)
       and (catalogueentry.catalogueentry like '%$searchstring%')
       and (entrytype like '$type%')";
@@ -106,23 +106,31 @@ sub CatSearch  {
     '%$searchstring%' and entrytype like '%$type%'";
     last SWITCH;
   }
-  $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
-#  print "$query\n";
+
+  print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
+  my $count=$sth->fetchrow_hashref;
+  $sth->finish;
+  $query=~ s/count\(\*\)/\*/g;
+  $query=$query." order by catalogueentry.catalogueentry limit $num,$offset";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+
   my $i=0;
   my @results;
   while (my $data=$sth->fetchrow_hashref){
 #   print "$data->{'catalogueentry'}
 #   $data->{'biblionumber'} \n";
 #    $results[$i]=ItemInfo($env,$data->{'biblionumber'}); 
-    $results[$i]="$data->{'biblionumber'}\t<a href=/cgi-bin/stuff>$data->{'catalogueentry'}</a>";
+    $results[$i]="$data->{'biblionumber'}\t$data->{'title'}\t
+    $data->{'author'}";
     $i++;
   }
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
-  return(@results);
+  return($count->{'count'},@results);
 }
 
 sub ItemInfo {
