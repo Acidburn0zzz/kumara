@@ -98,6 +98,7 @@ print <<printend
 
 
 <tr valign=top bgcolor=white><td>Publisher</td><td><input type=text name=Publisher value="$data->{'publishercode'}" size=20></td></tr>
+<tr valign=top bgcolor=white><td>Place</td><td><input type=text name=Place value="$data->{'place'}" size=20></td></tr>
 
 
 <tr valign=top bgcolor=white><td>ISBN</td><td><input type=text name=ISBN value="$data->{'isbn'}" size=20></td></tr>
@@ -121,7 +122,7 @@ print <<printend
 
 </table>
 
-<img src="/images/holder.gif" width=16 height=300 align=left>
+<img src="/images/holder.gif" width=16 height=500 align=left>
 
 
 
