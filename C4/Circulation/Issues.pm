@@ -10,6 +10,7 @@ use C4::Database;
 use C4::Accounts;
 use C4::Interface;
 use C4::Circulation;
+use C4::Scan;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -172,6 +173,8 @@ sub processitems {
     #if charge deal with it
     #now mark as issued
     &updateissues($item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
+    my $branch;
+    &UpdateStats($branch,'issue');
     output(40,$row2,$item->{'title'});
     $row2++;
   }
