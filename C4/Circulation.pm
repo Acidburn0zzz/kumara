@@ -7,6 +7,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Circulation::Issues;
+use C4::Interface;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -51,27 +52,27 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub Start_circ{
-  my (%env)=@_;
+  my ($env)=@_;
   #connect to database
   #start interface
-  &startint(\%env,'Circulation');
+  &startint($env,'Circulation');
   my ($reason,$data)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
   my $donext;
   if ($data eq 'Issues'){  
-    $donext=Issue(\%env);
+    $donext=Issue($env);
   } else {
-    &endint(\%env);
+    &endint($env);
   }
   if ($donext eq 'Circ'){
-    Start_circ(\%env);
+    Start_circ($env);
   } else {
-    &endint(\%env);
+    &endint($env);
   }
 }
 
 sub pastitems{
   #Get list of all items borrower has currently on issue
-  my (%env,$bornum,$dbh)=@_;
+  my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio
   where borrowernumber=$bornum and issues.itemnumber=items.itemnumber
   and items.biblionumber=biblio.biblionumber");
@@ -87,7 +88,7 @@ sub pastitems{
 
 sub checkoverdues{
   #checks whether a borrower has overdue items
-  my (%env,$bornum,$dbh)=@_;
+  my ($env,$bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio where
   borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
   items.biblionumber=biblio.biblionumber");
