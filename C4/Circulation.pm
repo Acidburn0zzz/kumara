@@ -78,13 +78,13 @@ sub Issue  {
   #check if member has a card reported as lost
   if ($borrower[22] ==1){
     #updae member info
-    &resultout('console'"Whoop whoop lost card");
+    &resultout('console',"Whoop whoop lost card");
   }
   #check the notes field if notes exist display them
   if ($borrower[26] ne ''){
     #display notes
     #deal with notes as issue_process.doc
-    &resultout ('console',"$borrower[26]");
+    &resultout('console',"$borrower[26]");
   }
   #check if borrower has overdue items
   #call overdue checker
