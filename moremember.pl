@@ -2,6 +2,9 @@
 
 #script to do a borrower enquiery/brin up borrower details etc
 #written 20/12/99 by chris@katipo.co.nz
+#Displays all the detailas about a borrower
+#needs html removed and to use the C4::Output more, but its tricky
+#last modified 21/1/2000 by chris@katipo.co.nz
 
 use strict;
 use C4::Output;
@@ -220,6 +223,8 @@ print <<printend
 
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Remove</b></TD>
 </TR>
+<form action=/cgi-bin/koha/modrequest.pl method=post>
+<input type=hidden name=from value=borrower>
 printend
 ;
 my ($rescount,$reserves)=FindReserves('',$bornum); #From C4::Reserves2
@@ -229,21 +234,26 @@ for (my $i=0;$i<$rescount;$i++){
   print "<tr VALIGN=TOP  >
   <TD><a href=\"/cgi-bin/koha/request.pl?bib=$reserves->[$i]{'biblionumber'}\">$reserves->[$i]{'title'}</a></td>
   <TD>$reserves->[$i]{'reservedate'}</td>
-
-  <TD>$2</td>
-  <TD><input type=radio name=\"remove-request_123\" value=y>Y
- <input type=radio name=\"remove-request_123\" value=n>N</td>
+  <input type=hidden name=biblio value=$reserves->[$i]{'biblionumber'}>
+  <input type=hidden name=borrower value=$bornum>
+  <TD></td>
+  <TD><select name=\"rank-request\">
+  <option value=n>No
+  <option value=del>Yes
+  </select>
   </tr>
   ";
 }
 print <<printend
+
 <tr VALIGN=TOP  >
 <TD colspan=5 align=right>
 <INPUT TYPE="image" name="submit"  VALUE="update" height=42  WIDTH=187 BORDER=0 src="/images/cancel-requests.gif"></td>
 </tr>
 </table>
+</form>
 <p align=right>
-<a href=rachey-reading.html><img height=42  WIDTH=187 BORDER=0 src="/images/reading-record.gif"></a>
+<a href=/cgi-bin/koha/readingrec.pl?bornum=$bornum><img height=42  WIDTH=187 BORDER=0 src="/images/reading-record.gif"></a>
 </p>
 printend
 ;

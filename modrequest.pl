@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
 #script to modify reserves/requests
-#writen 2/1/00 by chris@katipo.oc.nz
+#written 2/1/00 by chris@katipo.oc.nz
+#last update 27/1/2000 by chris@katipo.co.nz
 
 use strict;
 #use DBI;
@@ -29,5 +30,9 @@ for (my $i=0;$i<$count;$i++){
   }
   
 }
-
-print $input->redirect("/cgi-bin/koha/request.pl?bib=$biblio[0]");
+my $from=$input->param('from');
+if ($from eq 'borrower'){
+  print $input->redirect("/cgi-bin/koha/moremember.pl?bornum=$borrower[0]");
+ } else {
+   print $input->redirect("/cgi-bin/koha/request.pl?bib=$biblio[0]");
+}
