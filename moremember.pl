@@ -106,7 +106,7 @@ print <<printend
 <tr VALIGN=TOP  >
 <TD colspan=3 align=right>
 <nobr>
-<a href=/cgi-bin/koha/accounts.pl?bornum=$bornum><img height=42  WIDTH=187 BORDER=0 src="/images/view-account.gif"></a>
+<a href=/cgi-bin/koha/boraccount.pl?bornum=$bornum><img height=42  WIDTH=187 BORDER=0 src="/images/view-account.gif"></a>
 <a href=/cgi-bin/koha/pay.pl?bornum=$bornum><img height=42  WIDTH=187 BORDER=0 src="/images/pay-fines.gif"></a></nobr>
 </td>
 

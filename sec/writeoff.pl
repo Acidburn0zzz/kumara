@@ -27,19 +27,20 @@ while ( my ($key, $value) = each %inp){
 #  print $key,$value;
   my $accounttype=$input->param("accounttype$value");
   my $itemno=$input->param("itemnumber$value");
+  my $amount=$input->param("amount$value");
   if ($accounttype eq 'Res'){
     my $accountno=$input->param("accountno$value");
-    writeoff($bornum,$accountno,$itemno,$accounttype);
+    writeoff($bornum,$accountno,$itemno,$accounttype,$amount);
   } else {
-    writeoff($bornum,'',$itemno,$accounttype);
+    writeoff($bornum,'',$itemno,$accounttype,$amount);
   }
 }
-
+#print $input->header;
 print $input->redirect("/cgi-bin/koha/pay.pl?bornum=$bornum");
 
 #needs to be shifted to a module when time permits
 sub writeoff{
-  my ($bornum,$accountnum,$itemnum,$accounttype)=@_;
+  my ($bornum,$accountnum,$itemnum,$accounttype,$amount)=@_;
   my $dbh=C4Connect;
   my $query="Update accountlines set amountoutstanding=0 where ";
   if ($accounttype eq 'Res'){
@@ -51,5 +52,17 @@ sub writeoff{
 #  print $query;
   $sth->execute;
   $sth->finish;
+  $query="select max(accountno) from accountlines";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $account=$sth->fetchrow_hashref;
+  $sth->finish;
+  $account->{'max(accountno)'}++;
+  $query="insert into accountlines (borrowernumber,accountno,itemnumber,date,amount,description,accounttype)
+  values ('$bornum','$account->{'max(accountno)'}','$itemnum',now(),'$amount','Writeoff','W')";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish; 
+#  print $query;
   $dbh->disconnect;
 }

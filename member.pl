@@ -11,7 +11,7 @@ use C4::Search;
 
 my $input = new CGI;
 my $member=$input->param('member');
-
+$member=~ s/\,//g;
 print $input->header;
 #start the page and read in includes
 print startpage();

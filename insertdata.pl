@@ -11,7 +11,7 @@ use Date::Manip;
 use strict;
 
 my $input= new CGI;
-print $input->header;
+#print $input->header;
 #print $input->dump;
 
 #get all the data into a hash
@@ -37,9 +37,9 @@ if (my $data=$sth->fetchrow_hashref){
   altrelationship='$data{'altrelationship'}',othernames='$data{'othernames'}',phoneday='$data{'phoneday'}',
   categorycode='$data{'categorycode'}',city='$data{'city'}',area='$data{'area'}',phone='$data{'phone'}',
   borrowernotes='$data{'borrowernotes'}',altphone='$data{'altphone'}',surname='$data{'surname'}',
-  initials='$data{'initials'}',streetaddress='$data{'streetaddress'}',ethnicity='$data{'ethnicity'}'
+  initials='$data{'initials'}',streetaddress='$data{'address'}',ethnicity='$data{'ethnicity'}'
   where borrowernumber=$data{'borrowernumber'}";
-  print $query;
+#  print $query;
   my $sth2=$dbh->prepare($query);
   $sth2->execute;
   $sth2->finish;

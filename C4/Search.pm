@@ -17,7 +17,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
-&getboracctrecord &ItemType &itemissues); 
+&getboracctrecord &ItemType &itemissues &FrontSearch); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -104,25 +104,78 @@ sub OpacSearch {
   return($count,@results);
 }
 
-sub KeywordSearch {
+
+  
+sub FrontSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
-  $search->{'keyword'}=~ s/ +$//;
-  $search->{'keyword'}=~ s/'/\\'/;
-  my @key=split(' ',$search->{'keyword'});
+  $search->{'front'}=~ s/ +$//;
+  $search->{'front'}=~ s/'/\\'/;
+  my @key=split(' ',$search->{'front'});
   my $count=@key;
   my $i=1;
   my @results;
-  my $query ="Select * from catalogueentry where entrytype is not NULL and
-  entrytype<>'a' and entrytype <>'ad' and entrytype<>'aa' and ((catalogueentry
-  like '$key[0]%' or catalogueentry like '% $key[0]%')
+  my $query ="Select * from biblio,bibliosubtitle where
+  biblio.biblionumber=bibliosubtitle.biblionumber and
+  ((title like '$key[0]%' or title like '% $key[0]%'
+  or subtitle like '$key[0]%' or subtitle like '% $key[0]%'
+  or author like '$key[0]%' or author like '% $key[0]%')";
   while ($i < $count){
-    $query=$query." and (catalogueentry like '$key[$i]%' or catalogueentry like '% $key[$i]%')";
+    $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
     $i++;
   }
-  my $sth=$dbh->execute;
-  
-  
+  $query=$query.") group by biblio.biblionumber order by author,title";
+  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}\t$data->{'copyrightdate'}";
+#      print $results[$i];
+    $i++;
+  }
+  $sth->finish;
+  $sth=$dbh->prepare("Select biblionumber from bibliosubject where subject
+  like '%$search->{'keyword'}%'");
+  $sth->execute;
+  while (my $data=$sth->fetchrow_hashref){
+    my $sth2=$dbh->prepare("Select * from biblio where
+    biblionumber=$data->{'biblionumber'}");
+    $sth2->execute;
+    while (my $data2=$sth2->fetchrow_hashref){
+
+$results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$data->{'copyrightdate'}";
+#      print $results[$i];
+      $i++;   
+    }
+    $sth2->finish;
+  }    
+  my $i2=1;
+  @results=sort @results;
+  my @res;
+  my $count=@results;
+  $i=1;
+  $res[0]=$results[0];
+  while ($i2 < $count){
+    if ($results[$i2] ne $res[$i-1]){
+      $res[$i]=$results[$i2];
+      $i++;
+    }
+    $i2++;
+  }
+  $i2=0;
+  my @res2;
+  $count=@res;
+  while ($i2 < $num && $i2 < $count){
+    $res2[$i2]=$res[$i2+$offset];
+#    print $res2[$i2];
+    $i2++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@res2);
+}
+
   
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
@@ -135,7 +188,7 @@ sub KeywordSearch {
   my @results;
   my $query ="Select * from biblio,bibliosubtitle where
   biblio.biblionumber=bibliosubtitle.biblionumber and
-  ((title like '%$key[0]%' or subtitle like '%$key[0]%' or seriestitle)";
+  ((title like '%$key[0]%' or subtitle like '%$key[0]%')";
   while ($i < $count){
     $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
     $i++;

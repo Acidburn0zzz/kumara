@@ -37,7 +37,7 @@ while (my $data=$sth->fetchrow_hashref){
   #update borrowers corresponding
   #update categories
 #    my $temp=substr($data->{'categorycode'},0,1);
-  $query="update borrowers set area='H' where categorycode='$data->{'categorycode'}'";
+  $query="update borrowers set area='V' where categorycode='$data->{'categorycode'}'";
   my $sth2=$dbh->prepare($query);
   $sth2->execute;
   $sth2->finish;

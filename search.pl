@@ -33,6 +33,7 @@ my $title=$input->param('title');
 $search{'title'}=$title;
 my $keyword=$input->param('keyword');
 $search{'keyword'}=$keyword;
+$search{'front'}=$input->param('front');
 my $author=$input->param('author');
 $search{'author'}=$author;
 my $subject=$input->param('subject');
@@ -73,7 +74,9 @@ if ($itemnumber ne '' || $isbn ne ''){
     if ($keyword ne ''){
 #      print "hey";
       ($count,@results)=&KeywordSearch(\$blah,'intra',\%search,$num,$offset);
-    } else {
+    } elsif ($search{'front'} ne '') {
+    ($count,@results)&FrontSearch(\$blah,'intra',\%search,$num,$offset);
+    }else {
       ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
 #            print "hey";
     }

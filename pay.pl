@@ -56,6 +56,7 @@ print <<printend
 <input type=radio name=payfine$i value=wo>Writeoff
 <input type=hidden name=itemnumber$i value=$accts->[$i]{'itemnumber'}>
 <input type=hidden name=accounttype$i value=$accts->[$i]{'accounttype'}>
+<input type=hidden name=amount$i value=$accts->[$i]{'amount'}>
 <input type=hidden name=bornum value=$bornum>
 <input type=hidden name=accountno$i value=$accts->[$i]{'accountno'}>
 </td>
