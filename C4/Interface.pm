@@ -166,24 +166,25 @@ sub selborrower {
   if ($numbors>15) {
     $numbors = 15;
   }
-  my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE );
+  
+  my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE | NEWT_FLAG_RETURNEXIT);
   $li->Add(@borrows);
   my $bdata;
-  my $butt = Newt::Button("Okay");
+#  my $butt = Newt::Button("Okay");
   $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
-  $panel->Add(0,1,$butt,NEWT_ANCHOR_TOP);
+#  $panel->Add(0,1,$butt,NEWT_ANCHOR_TOP);
   $panel->AddHotKey(NEWT_KEY_F11);
   my ($reason,$data)=$panel->Run();
   my @stuff=$li->Get();
   debug_msg("",@stuff[0]);
-  my $data=$stuff[0];
+  my $data=(0,9,$stuff[0]);
   if ($data ne "") {
      my $bornum = substr($data,0,9);
      my $query = "select * from borrowers where cardnumber = '$bornum'";
      my $sth = $dbh->prepare($query);
      $sth->execute;
      if ($bdata =$sth->fetchrow_hashref) {
-       $data = $bdata->{'borrowernumber'}; 
+        $data = $bdata->{'borrowernumber'}; 
      }
   }   
   return($data,$bdata);
