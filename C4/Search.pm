@@ -357,7 +357,12 @@ sub CatSearch  {
 	     (biblio.title='$search->{'title'}' or (biblio.unititle = '$search->{'title'}'
 	     or biblio.unititle like '$search->{'title'} |%' or 
 	     biblio.unititle like '%| $search->{'title'} |%' or
-	     biblio.unititle like '%| $search->{'title'}'))";
+	     biblio.unititle like '%| $search->{'title'}') or
+	     (biblio.seriestitle = '$search->{'title'}' or
+	     biblio.seriestitle like '$search->{'title'} |%' or
+	     biblio.seriestitle like '%| $search->{'title'} |%' or
+	     biblio.seriestitle like '%| $search->{'title'}')
+	     )";
 	   } else {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
