@@ -66,17 +66,17 @@ sub gotopage{
 sub startmenu{
   my ($type)=@_;
   if ($type eq 'issue') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/issues-top.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc') || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/opac-top.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-top.inc') || die;
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/members-top.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-top.inc') || die;
   } elsif ($type eq 'acquisitions'){
-    open (FILE,'/usr/local/www/koha/htdocs/includes/aquisitions-top.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-top.inc') || die;
   } elsif ($type eq 'report'){
-    open (FILE,'/usr/local/www/koha/htdocs/includes/reports-top.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/reports-top.inc') || die;
   } else {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/cat-top.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc') || die;
   }
   my @string=<FILE>;
   close FILE;
@@ -89,17 +89,17 @@ sub startmenu{
 sub endmenu{
   my ($type)=@_;
   if ($type eq 'issue'){
-    open (FILE,'/usr/local/www/koha/htdocs/includes/issues-bottom.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc') || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/opac-bottom.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-bottom.inc') || die;
   } elsif ($type eq 'member') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/members-bottom.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/members-bottom.inc') || die;
   } elsif ($type eq 'acquisitions') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/aquisitions-bottom.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/aquisitions-bottom.inc') || die;
   } elsif ($type eq 'report') {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/reports-bottom.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/reports-bottom.inc') || die;
   } else {
-    open (FILE,'/usr/local/www/koha/htdocs/includes/cat-bottom.inc') || die;
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc') || die;
   }
   my @string=<FILE>;
   close FILE;

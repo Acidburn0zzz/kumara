@@ -78,6 +78,8 @@ print <<printend
 <b>Volume:</b> $data->{'volumeddesc'}<br>
 <b>Pages:</b> $data->{'pages'}<br>
 <b>Illus:</b> $data->{'illus'}<br>
+<b>Size:</b> $data->{'size'}<br>
+<b>Notes:</b> $data->{'notes'}<br>
 <b>No. of Items:</b> $count
 </font>
 </TD>

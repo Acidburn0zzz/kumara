@@ -104,7 +104,10 @@ print <<printend
 
 <tr valign=top bgcolor=white><td>Volume</td>
 <td><input type=text name=Volume value="$data->{'volumeddesc'}" size=20></td></tr>
-
+<tr valign=top bgcolor=white><td>Notes</td>
+<td><input type=text name=Notes value="$data->{'notes'}" size=20></td></tr>
+<tr valign=top bgcolor=white><td>Size</td>
+<td><input type=text name=Size value="$data->{'size'}" size=20></td></tr>
 
 <input type=hidden name=bibnum value="$data->{'biblionumber'}">
 

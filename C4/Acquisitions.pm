@@ -388,12 +388,13 @@ sub modsubject {
 }
 
 sub modbibitem {
-  my ($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc)=@_;
+  my
+($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size)=@_;
   my $dbh=C4Connect;
   my $query="update biblioitems set itemtype='$itemtype',
   isbn='$isbn',publishercode='$publishercode',publicationyear='$publicationdate',
   classification='$classification',dewey='$dewey',subclass='$subclass',illus='$illus',
-  pages='$pages',volumeddesc='$volumeddesc'
+  pages='$pages',volumeddesc='$volumeddesc',notes='$notes',size='$size'
   where
   biblioitemnumber=$bibitemnum";
   my $sth=$dbh->prepare($query);

@@ -44,7 +44,8 @@ if ($class =~/[0-9]+/){
 my $illus=checkinp($input->param('Illustrations'));
 my $pages=checkinp($input->param('Pages'));
 my $volumeddesc=checkinp($input->param('Volume'));
-
+my $notes=checkinp($input->param('Notes'));
+my $size=checkinp($input->param('Size'));
 
 my (@items)=itemissues($bibitemnum);
 #print @items;           
@@ -80,7 +81,7 @@ if ($existing eq 'YES'){
    }
    if ($flag eq 'notall' && $flag2 eq 'leastone'){
       $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
-      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
+      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size);
       for (my $i=0;$i<$count;$i++){
         if ($barcodes[$i] ne ''){
 	  moditem($items[$i]->{'itemnumber'},$bibitemnum);
@@ -88,7 +89,7 @@ if ($existing eq 'YES'){
       }
       
    } elsif ($flag2 eq 'leastone') {
-      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
+      modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size);
    }
 }
 print $input->redirect("moredetail.pl?type=intra&bib=$bibnum&bi=$bibitemnum");
