@@ -62,7 +62,7 @@ sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($env,$bornum,$dbh)=@_;
   my $query1 = "select * from issues   where (borrowernumber=$bornum
-    and (returndate is null) order by date_due";
+    and returndate is null) order by date_due";
   my $sth=$dbh->prepare($query1);
   $sth->execute;
   #my $sth=$dbh->prepare("Select * from issues,items,biblio,biblioitems
