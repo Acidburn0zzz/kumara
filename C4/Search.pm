@@ -87,7 +87,7 @@ sub OpacSearch {
   for ($i=1;$i<$count;$i++){
     $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
   }
-  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[$i]%')";
+  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[0]%')";
   for ($i=1;$i<$count;$i++){
     $query.=" and (notes like '$key[$i]%' or notes like '% $key[$i]%')";
   }
@@ -209,7 +209,7 @@ sub KeywordSearch {
   for ($i=1;$i<$count;$i++){
     $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
   }
-  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[$i]%')";
+  $query.= ") or ((notes like '$key[0]%' or notes like '% $key[0]%')";
   for ($i=1;$i<$count;$i++){
     $query.=" and (notes like '$key[$i]%' or notes like '% $key[$i]%')";
   }
