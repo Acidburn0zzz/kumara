@@ -14,7 +14,7 @@ my $input=new CGI;
 my $bornum=$input->param('bornum');
 #get borrower details
 my $data=borrdata('',$bornum);
-
+my $user=$input->remote_user;
 
 #get account details
 my %bor;
@@ -34,7 +34,7 @@ for (my $i=0;$i<@names;$i++){
     my $amount=$input->param($names[$i+4]);
     my $bornum=$input->param($names[$i+5]);
     my $accountno=$input->param($names[$i+6]);
-    makepayment($bornum,$accountno,$amount);
+    makepayment($bornum,$accountno,$amount,$user);
     $check=2;
   }
 }

@@ -107,7 +107,7 @@ sub recordpayment{
 
 sub makepayment{
   #here we update both the accountoffsets and the account lines
-  my ($bornumber,$accountno,$amount)=@_;
+  my ($bornumber,$accountno,$amount,$user)=@_;
   my $env;
   my $dbh=C4Connect;
   # begin transaction
@@ -129,11 +129,11 @@ sub makepayment{
   my $payment=0-$amount;
   $updquery = "insert into accountlines 
   (borrowernumber, accountno,date,amount,description,accounttype,amountoutstanding)  
-  values ($bornumber,$nextaccntno,now(),$payment,'Payment,thanks', 'Pay',0)";
+  values ($bornumber,$nextaccntno,now(),$payment,'Payment,thanks - $user', 'Pay',0)";
   my $usth = $dbh->prepare($updquery);
   $usth->execute;
   $usth->finish;
-  UpdateStats($env,'branch','payment',$amount);
+  UpdateStats($env,$user,'payment',$amount);
   $sth->finish;
   $dbh->disconnect;
 }
