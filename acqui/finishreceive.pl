@@ -54,5 +54,5 @@ if ($quantrec > 1){
   $barcodes[0]=$barcode;
 }
 makeitems($quantrec,$bibitemno,$biblio,$replacement,$cost,$bookseller,$branch,@barcodes);
-#print $input->redirect("/cgi-bin/koha/acqui/receive.pl?invoice=$invoiceno&id=$id&freight=$freight&gst=$gst");
-print $input->redirect("/acquisitions/");
+print $input->redirect("/cgi-bin/koha/acqui/receive.pl?invoice=$invoiceno&id=$id&freight=$freight&gst=$gst");
+#print $input->redirect("/acquisitions/");
