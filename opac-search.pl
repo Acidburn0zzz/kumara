@@ -48,7 +48,7 @@ my $disp=$offset+1;
 print "<br> Results $disp to $offset2 displayed";
 print mktablehdr;
 
-print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'));
+print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('BRANCH'));
 
 my $count2=@results;
 my $i=0;
@@ -71,7 +71,11 @@ while ($i < $count2){
         $stuff[4]=$stuff[4]."On Loan $nacount";
       }
       if ($lcount > 0){
-        $stuff[4]=$stuff[4]."L$lcount";
+        $stuff[4]=$stuff[4]."Levin";
+	if ($lcount >1 ){
+	  $stuff[4]=$stuff[4].$lcount;
+	}
+	$stuff[4].=" ";
       }
       if ($fcount > 0){
         $stuff[4]=$stuff[4]."F$fcount";
