@@ -54,7 +54,8 @@ my $priv_func = sub {
 sub FindReserves {
   my ($bib)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from reserves where biblionumber=$bib";
+  my $query="Select * from reserves,borrowers where biblionumber=$bib and
+reserves.borrowernumber=borrowers.borrowernumber";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
@@ -69,7 +70,7 @@ sub FindReserves {
 }
 
 sub CreateReserve {                                                           
-  my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;   
+  my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems,$priority) = @_;   
   my $fee=CalcReserveFee($env,$borrnum,$biblionumber,$constraint,$bibitems);
   my $dbh = &C4Connect;       
   my $const = lc substr($constraint,0,1);       
@@ -88,8 +89,8 @@ sub CreateReserve {
     $usth->finish;                        
   }                     
   my $query="insert into reserves
-  (borrowernumber,biblionumber,reservedate,branchcode,constrainttype)           
-  values ('$borrnum','$biblionumber','$resdate','$branch','$const')";   
+  (borrowernumber,biblionumber,reservedate,branchcode,constrainttype,priority)           
+  values ('$borrnum','$biblionumber','$resdate','$branch','$const','$priority')";   
   my $sth = $dbh->prepare($query);                        
   $sth->execute();                
   if (($const eq "o") || ($const eq "e")) {     
@@ -108,7 +109,7 @@ sub CreateReserve {
       $i++;                         
     }                                   
   } 
-  print $query;
+#  print $query;
   $dbh->disconnect();         
   return();   
 }             

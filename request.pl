@@ -32,6 +32,7 @@ print <<printend
 <form action="placerequest.pl" method=post>
 <INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=187 BORDER=0 src="/images/place-request.gif" align=right >
 <input type=hidden name=biblio value=$bib>
+<input type=hidden name=type value=str8>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left >
 
 <!----------------BIBLIO RESERVE TABLE-------------->
@@ -66,9 +67,9 @@ print <<printend
 <TD><input type=text size=20 name=member></td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=levin>Levin
-<option value=foxton>Foxton
-<option value=Shannon>Shannon
+<option value=L>Levin
+<option value=F>Foxton
+<option value=S>Shannon
 </select>
 </td>
 <td><input type=checkbox name=request value=any>Next Available, <br>(or choose from list below)</td>
@@ -147,8 +148,8 @@ print "<tr VALIGN=TOP  >
 <option value=\"\">Del
 </select>
 </td>
-<TD><a href=/members/rachey-record.html>Rachey Hamilton-Williams</a></td>
-<TD>1/2/00</td>
+<TD><a href=/cgi-bin/koha/members.pl>$reserves->[$i]{'firstname'} $reserves->[$i]{'surname'}</a></td>
+<TD>$reserves->[$i]{'reservedate'}</td>
 <TD><select name=pickup>
 <option value=levin>Levin
 <option value=foxton>Foxton

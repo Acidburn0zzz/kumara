@@ -11,14 +11,17 @@ use C4::Output;
 use C4::Reserves2;
 
 my $input = new CGI;
-print $input->header;
+#print $input->header;
 
 my @bibitems=$input->param('biblioitem');
 my $biblio=$input->param('biblio');
 my $borrower=$input->param('member');
 my $branch=$input->param('pickup');
-
-my $count=@bibitems;
+my @rank=$input->param('rank-request');
+my $type=$input->param('type');
+my $bornum=borrdata($borrower);
+if ($type eq 'str8' && $bornum ne ''){
+ my $count=@bibitems;
 @bibitems=sort @bibitems;
 my $i2=1;
 my @realbi;
@@ -30,12 +33,18 @@ for (my $i=1;$i<$count;$i++){
     $i2++;
   }
 }
-print $input->dump;
+#print $input->dump;
 my $env;
-my $bornum=borrdata($borrower);
+
 my $const;
 if ($input->param('request') eq 'any'){
   $const='a';
 }
-CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi);
+CreateReserve(\$env,$branch,$bornum->{'borrowernumber'},$biblio,$const,\@realbi,$rank[0]);
 #print @realbi;
+
+print $input->redirect("request.pl?bib=$biblio");
+} elsif ($bornum eq ''){
+  print $input->header();
+  print "Invalid card number please try again";
+}
