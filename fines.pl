@@ -28,7 +28,7 @@ for (my $i=0;$i<$count;$i++){
         $borrower=BorType($bornum);
       }
 
-      if ($borrower->{'description'} !~ /Staff/ && $borrower->{'description'} !~ /Branch/){
+#      if ($borrower->{'description'} !~ /Staff/ && $borrower->{'description'} !~ /Branch/){
           my ($amount)=CalcFine($data->[$i]->{'itemnumber'},$borrower->{'categorycode'},$difference);      
 	  if ($amount > $max){
   	    $amount=$max;
@@ -39,7 +39,7 @@ for (my $i=0;$i<$count;$i++){
 	  } else {
 #	    print "0 fine\n";
 	  }
-      }
+#      }
     }
 }
 print "\n $count2\n";
