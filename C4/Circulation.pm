@@ -65,30 +65,31 @@ sub Issue  {
   my $borcode=&scanborrower();
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
   $sth->execute;
-  my @borrower=$sth->fetchrow_array;
-  my $bornum=$borrower[0];
+  my $borrower=$sth->fetchrow_hashref;
+  my $bornum=$borrower->{'borrowernumber'};
   $sth->finish;
   if ($bornum eq ''){
     #borrower not found
    } else {  
-    my $borrowers=join(' ',($borrower[5],$borrower[3],$borrower[2]));
+    my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},
+    $borrower->{'surname'}));
     output(1,1,$borrowers);
     #process borrower traps (could be function)
     #check first GNA trap (no address this is the 22nd item in the table)
-    if ($borrower[21] == 1){
+    if ($borrower->{'gonenoaddress'} == 1){
       #got to membership update and update member info
- 
+      output(20,1,"Borrower has no address");
     }
     #check if member has a card reported as lost
-    if ($borrower[22] ==1){
+    if ($borrower->{'lost'} ==1){
       #updae member info
-#
+      output(20,1,"Borrower has lost card");
     }
     #check the notes field if notes exist display them
-    if ($borrower[26] ne ''){
+    if ($borrower->{'borrowernotes'} ne ''){
       #display notes
       #deal with notes as issue_process.doc
-#      &resultout('console',"$borrower[26]",$interface);
+      output(20,1,$borrower->{'borrowernotes'});
     }
     #check if borrower has overdue items
     #call overdue checker
@@ -99,7 +100,7 @@ sub Issue  {
     &checkwaiting;
     #deal with any money still owing
     if ($amount > 0){
-      &reconcileaccount($bornum,$dbh);
+#      &reconcileaccount($dbh,$bornum);
     }
     #deal with alternative loans
     #now check items 
@@ -116,12 +117,11 @@ sub processitems {
   my $dbh=&C4Connect;  
   my $sth=$dbh->prepare("Select * from items where barcode = '$itemnum'");
   $sth->execute;
-  my @item=$sth->fetchrow_array;  
-#  print $itemnum,"\n",$item[0],"\n";
+  my $item=$sth->fetchrow_hashref;  
   $sth->finish;
   #check if item is restricted
-  if ($item[23] ==1 ){
-    print "whoop whoop restricted\n";
+  if ($item->{'restricted'} == 1 ){
+    output(20,1,"whoop whoop restricted");
     #check borrowers status to take out restricted items
     # if borrower allowed {
     #  book issued
@@ -130,13 +130,7 @@ sub processitems {
     # }
   }
   #check if item is on issue already
-  my $status=&previousissue($item[0],$dbh,$bornum,$interface);
-  if ($status eq 'out'){
-    #book is already out, deal with it
-    #if its out to another deal with it
-    #if its out the person ask if they want to renew it etc
-#    print "book is out";
-  }
+  &previousissue($item->{'itemnumber'},$dbh,$bornum,$interface);
   #check reserve
   &checkreserve;
   #if charge deal with it
@@ -152,18 +146,22 @@ sub checkoverdues{
 }
 
 sub previousissue {
-  my ($itemnum,$dbh,$bornum,$interface)=@_;
+  my ($itemnum,$dbh,$bornum)=@_;
   my $sth=$dbh->prepare("Select firstname,surname,issues.borrowernumber
   from issues,borrowers where 
   issues.itemnumber='$itemnum' and
   issues.borrowernumber=borrowers.borrowernumber");
   $sth->execute;
-  my @borrower=$sth->fetchrow_array;
+  my $borrower=$sth->fetchrow_hashref;
   $sth->finish;
-  if ($borrower[0] ne ''){
-    my $text="book is issued to borrower $borrower[0] $borrower[1] borrowernumber  $borrower[2]";
-#    &alert('console',$text,$interface);
-    return("out");
+  if ($borrower->{'borrowernumber'} ne ''){
+    if ($bornum eq $borrower->{'borrowernumber'}){
+      output(1,20,"Book is marked as issue to curent borrower");
+    } else {
+      my $text="book is issued to borrower $borrower->{'firstname'}
+      $borrower->{'surname'} borrowernumber $borrower->{'borrowernumber'}";    
+      output(1,20,$text);
+    }
   } 
 }
 

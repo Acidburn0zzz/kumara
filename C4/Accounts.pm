@@ -54,27 +54,34 @@ my $priv_func = sub {
 sub checkaccount  {
   #take borrower number
   #check accounts and list amounts owing
-  my ($bornumber,$dbh,$interface)=@_;
+  my ($bornumber,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from accountlines where
   borrowernumber=$bornumber");
   $sth->execute;
   my $total=0;
-  while (my @data=$sth->fetchrow_array){
-    $total=$total+$data[8];
+  while (my $data=$sth->fetchrow_hashref){
+    $total=$total+$data->{'amountoutstanding'};
   }
   $sth->finish;
   if ($total > 0){
     output(1,2,"borrower owes $total");
     if ($total > 5){
-      reconcileaccount($interface);
+#      reconcileaccount($dbh,$bornumber);
     }
   }
   return($total);
 }    
 
 sub reconcileaccount {
-  my ($interface)=@_;
-#  heading('console',$interface,'Accounts','red');
+  #print put money owing give person opportunity to pay it off
+  my ($dbh,$bornumber)=@_;
+  my $sth=$dbh->prepare("Select * from accountlines where 
+  borrowernumber=$bornumber");   
+  $sth->execute;     
+  &clearscreen();
+  while (my $data=$sth->fetchrow_hashref){
+    print $data->{'itemnumber'};
+  }
 }
 			
 END { }       # module clean-up code here (global destructor)

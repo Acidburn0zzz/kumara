@@ -2,11 +2,9 @@
 
 use strict;
 #use DBI;
-use C4::Database;
-use C4::Circulation;
+use C4::Interface2;
 
-my $num=$ARGV[0];
-
-my @data=Issue($num,3);
-print @data;
-print "\n$data[21]\n";
+startint("Circulation");
+my $data=dialog("Borrower");
+print $data;
+endint();

@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&dialog &startint &endint &output);
+@EXPORT = qw(&dialog &startint &endint &output &clearscreen);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -63,6 +63,10 @@ sub startint {
   Newt::PushHelpLine();
   Newt::DrawRootText(0,0,$msg);
 #  Newt::Finished();
+}
+
+sub clearscreen{
+  Newt::Cls();
 }
 
 sub output {
