@@ -12,23 +12,23 @@ while (my $data=$sth->fetchrow_hashref){
   $stop{$data->{'word'}}=$data->{'word'};
 }
 $sth->finish;
-$sth=$dbh->prepare("Select * from catalogueentry where entrytype = 't' or entrytype='st'");
-$sth->execute;
-while (my $data=$sth->fetchrow_hashref){
-  $data->{'selection'}=$data->{'catalogueentry'};
-  while ( my ($key, $value) = each %stop) {
-    $data->{'selection'}=~ s/ $value / /gi;
-    $data->{'selection'}=~ s/ $value$//gi;
-    $data->{'selection'}=~ s/^$value //gi;
+while (my $da=<STDIN>){
+  chomp $da;
+  my @temp=split('\t',$da);
+  if ($temp[1] =~ /t/){
+    my $dat=$temp[0];
+#    print "hey";
+    while ( my ($key, $value) = each %stop) {
+      $dat=~ s/ $value / /gi;
+      $dat=~ s/ $value$//gi;
+      $dat=~ s/^$value //gi;
+    }
+    $dat=~ s/\'//g;
+    print "$temp[0]\t$temp[1]\t \t \t \t$dat\n";
+  } else {
+    print $da,"\n";
+#    print $temp[1],"\n";
   }
-  $data->{'selection'}=~ s/\'//g;
-  $data->{'catalogueentry'}=~ s/\'/\\\'/g;
-  my $sth2=$dbh->prepare("Update catalogueentry set selection='$data->{'selection'}' where
-  entrytype='$data->{'entrytype'}' and catalogueentry='$data->{'catalogueentry'}'");
-  $sth2->execute;
-  $sth2->finish;
 }
-
-
 
 $dbh->disconnect;
