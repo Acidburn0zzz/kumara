@@ -31,31 +31,33 @@ print <<printend
 <p>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 <TR VALIGN=TOP>
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>FINES & CHARGES</TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>CALCULATE</TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=2><B>FINES & CHARGES</TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=1><B>AMOUNT</TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=1><B>STILL OWING</TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=1><B>FIX</B></TD>
 </TR>
 
-
+<form method=post action=tidyaccounts.pl>
 printend
 ;
 for (my $i=0;$i<$numaccts;$i++){
-$accts->[$i]{'amount'}+=0.00;
-$accts->[$i]{'amountoutstanding'}+=0.00;
-print <<printend
-<tr VALIGN=TOP  >
-<td>$accts->[$i]{'date'}</td>
-<TD>$accts->[$i]{'description'}
+  $accts->[$i]{'amount'}+=0.00;
+  $accts->[$i]{'amountoutstanding'}+=0.00;
+  print <<printend
+  <tr VALIGN=TOP  >
+  <td>$accts->[$i]{'date'}</td>
+  <TD>$accts->[$i]{'description'}
 printend
 ;
-if ($accts->[$i]{'accounttype'} ne 'F' && $accts->[$i]{'accounttype'} ne 'FU'){
-  print "$accts->[$i]{'title'}";
-}
-print <<printend
-</td>
-<TD>$accts->[$i]{'accounttype'}</td>
-<td>$accts->[$i]{'amount'}</td>
-<TD>$accts->[$i]{'amountoutstanding'}</td>
+  if ($accts->[$i]{'accounttype'} ne 'F' && $accts->[$i]{'accounttype'} ne 'FU'){
+     print "$accts->[$i]{'title'}";
+  }
+  print <<printend
+  </td>
 
+  <td>$accts->[$i]{'amount'}</td>
+  <TD>$accts->[$i]{'amountoutstanding'}</td>
+  <td><input type=text size=5 name=$accts->[$i]{'accountno'} value="$accts->[$i]{'amount'}"></td>
 </tr>
 printend
 ;
@@ -71,11 +73,11 @@ print <<printend
 
 
 
-</form>
+
 </table>
-
-
-
+<input type=hidden name=bornum value=$bornum>
+<input type=submit value="Tidy Accounts">
+</form>
 
 
 

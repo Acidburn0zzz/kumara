@@ -48,7 +48,7 @@ print <<printend
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 >
 <TR VALIGN=TOP>
 <td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>FINES & CHARGES</TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>CALCULATE</TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" colspan=4><B>AMOUNT OWING</TD>
 </TR>
 <form action=/cgi-bin/koha/pay.pl method=post>
 

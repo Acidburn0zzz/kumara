@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&recordpayment);
+@EXPORT = qw(&recordpayment &fixaccounts);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -119,5 +119,25 @@ sub getnextacctno {
   $sth->finish;
   return($nextaccntno);
 }
-			
+
+sub fixaccounts {
+  my ($borrowernumber,$accountno,$amount)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from accountlines where borrowernumber=$borrowernumber
+     and accountno=$accountno";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  my $diff=$amount-$data->{'amount'};
+  my $outstanding=$data->{'amountoutstanding'}+$diff;
+  $sth->finish;
+  $query="Update accountlines set amount='$amount',amountoutstanding='$outstanding' where
+          borrowernumber=$borrowernumber and accountno=$accountno";
+   $sth=$dbh->prepare($query);
+#   print $query;
+   $sth->execute;
+   $sth->finish;
+   $dbh->disconnect;
+ }
+ 
 END { }       # module clean-up code here (global destructor)
