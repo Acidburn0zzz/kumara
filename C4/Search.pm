@@ -1060,7 +1060,7 @@ sub bibitems {
   my $query="Select * from biblioitems,itemtypes,items where
   biblioitems.biblionumber='$bibnum' and biblioitems.itemtype=itemtypes.itemtype and
   biblioitems.biblioitemnumber=items.biblioitemnumber group by
-  biblioitemnumber";
+  items.biblioitemnumber";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
