@@ -58,8 +58,7 @@ sub Returns {
   my ($env)=@_;
   my $dbh=&C4Connect;  
   my @items;
-  $items[0]="."x50;
-  my $itcnt=0;
+  @items[0]=" "x50;
   my $reason;
   my $item;
   my $reason;
@@ -73,7 +72,15 @@ sub Returns {
     if (($reason ne "Circ") && ($reason ne "Quit")) {
       ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
       if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
-        debug_msg($env,$reason);
+        if ($reason eq "Returned") {
+	my $fmtitem = fmtstr($env,$itemrec->{'title'},"L50");
+        debug_msg($env,$fmtitem);
+	
+         unshift @items,$fmtitem;
+	  
+	} else {
+          debug_msg($env,$reason);
+	}
       }
     }
   }
@@ -88,7 +95,8 @@ sub checkissue {
   my $borrower;
   my $itemno;
   my $itemrec;
-  my $amt_owing; 
+  my $amt_owing;
+  $item = uc $item;
   my $query = "select * from items where barcode = '$item'";
   my $sth=$dbh->prepare($query); 
   $sth->execute;
@@ -101,12 +109,14 @@ sub checkissue {
      if (my $issuerec=$sth->fetchrow_hashref) {
      $sth->finish;
      $query = "select * from borrowers where
-       (borrowernumber = = '$issuerec->{'borrowernumber'}')";
-     my $sth->prepare($query);
+       (borrowernumber = '$issuerec->{'borrowernumber'}')";
+     my $sth= $dbh->prepare($query);
      $sth->execute;
      $borrower = $sth->fetchrow_hashref;
-     $amt_owing = returnrecord($env,$dbh,$bornum,$itemno);   
-     $reason = "Returned";
+     $bornum = $issuerec->{'borrowernumber'};
+     $itemno = $issuerec->{'itemnumber'};
+     $amt_owing = returnrecord($env,$dbh,$bornum,$itemno);     
+     $reason = "Returned";    
      } else {
        $sth->finish;
        $reason = "Item not issued";
@@ -125,9 +135,10 @@ sub returnrecord {
   my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
   my @datearr = localtime(time);
   my $dateret = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
-  debug_msg($env,"before return");
-  my $query = "update issues set returndate = '$dateret', branchcode ='$env->{'branchcode'}' where (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
-  and (returndate is null)";  
+  debug_msg($env,"before return $itemno $bornum");
+  my $query = "update issues set returndate = '$dateret', branchcode ='$env->{'branchcode'}' where 
+    (borrowernumber = '$bornum') and (itemnumber = '$itemno') 
+    and (returndate is null)";  
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;

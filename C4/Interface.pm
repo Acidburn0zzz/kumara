@@ -204,21 +204,23 @@ sub returnwindow {
     $li1->Add($items->[$i]);
     $i++;
   }
-  $panel->Add(0,0,$entry,NEWT_ANCHOR_TOP);
-  $panel->Add(0,1,$accchk,NEWT_ANCHOR_TOP);
-  $panel->Add(1,0,$la1);
-  $panel->Add(2,0,$fee);
-  $panel->Add(1,1,$l1);
-  $panel->Add(2,1,$li1);
+  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT);
+  $panel->Add(1,0,$accchk,NEWT_ANCHOR_LEFT);
+  $panel->Add(2,0,$la1,NEWT_ANCHOR_RIGHT);
+  $panel->Add(2,1,$fee,NEWT_ANCHOR_RIGHT);
+  $panel->Add(0,2,$l1,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,3,$li1,NEWT_ANCHOR_LEFT);
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
       $reason="Circ";
+      $panel->Hide;
     }
     if ($data eq NEWT_KEY_F12){
-      $reason="Quit"
+      $reason="Quit";
+      $panel->Hide;
     }
   }
   my $stuff=$entry->Get();
