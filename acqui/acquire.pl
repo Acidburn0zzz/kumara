@@ -102,10 +102,17 @@ Shopping Basket For: $booksellers[0]->{'name'}
 <TR VALIGN=TOP>
 <TD>Branch</td>
 <td><select name=branch size=1>
-<option value=D selected>District
-<option value=C>Levin
-<option value=F>Foxton
-<option value=S>Shannon
+EOP
+;
+my ($count2,@branches)=branches();                                                                         
+for (my $i=0;$i<$count2;$i++){                                                                           
+  print "<option value=$branches[$i]->{'branchcode'}";                                                   
+  if ($results[0]->{'branchcode'} == $branches[$i]->{'branchcode'}){                                           
+  print " Selected";                                                                                   
+  }                                                                                                      
+  print ">$branches[$i]->{'branchname'}";                                                                
+}   
+print <<EOP
 </select>
 </td>
 </tr>

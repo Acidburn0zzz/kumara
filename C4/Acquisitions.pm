@@ -15,7 +15,7 @@ $VERSION = 0.01;
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
 &getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
-&findall &needsmod &delitem &delbibitem &delorder);
+&findall &needsmod &delitem &delbibitem &delorder &branches);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -226,6 +226,22 @@ sub bookfunds {
   my $dbh=C4Connect;
   my $query="Select * from aqbookfund,aqbudget where aqbookfund.bookfundid
   =aqbudget.bookfundid group by aqbookfund.bookfundid order by bookfundname";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+}
+
+sub branches {
+  my $dbh=C4Connect;
+  my $query="Select * from branches";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;

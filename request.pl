@@ -9,7 +9,7 @@ use C4::Search;
 use CGI;
 use C4::Output;
 use C4::Reserves2;
-
+use C4::Acquisitions;
 my $input = new CGI;
 print $input->header;
 
@@ -69,10 +69,14 @@ print <<printend
 <TD><input type=text size=20 name=notes></td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=C>Levin
-<option value=F>Foxton
-<option value=S>Shannon
-<option value=T>Tokomaru
+printend
+;
+my ($count2,@branches)=branches;                                                                         
+for (my $i=0;$i<$count2;$i++){                                                                           
+  print "<option value=$branches[$i]->{'branchcode'}";                                                   
+  print ">$branches[$i]->{'branchname'}";                                                                
+}   
+print <<printend
 </select>
 </td>
 <td><input type=checkbox name=request value=any>Next Available, <br>(or choose from list below)</td>
@@ -182,26 +186,16 @@ print "</select>
 <td>$reserves->[$i]{'reservenotes'}</td>
 <TD>$date</td>
 <TD><select name=pickup>
-<option value=C";
-if ($reserves->[$i]{'branchcode'} eq 'C'){
-  print " selected";
-}
-print ">Levin
-<option value=F";
-if ($reserves->[$i]{'branchcode'} eq 'F'){
-  print " selected";
-}
-print ">Foxton
-<option value=S";
-if ($reserves->[$i]{'branchcode'} eq 'S'){
-  print " selected";
-}
-print">Shannon
-<option value=T";
-if ($reserves->[$i]{'branchcode'} eq 'T'){
-  print " selected";
-}
-print ">Tokomaru
+";
+my ($count2,@branches)=branches;                                                                         
+for (my $i2=0;$i2<$count2;$i2++){                                                                           
+  print "<option value=$branches[$i2]->{'branchcode'}";                                                   
+  if ($reserves->[$i]{'branchcode'} eq $branches[$i2]->{'branchcode'}){                                           
+    print " Selected";                                                                                   
+  }
+  print ">$branches[$i2]->{'branchname'}\n";                                                                
+}   
+print "
 </select>
 </td>
 <TD>$type</td>
