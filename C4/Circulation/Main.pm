@@ -232,7 +232,7 @@ sub checkwaiting{
   my @itemswaiting;
   my $query = "select * from reserves
     where (borrowernumber = '$bornum')
-    and (reserves.found='W')";
+    and (reserves.found='W') and cancellationdate is NULL";
   my $sth = $dbh->prepare($query);
   $sth->execute();
   my $cnt=0;
