@@ -314,10 +314,30 @@ print <<printend
 <td   COLSPAN=3 ><input type=text name=contactname size=40 value="$data->{'contactname'}"></td>
 <td><input type=text name=altphone size=20 value="$data->{'altphone'}"></td>
 <td><select name=altrelationship size=1>
-<option value="workplace">Workplace
-<option value="relative">Relative
-<option value="friend">Friend
-<option value="neighbour">Neighbour
+<option value="workplace"
+printend
+;
+if ($data->{'altrelationship'} eq 'workplace'){
+  print " selected ";
+}
+
+print ">Workplace
+<option value=\"relative\"";
+if ($data->{'altrelationship'} eq 'relative'){
+  print " selected ";
+}
+print ">Relative
+<option value=\"friend\"";
+if ($data->{'altrelationship'} eq 'workplace'){
+  print " selected ";
+}
+print ">Friend
+<option value=\"neighbour\"";
+if ($data->{'altrelationship'} eq 'workplace'){
+  print " selected ";
+}
+print <<printend
+>Neighbour
 </select></td></tr>
 
 <tr valign=top bgcolor=white>
@@ -333,7 +353,7 @@ print <<printend
 <tr valign=top bgcolor=white>
 
 <td><FONT SIZE=2>Notes</font></td>
-<td  COLSPAN=4><textarea name=altnotes wrap=physical cols=70 rows=3></textarea></td></tr>
+<td  COLSPAN=4><textarea name=altnotes wrap=physical cols=70 rows=3>$data->{'altnotes'}</textarea></td></tr>
 </tr>
 
 

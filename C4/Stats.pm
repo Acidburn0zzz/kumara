@@ -60,7 +60,7 @@ sub UpdateStats {
   my $sth=$dbh->prepare("Insert into statistics
      (datetime,branch,type,usercode,value,other,itemnumber) 
      values (now(),'$branch',
-     '$type','$user','$amount','$other','$itemnumber')");
+     '$type','$user','$amount','$other','$itemnum')");
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
