@@ -54,10 +54,11 @@ sub UpdateStats {
   #module to insert stats data into stats table
   my ($branch,$type,$amount)=@_;
   my $dbh=C4Connect();
-  my $sth=$sbh->prepare("Insert into statistics (datetime,branch,type) values
-  (datetime('now'::abstime),'$branch','$type'))");
+  my $sth=$dbh->prepare("Insert into statistics (datetime,branch,type) values
+  (datetime('now'::abstime),'$branch','$type')");
   $sth->execute;
   $sth->finish;
+  $dbh->disconnect;
 }
 
 END { }       # module clean-up code here (global destructor)
