@@ -41,7 +41,7 @@ if ($data->{'ethnicity'}eq 'asian'){
   $data->{'ethnicity'} = 'Asian';
 }
 print <<printend
-<FONT SIZE=6><em>$data->{'othernames'} $data->{'surname'}</em></FONT><P>
+<FONT SIZE=6><em>$data->{'firstname'} $data->{'surname'}</em></FONT><P>
 <p>
 <form action=/cgi-bin/koha/wmemberentry.pl method=post>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=270>
