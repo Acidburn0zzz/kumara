@@ -93,6 +93,9 @@ sub renew_window {
   $borrbox->draw();
   my @renews = $issuelist->activate();
   $issuelist->erase();
+  undef $titlepanel;
+  undef $issuelist;
+  undef $borrbox;
   return \@renews;
 }  
 			       

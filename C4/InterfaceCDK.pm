@@ -226,6 +226,8 @@ sub brmenu {
     $env->{'branchcode'} = $brrec->{'branchcode'};
     $env->{'branchname'} = $brrec->{'branchname'};
   }
+  undef $menu;
+  undef $titlebar;
   return();
   
 }
@@ -248,6 +250,7 @@ sub prmenu {
   # Activate the object.         
   my ($menuItem) = $menu->activate();
   undef $menu;
+  undef $titlebar;
   # Check the results.
   if (defined $menuItem) {      
     my $prrec = @$prrecs[$menuItem];
@@ -268,8 +271,6 @@ sub borrower_dialog {
   my @rowtitles = (" ");
   my @coltypes  = ("UMIXED","UMIXED");
   my @colwidths = (12,12);
-  #Cdk::refreshCdkScreen();
-  #Cdk::raw();
   my $matrix = new Cdk::Matrix (
      'ColTitles'=> \@coltitles,
      'RowTitles'=> \@rowtitles, 
@@ -379,7 +380,6 @@ sub actfmenu {
     #debug_msg($env,"");
     C4::Circulation::Renewals::bulkrenew($env,$dbh,
       $borrower->{'borrowernumber'},$amountowing,$borrower,$odues);
-    #debug_msg($env,"");
     Cdk::refreshCdkScreen();
   } elsif ($funct == 2 ) {
     $entryBox->erase();
@@ -520,6 +520,11 @@ sub returnwindow {
   } else {
     $reason="";
   }
+  undef $bookentry;
+  undef $funcmenu;
+  undef $borrbox;
+  undef $returnlist;
+  undef $titlepanel;
   return($reason,$barcode);
   }
 

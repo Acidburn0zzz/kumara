@@ -81,7 +81,10 @@ sub accountsdialog {
   $borpanel->erase();
   $acctlist->erase();
   $amountentry->erase();
-  $acctlist->unregister();
+  undef $acctlist;
+  undef $borpanel;
+  undef $borpanel;
+  undef $titlepanel;
   return($amount,$reason);
 }
 
