@@ -61,6 +61,8 @@ sub KeywordSearch {
   (catalogueentry.catalogueentry=biblio.title and 
   catalogueentry.entrytype='t' and catalogueentry.catalogueentry ~*
   '$search->{'keyword'}')) order by biblio.title"; 
+  my $query ="Select * from biblio where author ~* '$search->{'keyword'}' or
+title ~* '$search->{'keyword'}'";
   my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
