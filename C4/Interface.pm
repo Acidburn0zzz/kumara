@@ -213,15 +213,9 @@ sub borrower_dialog {
   my $name = "Borrower";
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label($name);
-<<<<<<< Interface.pm
-  my $entry2=Newt::Entry(40,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
-  my $label2=Newt::Label(" Book ");
-  my $panel1=Newt::Panel(4,4,$name);
-=======
   my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label2=Newt::Label(" Book: ");
   my $panel1=Newt::Panel(4,4,$name,1,1);
->>>>>>> 1.29
   $panel1->AddHotKey(NEWT_KEY_F11);
   $panel1->AddHotKey(NEWT_KEY_F10);  
   $panel1->AddHotKey(NEWT_KEY_F9);
