@@ -146,14 +146,36 @@ sub Issue  {
     }
 }    
 
+sub pastitems{
+  #Get list of all items borrower has currently on issue
+  my ($bornum,$dbh)=@_;
+  my $sth=$dbh->prepare("Select * from issues,item,biblio,biblioitems
+  where borrowernumber=$bornum and issues.itemnumber=item.itemnumber
+  and item.biblionumber=biblioitems.biblioitemnumber
+  and biblioitems.biblionumber=biblio.biblionumber");
+  $sth->execute;
+  my $i=0;
+  my @items;
+  while (my $data->fetchrow_hashref){
+     $items[$i]="$data->{'title'} $data->{'author'};    
+     $i++;
+  }
+  return(\@items);
+}
+ 
+
 sub processitems {
   #process a uses items
 #  clearscreen();
+
   output(1,1,"Processing Items");
   helptext("F11 Ends processing for current borrower  F10 ends issues");
   my ($bornum)=@_;
   my ($itemnum,$reason)=&scanbook();
   my $dbh=&C4Connect;  
+  my $items=pastitems($bornum,$dbh);
+  issueswindow('Issues',$items,$items);
+  pause();
   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
   my $sth=$dbh->prepare($query);  
   $sth->execute;
@@ -224,8 +246,8 @@ sub checkoverdues{
   #checks whether a borrower has overdue items
   my ($bornum,$dbh)=@_;
   my $sth=$dbh->prepare("Select * from issues,items,biblio where
-borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
-items.biblionumber=biblio.biblionumber");
+  borrowernumber=$bornum and issues.itemnumber=items.itemnumber and
+  items.biblionumber=biblio.biblionumber");
   $sth->execute;
   my $row=1;
   my $col=40;

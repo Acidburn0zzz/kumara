@@ -17,7 +17,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&dialog &startint &endint &output &clearscreen &pause &helptext
-&textbox &menu);
+&textbox &menu &issuewindow);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -122,6 +122,28 @@ sub list {
     $data=$stuff[0];
   return($reason,$data);
 }
+
+sub issuewindow {
+  my ($title,$items1,$items2)=@_;
+  my $panel = Newt::Panel(4, 4, $title);
+  my $li = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  my $li2 = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  $li->Add($items->@);
+  $li2->Add($items2->@);
+  $panel->Add(0,0,$li,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,1,$li2,NEWT_ANCHOR_LEFT);  
+  $panel->AddHotKey(NEWT_KEY_F11);
+   my ($reason,$data)=$panel->Run();
+  if ($reason eq NEWT_EXIT_HOTKEY) {   
+    if ($data eq NEWT_KEY_F11) {  
+        $reason="Quit";         
+    }
+  }
+  my @stuff=$li->Get();
+    $data=$stuff[0];
+  return($reason,$data);
+}
+
 
 sub dialog {
   my ($name)=@_;
