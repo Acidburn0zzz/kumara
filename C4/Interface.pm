@@ -124,7 +124,9 @@ sub list {
 }
 
 sub issuewindow {
-  my ($title,$items1,$items2,$borrower)=@_;
+  my ($title,$items1,$items2,$borrower,$name)=@_;
+  my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $label=Newt::Label($name);
   my $panel = Newt::Panel(4, 4, $title);
   my $l1=Newt::Label("Previous");
   my $l2=Newt::Label("Current");
@@ -132,26 +134,35 @@ sub issuewindow {
   my $li = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $li2 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   my $li3 = Newt::Listbox(5,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
-  $li->Add($items1->[0]);
-  $li2->Add($items2->[0]);
+   $li->Add($items1->[0],$items1->[1]);
+  $li2->Add($items2->[0],$items2->[1]);
   $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
   "$borrower->{'city'}");
+  $panel->AddHotKey(NEWT_KEY_F11);
+  $panel->AddHotKey(NEWT_KEY_F10);
   $panel->Add(0,0,$l3,NEWT_ANCHOR_LEFT);
   $panel->Add(0,1,$li3,NEWT_ANCHOR_LEFT);  
   $panel->Add(0,2,$l1,NEWT_ANCHOR_LEFT);
   $panel->Add(0,3,$li,NEWT_ANCHOR_LEFT);  
   $panel->Add(1,2,$l2,NEWT_ANCHOR_LEFT);
   $panel->Add(1,3,$li2,NEWT_ANCHOR_LEFT);  
-  $panel->AddHotKey(NEWT_KEY_F11);
-   my ($reason,$data)=$panel->Run();
+  $panel->Add(0,4,$label,NEWT_ANCHOR_LEFT);
+  $panel->Add(1,5,$entry,NEWT_ANCHOR_LEFT);
+  my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
-        $reason="Quit";         
+        $reason="Finished user";         
+    }
+    if ($data eq NEWT_KEY_F10) {  
+        $reason="Finished issues";         
+    }
+    if ($data eq NEWT_KEY_F12){
+      $reason="Quit"
     }
   }
-  my @stuff=$li->Get();
-    $data=$stuff[0];
-  return($reason,$data);
+#  Newt::Finished();
+  my $stuff=$entry->Get();
+  return($stuff,$reason);
 }
 
 

@@ -127,14 +127,13 @@ sub Issue  {
     }
     #deal with alternative loans
     #now check items 
- #   clearscreen();
- #   my $text="$borrower->{'title'} $borrower->{'firstname'} $borrower->{'lastname'}";
- #   output(0,2,$text);
- #   output(0,3,$borrower->{'streetaddress'});
- #   output(0,4,$borrower->{'city'});
-    my $done=&processitems($bornum,$borrower);
+    clearscreen();
+    my $items=pastitems($bornum,$dbh);
+    my $items2;
+    my $done;
+    ($done,$items2)=&processitems($bornum,$borrower,$items,$items2);
     while ($done eq 'No'){
-      $done=&processitems($bornum,$borrower);
+      ($done,$items2)=&processitems($bornum,$borrower,$items,$items2);
     }    
     $dbh->disconnect;  
     if ($done ne 'Circ'){
@@ -165,18 +164,26 @@ sub pastitems{
 sub processitems {
   #process a users items
 #  clearscreen();
-  output(1,1,"Processing Items");
+#  output(1,1,"Processing Items");
   helptext("F11 Ends processing for current borrower  F10 ends issues");
-  my ($bornum,$borrower)=@_;
+  my ($bornum,$borrower,$items,$items2)=@_;
   my $dbh=&C4Connect;  
-  my $items=pastitems($bornum,$dbh);
-  issuewindow('Issues',$items,$items,$borrower);
-#  pause();
+  my $row=5;
+#  my $count=$$items;
+  my $i=0;
+  while ($items->[$i]){
+    output (1,$row,$items->[$i]);
+    $i++;
+    $row++;
+  }
+  #my ($itemnum,$reason)=issuewindow('Issues',$items,$items2,$borrower,"Borrower barcode");
+#  $itemnum=uc $itemnum;
   my ($itemnum,$reason)=&scanbook();
   my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
   my $sth=$dbh->prepare($query);  
   $sth->execute;
   my $item=$sth->fetchrow_hashref;  
+  $items2=$item;
   $sth->finish;
   #check if item is restricted
   if ($item->{'restricted'} == 1 ){
@@ -194,7 +201,7 @@ sub processitems {
     &checkreserve;
     #if charge deal with it
     #now mark as issued
-   &updateissues($item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
+    &updateissues($item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
   }
   $dbh->disconnect;
   #check to see if more books to process for this user
@@ -203,7 +210,7 @@ sub processitems {
   } else {
     if ($reason ne 'Finished issues'){
       #return No to let them no that we wish to process more Items for borrower
-      return('No');
+      return('No',$items2);
     } else  {
       return('Circ');
     }
@@ -217,7 +224,7 @@ sub updateissues{
    my $query="Select loanlength from biblioitems,itemtypes
    where (biblioitems.biblioitemnumber='$bitno') 
    and (biblioitems.itemtype = itemtypes.itemtype)";
-   print "\n$query\n";
+#   print "\n$query\n";
    my $ow = getc;
    my $sth=$dbh->prepare($query);
    $sth->execute;
@@ -229,7 +236,7 @@ sub updateissues{
    $query = "Insert into issues (borrowernumber,itemnumber,date_due)
    values ($bornum,$itemno,datetime('now'::abstime)+$loanlength)";
    my $sth=$dbh->prepare($query);
-   print "\n$query\n";
+#   print "\n$query\n";
    my $ow = getc;
    $sth->execute;
    $sth->finish;
