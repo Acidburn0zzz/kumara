@@ -134,7 +134,7 @@ sub titlepanel{
     $env->{'branchname'}."-".$env->{'queue'},"C20");
   @header[0] = @header[0].fmtstr($env,$title2,"R26");
   my $label = new Cdk::Label ('Message' =>\@header,
-     'Ypos'=>0);
+     'Ypos'=>1);
   $label->draw();
   return $label;
   }
