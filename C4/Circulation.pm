@@ -55,28 +55,36 @@ sub Issue  {
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower;
 #  print $bornum;
+# debug
+#  resultout('console',$borcode);
   my $dbh=&C4Connect;  
-  my $sth=$dbh->prepare("Select * from borrowers where barcode=$borcode");
+  my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
   $sth->execute;
   my @borrower=$sth->fetchrow_array;
   my $bornum=$borrower[0];
+#  print @borrower;
+#  die;
+  if ($bornum eq ''){
+    #borrower not found
+    &resultout('console',"Borrower not found");
+  }
   $sth->finish;
   #process borrower traps (could be function)
   #check first GNA trap (no address this is the 22nd item in the table)
   if ($borrower[21] == 1){
     #got to membership update and update member info
-     &resultsout('console',"Whoop whoop no address");
+     &resultout('console',"Whoop whoop no address");
   }
   #check if member has a card reported as lost
   if ($borrower[22] ==1){
     #updae member info
-    print "Whoop whoop lost card\n";
+    &resultout('console'"Whoop whoop lost card");
   }
   #check the notes field if notes exist display them
   if ($borrower[26] ne ''){
     #display notes
     #deal with notes as issue_process.doc
-    print "$borrower[26]\n";
+    &resultout ('console',"$borrower[26]");
   }
   #check if borrower has overdue items
   #call overdue checker
