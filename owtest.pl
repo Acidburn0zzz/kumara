@@ -19,8 +19,9 @@ my %env = (
 #Login(\%env);
 $env{'branchcode'} = "C";
 $env{'usercode'} = "olwen";
+$env{'telnet'} = "Y";
 
- Start_circ(\%env);
+Start_circ(\%env);
 
 #my@date=Issue();
 #print @date;

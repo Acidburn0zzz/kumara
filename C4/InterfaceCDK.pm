@@ -177,7 +177,11 @@ sub msg_yn {
 
 sub debug_msg {
   my ($env,$text)=@_;
-  popupLabel (["Debug </R>$text"]);
+  if ($env->{'telnet'} eq "Y") {
+    popupLabel (["Debug </R>$text"]);
+  } else {
+    print "****DEBUG $text****";
+  }  
   return();
 }
 
