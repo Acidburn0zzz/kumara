@@ -63,7 +63,8 @@ if ($existing eq 'YES'){
     my $temp="check_group_".$items[$i]->{'barcode'};
     my $barcode=$input->param($temp);
     if ($barcode ne ''){
-      moditem($items[$i]->{'itemnumber'},$group);
+      moditem($items[$i]->{'notforloan'},$items[$i]->{'itemnumber'},$group);
+#      print "modify $items[$i]->{'itemnumber'} $group";
     }
   }
   $bibitemnum=$group;
