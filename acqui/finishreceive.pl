@@ -9,7 +9,7 @@ use CGI;
 use C4::Search;
 
 my $input=new CGI;
-print $input->header;
+#print $input->header;
 
 my $user=$input->remote_user;
 #print $input->dump;
@@ -64,7 +64,7 @@ if ($itemtype =~ /PER/){
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
 modbiblio($biblio,$title,$author,$copyright,$series);
 modbibitem($bibitemno,$itemtype,$isbn,$publisher,$pubdate,$class,$dewey,$subclass,$illus,$pages,$volinf,$notes,$size);
-print $notes;
+#print $notes;
 my $barcode=$input->param('barcode');
 my @barcodes;
 if ($barcode =~ /\,/){
