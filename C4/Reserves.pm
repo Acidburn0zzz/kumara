@@ -121,21 +121,21 @@ sub EnterReserves{
 	  $donext = $results;	    
 	}
       }
-      debug_msg($env,"Do Next $donext");
-      debug_msg($env,"Biblio $biblionumber ");           
+      #debug_msg($env,"Do Next $donext");
+      #debug_msg($env,"Biblio $biblionumber ");           
 
 
 
       if ($biblionumber eq "") {
         error_msg($env,"No items found");   
       } else {
-        debug_msg($env,"getting items $biblionumber");	
-        my @items = C4::Search::GetItems($env,$biblionumber);
-        debug_msg($env,"got items ");
+        #debug_msg($env,"getting items $biblionumber");	
+        my @items = GetItems($env,$biblionumber);
+        #debug_msg($env,"got items ");
 	 
 	my $cnt_it = @items;
 	my $dbh = &C4Connect;
-	    debug_msg($env,"select biblio $biblionumber ");
+	#debug_msg($env,"select biblio $biblionumber ");
 	    
         my $query = "Select * from biblio where biblionumber = $biblionumber";
 	my $sth = $dbh->prepare($query);
@@ -143,7 +143,7 @@ sub EnterReserves{
 	my $data=$sth->fetchrow_hashref;
 	$sth->finish;
         my @branches;
-	    debug_msg($env,"select branches ");
+	#debug_msg($env,"select branches ");
 	    
         my $query = "select * from branches order by branchname";
         my $sth=$dbh->prepare($query);
@@ -157,7 +157,7 @@ sub EnterReserves{
         $donext = "";
 	while ($donext eq "") {
           my $title = titlepanel($env,"Reserves","Create Reserve");
-       	  debug_msg($env,"make reserves");
+       	  #debug_msg($env,"make reserves");
 	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
             MakeReserveScreen($env, $data, \@items, \@branches);
       	  my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
@@ -181,13 +181,13 @@ sub EnterReserves{
 sub CreateReserve {
   my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
   my $dbh = &C4Connect;
-  $dbh->{RaiseError} = 1;
-  $dbh->{AutoCommit} = 0;
+  #$dbh->{RaiseError} = 1;
+  #$dbh->{AutoCommit} = 0;
   my $const = lc substr($constraint,0,1);
   debug_msg($env,"constraint $constraint $const");
   my @datearr = localtime(time);
   my $resdate = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
-  eval {     
+  #eval {     
     # updates take place here
     my $query="insert into reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype) values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
     my $sth = $dbh->prepare($query);
@@ -206,14 +206,14 @@ sub CreateReserve {
 	$i++;
       }
     }
-    $dbh->commit();
-  };
-  if (@_) {
-    # update failed
-    my $temp = @_;
-    #  error_msg($env,"Update failed");    
-    $dbh->rollback(); 
-  }
+  #$dbh->commit();
+  #};
+  #if (@_) {
+  #  # update failed
+  #  my $temp = @_;
+  #  #  error_msg($env,"Update failed");    
+  #  $dbh->rollback(); 
+  #}
   $dbh->disconnect();
   return();
 }    

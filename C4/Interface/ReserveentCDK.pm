@@ -205,8 +205,6 @@ sub MakeReserveScreen {
 		    } else {
 		      $complete = 4;
 		      my $no_ans = @itemans;
-		      #debug_msg ($env,"itemres 0- @itemans[0]");   
-		      #debug_msg ($env,"itemres 1- @itemans[1]");   
   		      my @items;
                       my $cnt = @itemans;
                       my $i = 0;
@@ -221,7 +219,6 @@ sub MakeReserveScreen {
                         $i++;
                       }
                       @answers[3] = \@items;
-                      #debug_msg($env,"$answers[0] $answers[1] $answers[2] $answers[3]");
 	            }
 		  }
 		}

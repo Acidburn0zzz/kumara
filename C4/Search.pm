@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-#use C4::InterfaceCDK;
+use C4::InterfaceCDK;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -248,18 +248,18 @@ $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchnam
 
 sub GetItems {
    my ($env,$biblionumber)=@_;
-   debug_msg($env,"GetItems");
+   #debug_msg($env,"GetItems");
    my $dbh = &C4Connect;
    my $query = "Select * from biblioitems where (biblionumber = $biblionumber)";
    debug_msg($env,$query);
    my $sth=$dbh->prepare($query);
    $sth->execute;
-   debug_msg($env,"executed query");
+   #debug_msg($env,"executed query");
       
    my $i=0;
    my @results;
    while (my $data=$sth->fetchrow_hashref) {
-      debug_msg($env,$data->{'biblioitemnumber'});
+      #debug_msg($env,$data->{'biblioitemnumber'});
       my $line = $data->{'biblioitemnumber'}."\t".$data->{'itemtype'};
       $line = $line."\t$data->{'classification'}\t$data->{'dewey'}";
       $line = $line."\t$data->{'subclass'}\t$data->{isbn}";
