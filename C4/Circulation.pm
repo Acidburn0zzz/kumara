@@ -63,6 +63,7 @@ sub Issue  {
   my $dbh=&C4Connect;  
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower();
+  output(1,1,$borcode);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
@@ -104,16 +105,20 @@ sub Issue  {
     }
     #deal with alternative loans
     #now check items 
-    &processitems($bornum);
+    my $done=&processitems($bornum);
+    while ($done eq 'No'){
+      $done=&processitems($bornum);
+    }
     $dbh->disconnect;
   }
 #    return (@borrower);
  
 }    
 
-sub processitems { 
+sub processitems {
+  output(1,1,"process");
   my ($bornum,$interface)=@_;
-  my $itemnum=&scanbook($interface);
+  my ($itemnum,$reason)=&scanbook($interface);
   my $dbh=&C4Connect;  
   my $sth=$dbh->prepare("Select * from items where barcode = '$itemnum'");
   $sth->execute;
@@ -137,6 +142,12 @@ sub processitems {
   #now mark as issued
   &updateissues;
   $dbh->disconnect;
+  if ($reason eq 'Quit'){
+    print $reason;
+    return('Yes');
+  } else {
+    return('No');
+  }
 }
 
 sub updateissues{
@@ -175,15 +186,15 @@ sub scanbook {
   my ($interface)=@_;
   #scan barcode
 #  my $number='L01781778';  
-  my $number=dialog("Book Barcode:");
-  return ($number);
+  my ($number,$reason)=dialog("Book Barcode:");
+  return ($number,$reason);
 }
 
 sub scanborrower {
   my ($interface)=@_;
   #scan barcode
 #  my $number='V00126643';  
-  my $number=&dialog("Borrower Barcode:");
+  my ($number,$reason)=&dialog("Borrower Barcode:");
   return ($number);
 }
 

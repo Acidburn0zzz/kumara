@@ -66,7 +66,7 @@ sub checkaccount  {
   if ($total > 0){
     output(1,2,"borrower owes $total");
     if ($total > 5){
-#      reconcileaccount($dbh,$bornumber);
+      reconcileaccount($dbh,$bornumber,$total);
     }
   }
   return($total);
@@ -74,14 +74,42 @@ sub checkaccount  {
 
 sub reconcileaccount {
   #print put money owing give person opportunity to pay it off
-  my ($dbh,$bornumber)=@_;
+  my ($dbh,$bornumber,$total)=@_;
+  #get borrower information
   my $sth=$dbh->prepare("Select * from accountlines where 
   borrowernumber=$bornumber");   
   $sth->execute;     
+  #display account information
   &clearscreen();
+  &helptext('F11 quits');
+  output(20,0,"Accounts");
+  my $row=4;
+  my $i=0;
+  my $text;
+  output (1,2,"Account Info");
+  output (1,3,"Item\tDate\tDescription\tAmount");
   while (my $data=$sth->fetchrow_hashref){
-    print $data->{'itemnumber'};
+    my $line=$i+1;
+    my $amount=0+$data->{'amountoutstanding'};
+    $text="$line\t$data->{'date'}\t$data->{'description'}\t$amount";
+    output (1,$row,$text);
+    $row++;
+    $i++;
   }
+  $text="Borrower owes \$$total";
+  output (1,$row,$text);
+  #get amount paid and update database
+  my ($data,$reason)=&dialog("Amount to pay");
+#  &updateaccounts($bornumber,$dbh,$data);
+  #Check if the boorower still owes
+#  $total=&checkaccount($bornumber,$dbh);
+  return($total);
+
+}
+
+sub updateaccounts{
+  my ($bornumber,$dbh,$data)=@_;
+  
 }
 			
 END { }       # module clean-up code here (global destructor)
