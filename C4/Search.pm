@@ -74,7 +74,7 @@ sub OpacSearch {
   my $query ="Select count(*) from biblio where 
   (title like '$key[0]%' or title like '% $key[0]%'";
   while ($i < $count){
-    $query=$query." and title like '$key[$i]%' or title like '% %key[$i]%'";
+    $query=$query." and title like '$key[$i]%' or title like '% $key[$i]%'";
     $i++;
   }
   $query=$query.") or (author like '$key[0]%' or author like '% $key[0]%'";
@@ -92,7 +92,7 @@ sub OpacSearch {
   $query=~ s/count\(\*\)/\*/;
   $query= $query." limit $offset,$num";
   $sth=$dbh->prepare($query);
-#  print $query;
+  print $query;
   $sth->execute;
   $i=0;
   while (my $data=$sth->fetchrow_hashref){
