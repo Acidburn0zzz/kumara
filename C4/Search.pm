@@ -350,6 +350,12 @@ sub CatSearch  {
 	 }
       } else {
           if ($search->{'title'} ne ''){
+	   if ($search->{'ttype'} eq 'exact'){
+	     $query="select count(*) from biblio
+	     where                            
+	     (biblio.title='$search->{'title'}')";
+
+	   } else {
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
@@ -380,6 +386,7 @@ sub CatSearch  {
 	      }
 	      $query.=")";
 	    }
+	   }
 	  } elsif ($search->{'class'} ne ''){
 	     $query="select count(*) from biblioitems,biblio where biblio.biblionumber=biblioitems.biblionumber";
 	     my @temp=split(/\|/,$search->{'class'});
