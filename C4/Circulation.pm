@@ -113,13 +113,13 @@ sub previousissue {
   $sth->finish;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
-      output(1,24,"Book is marked as issue to current borrower");       
-      #  my $resp = &msg_yn("Book is marked as issue to current borrower");
+      # output(1,24,"Book is marked as issue to current borrower");       
+      my $resp = &msg_yn("Book is issued to this borrower", "Renew?");
   
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
-      output(1,24,$text);
-      # my $resp = &msg_yn($text);
+      # output(1,24,$text);
+      my $resp = &msg_yn($text,"Return");
     }
   } 
   return($borrower->{'borrowernumber'});
@@ -175,9 +175,9 @@ sub scanborrower {
   my ($env,$interface)=@_;
   #scan barcode
 # my $number='V00126643';  
-  my ($number,$reason)=&borrower_dialog($env);
+  my ($number,$reason,$book)=&borrower_dialog($env);
   $number=uc $number;
-  return ($number,$reason);
+  return ($number,$reason,$book);
 }
 
 

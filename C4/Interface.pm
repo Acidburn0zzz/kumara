@@ -3,9 +3,11 @@ package C4::Interface; #asummes C4/Interface
 #uses Newt
 
 use strict;
-use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
-NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F9 NEWT_KEY_F12
-NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE);
+use Newt qw(:keys :exits :anchors :flags :colorsets :entry :fd :grid :macros
+:textbox);
+#use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
+#NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F4 NEWT_KEY_F5 NEWT_KEY_F9 NEWT_KEY_F12
+#NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE);
 #use C4::Circulation;
 
 require Exporter;
@@ -107,12 +109,12 @@ sub helptext {
 sub list {
   my ($title,@items)=@_;
   my $numitems=@items;
-  my $panel = Newt::Panel(4, 4, $title);
-  my $li = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
+  my $panel = Newt::Panel(1, 4, $title);
+  my $li = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT |  NEWT_FLAG_MULTIPLE);
   $li->Add(@items);
-  $panel->Add(0,0,$li,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
   $panel->AddHotKey(NEWT_KEY_F11);
-   my ($reason,$data)=$panel->Run();
+  my ($reason,$data)=$panel->Run();
 #  if ($reason eq NEWT_EXIT_HOTKEY) {   
 #    if ($data eq NEWT_KEY_F11) {  
 #        $reason="Quit";         
@@ -126,7 +128,7 @@ sub list {
 sub issuewindow {
   my ($env,$title,$items1,$items2,$borrower,$name)=@_;
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
-  my $label=Newt::Label("book");
+  my $label=Newt::Label("Book");
   my $panel = Newt::Panel(50,25, $title,5,5);
   my $l1  = Newt::Label("Previous");
   my $l2  = Newt::Label("Current");
@@ -140,14 +142,14 @@ sub issuewindow {
   "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
  $panel->AddHotKey(NEWT_KEY_F10);
-# $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,45);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
   $panel->Add(0,2,$li3,NEWT_ANCHOR_LEFT);  
   $panel->Add(0,3,$l1,NEWT_ANCHOR_LEFT);
   $panel->Add(0,4,$li,NEWT_ANCHOR_LEFT);  
-  $panel->Add(1,3,$l2,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,4,$li2,NEWT_ANCHOR_LEFT);  
+  $panel->Add(1,3,$l2,NEWT_ANCHOR_RIGHT);
+  $panel->Add(1,4,$li2,NEWT_ANCHOR_RIGHT);  
  
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
@@ -199,9 +201,9 @@ sub borrower_dialog {
   my $name = "Borrower";
   my $entry=Newt::Entry(20,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $label=Newt::Label($name);
-  my $entry2=Newt::Entry(40,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
-  my $label2=Newt::Label(" Book ");
-  my $panel1=Newt::Panel(2,4,$name);
+  my $entry2=Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $label2=Newt::Label(" Book: ");
+  my $panel1=Newt::Panel(4,4,$name,1,1);
   $panel1->AddHotKey(NEWT_KEY_F11);
   $panel1->AddHotKey(NEWT_KEY_F10);  
   $panel1->AddHotKey(NEWT_KEY_F9);
@@ -209,7 +211,7 @@ sub borrower_dialog {
   $panel1->Add(1,0,$entry,NEWT_ANCHOR_LEFT);
   $panel1->Add(2,0,$label2,NEWT_ANCHOR_LEFT);
   $panel1->Add(3,0,$entry2,NEWT_ANCHOR_LEFT);
-  my ($reason,$data,$d1,$d2)=$panel1->Run();
+  my ($reason,$data)=$panel1->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
       $reason="Finished user";         
@@ -225,24 +227,25 @@ sub borrower_dialog {
   }
 #  Newt::Finished();
   my $stuff=$entry->Get();
-  return($stuff,$reason);
+  my $stuff2=$entry2->Get();
+  return($stuff,$reason,$stuff2);
 }
 
 sub msg_yn {
-  my ($text)=@_;
-  my $panel1=Newt::Panel(2,4,"");
-  $panel1->Add(0,0,$text,NEWT_ANCHOR_LEFT);
-  $panel1->AddHotKey(NEWT_KEY_F4);
-  $panel1->AddHotKey(NEWT_KEY_F5);
+  my ($text1,$text2)=@_;
+  Newt::Bell();
+  my $panel1=Newt::Panel(4,4,"");
+  my $label1=Newt::Label($text1);
+  my $label2=Newt::Label($text2);
+  my $bpanel=Newt::Panel(2,4,"");
+  my $ybutt=Newt::Button("Yes");
+  my $nbutt=Newt::Button("No");
+  $bpanel->Add(0,0,$ybutt,NEWT_ANCHOR_LEFT);
+  $bpanel->Add(1,0,$nbutt,NEWT_ANCHOR_RIGHT);
+  $panel1->Add(0,0,$label1,NEWT_ANCHOR_TOP);
+  $panel1->Add(0,1,$label2,NEWT_ANCHOR_TOP);
+  $panel1->Add(0,2,$bpanel,NEWT_ANCHOR_TOP);
   my ($reason,$data) =$panel1->Run();
-  if ($reason eq NEWT_EXIT_HOTKEY) {
-    if ($data eq NEWT_KEY_F4) {
-      $reason="Y";
-    }
-    if ($data eq NEWT_KEY_F5) {
-      $reason="N";
-    }
-  }  
   return($reason);
 }
 
