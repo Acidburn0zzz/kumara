@@ -66,7 +66,7 @@ sub checkaccount  {
   if ($total > 0){
     &resultout('console',"borrower owes $total",$interface);
     if ($total > 5){
-      reconcileaccount;
+      reconcileaccount();
     }
   }
   return($total);

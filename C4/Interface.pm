@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&userdialog &resultout &startint &endint);
+@EXPORT = qw(&userdialog &resultout &startint &endint &list &button);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -96,7 +96,7 @@ sub resultout{
 
 sub main_win {
   my ($mwh)=@_;
-  $mwh->erase();        
+#  $mwh->erase();        
   # This function selects a few common colours for the  foreground colour 
   select_colour(\$mwh, 'red');
   $mwh->box(ACS_VLINE, ACS_HLINE);        
@@ -104,6 +104,7 @@ sub main_win {
   $mwh->standout();                        
   $mwh->addstr(0, 1, "Welcome to the Kumara Issues Screen");             
   $mwh->standend();
+  $mwh->refresh();
 }              
 
 sub dialog {
@@ -148,5 +149,34 @@ sub grab_key {
   return $key;  
 }  
 
+sub button {
+ my ($mwh,@buttons,$active)=@_;
+ # Calls a vertical button bar                                      
+ my ($text, $sel) =buttons( 'window'=> \$mwh,     
+ 'buttons'                      =>\@buttons,           
+ 'active_button'                =>$active,          
+ 'ypos'                         => 10,             
+ 'xpos'                         => 10,                 
+ 'vertical'                     => 1);    
+}
+
+sub list {
+  my ($mwh)=@_;
+  # List box in interactive mode.
+  my %list=('1'=>'Issues');
+  if ($mwh ne ''){   
+    my ($text, $sel) = list_box('window'=>$mwh,
+    'title'               =>'Choose one',                              
+    'ypos'                =>9,                                         
+    'xpos'                =>10,                                        
+    'lines'               =>5,                                         
+    'cols'                =>25,                                                                                          'list'                =>
+    'list'                =>\%list,                                    
+    'border'              =>'green',                                   
+    'selected'    => 1);     
+  } else {
+    print "weird"
+  }
+}
 
 END { }       # module clean-up code here (global destructor)

@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&Issue);
+@EXPORT = qw(&Start_circ);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -55,14 +55,19 @@ sub Start_circ{
   #connect to database
   my $dbh=&C4Connect;  
   #start interface
-  my $interface=startint('console');
-  &Issue;
+  my $interface=startint('console','Circulation');
+  my @buttons = ('< Test 1 >', '< Test 2 >', '< Test 3 >');
+  my $active='';
+   my $choice=&button($interface,@buttons,$active);
+#  if ($choice==1){
+#    &Issue($dbh,$interface);
+#  }
+  $dbh->disconnect;
+  &endint();
 }
 
-
-
 sub Issue  {
-
+  my ($dbh,$interface)=@_;
   #get borrowerbarcode from scanner
   my $borcode=&scanborrower($interface);
   my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
@@ -106,8 +111,6 @@ sub Issue  {
   #deal with alternative loans
   #now check items 
   &processitems($bornum,$interface);
-  $dbh->disconnect;
-  &endint();
   return (@borrower);
 }    
 
