@@ -1,4 +1,5 @@
-package C4::Circulation::Borrower; #assumes C4/Circulation/Borrower
+package C4::Circulation;
+#package C4::Circulation::Borrower; #assumes C4/Circulation/Borrower
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
@@ -68,32 +69,35 @@ sub findborrower  {
   my $borrower;
   my $reason = "";
   my $book;
-  while (($bornum eq '') && ($reason ne "Finished issues")) {
+  while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
     ($borcode,$reason,$book)=&scanborrower(); #C4::Circulation
-    if ($borcode ne '') {
-      ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
-    } elsif ($book ne "") {
-      my $query = "select * from issues,items where (barcode = '$book') 
-        and (items.itemnumber = issues.itemnumber) 
-        and (issues.returndate is null)";
-      my $iss_sth=$dbh->prepare($query);
-      $iss_sth->execute;
-      if (my $issdata  = $iss_sth->fetchrow_hashref) {
-         $bornum=$issdata->{'borrowernumber'};
-	 $iss_sth->finish;
-	 $sth = $dbh->prepare("Select * from borrowers 
-	   where borrowernumber =  '$bornum'");
-	 $sth->execute;
-	 $borrower=$sth->fetchrow_hashref;
-	 $sth->finish;
-       } else {
-         error_msg($env,"Item $book not found");
-       } 
+    debug_msg($env,"Reaz = $reason");
+    if ($reason eq "") {
+      if ($borcode ne '') {
+        ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
+      } elsif ($book ne "") {
+        my $query = "select * from issues,items where (barcode = '$book') 
+          and (items.itemnumber = issues.itemnumber) 
+          and (issues.returndate is null)";
+        my $iss_sth=$dbh->prepare($query);
+        $iss_sth->execute;
+        if (my $issdata  = $iss_sth->fetchrow_hashref) {
+           $bornum=$issdata->{'borrowernumber'};
+	   $iss_sth->finish;
+	   $sth = $dbh->prepare("Select * from borrowers 
+	     where borrowernumber =  '$bornum'");
+	   $sth->execute;
+	   $borrower=$sth->fetchrow_hashref;
+	   $sth->finish;
+         } else {
+           error_msg($env,"Item $book not found");
+         } 
+      }
     } 
-  }
+  } 
   my $issuesallowed;
-  if ($reason ne "Finished issues") {
+  if ($reason eq "") {
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
 #    output(1,1,$borrowers);
     $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
@@ -194,16 +198,17 @@ sub Borenq {
   my $dbh=C4Connect;
   #get borrower guff
   my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
-  my ($data,$reason)=&borrowerwindow($env,$borrower);
-  if ($reason eq 'Modify'){
-    modifyuser($env,$borrower);
-  } elsif ($reason eq 'New'){
-    Borenq($env);
-  }
+  if ($reason eq "") {
+    my ($data,$reason)=&borrowerwindow($env,$borrower);
+    if ($reason eq 'Modify'){
+      modifyuser($env,$borrower);
+    } elsif ($reason eq 'New'){
+      Borenq($env);
+    }
 #  debug_msg("",$reason);
 #  debug_msg("",$data);
-
-
+  }
+  return $reason;
 }  
 
 END { }       # module clean-up code here (global destructor)

@@ -65,14 +65,14 @@ sub Issue  {
     #clear help
     helptext('');
     clearscreen();
+    my $done;
     my ($items,$items2);
     my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
       #C4::Circulation::Borrowers
-    my $done;
-    if ($reason eq "Finished issues") {
+    if ($reason ne "") {
       $dbh->disconnect;
       clearscreen();
-      $done = "Circ";
+      $done = $reason;
     } else {
       #deal with alternative loans
       #now check items 
@@ -85,17 +85,17 @@ sub Issue  {
         ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
       }    
       $dbh->disconnect;  
-#      debug_msg("","after processitems done = $done");
+      debug_msg("","after processitems done = $done");
     }
-    if ($done ne 'Circ'){
-#      debug_msg("","calling issue again with $done");
-      $done=Issue($env);
-      
-    }
-    if ($done ne 'Quit'){
-#      debug_msg("","returning $done");
-      return($done); #to C4::Circulation
-    }
+   # if ($done ne 'Circ'){
+   #    debug_msg("","calling issue again with $done");
+   #    $done=Issue($env);      
+   # }
+   # if ($done ne 'Quit'){
+   #    debug_msg("","returning $done");
+   #    return($done); #to C4::Circulation
+   # }
+   return ($done);
 }    
 
 
