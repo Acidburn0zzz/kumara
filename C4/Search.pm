@@ -285,8 +285,8 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio,biblioitems
-         where (biblio.biblionumber=biblioitems.biblionumber) and 
+         biblio
+         where 
          ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%')";    
 	 while ($i < $count){ 
            $query=$query." and (author like '$key[$i]%' or author like '% $key[$i]%')";   
@@ -296,18 +296,17 @@ sub CatSearch  {
          if ($search->{'title'} ne ''){ 
 	   $query=$query. " and title like '%$search->{'title'}%'";
 	 }
-	 if ($search->{'class'} ne ''){
-	   $query.=" and biblioitems.itemtype='$search->{'class'}'";
-	 }
+#	 if ($search->{'class'} ne ''){
+#	   $query.=" and biblioitems.itemtype='$search->{'class'}'";
+#	 }
       } else {
           if ($search->{'title'} ne ''){
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
-            $query="select count(*) from biblio,bibliosubtitle,biblioitems
+            $query="select count(*) from biblio,bibliosubtitle
 	    where
-            (biblio.biblionumber=bibliosubtitle.biblionumber and 
-	    biblioitems.biblionumber=biblio.biblionumber) and
+            (biblio.biblionumber=bibliosubtitle.biblionumber) and 
 	    (((title like '$key[0]%' or title like '% $key[0]%')";
 	    while ($i<$count){
 	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%')";
@@ -322,9 +321,9 @@ sub CatSearch  {
 	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
 	    }
 	    $query=$query."))";
-	    if ($search->{'class'} ne ''){
-	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
-	    }
+#	    if ($search->{'class'} ne ''){
+#	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
+#	    }
 	  } elsif ($search->{'class'} ne ''){
 	     $query="select count(*) from biblioitems,biblio where itemtype =
 '$search->{'class'}' and biblio.biblionumber=biblioitems.biblionumber";
@@ -466,7 +465,8 @@ sub ItemInfo {
   items.holdingbranch ";
 #  print $type;
   if ($type ne 'intra'){
-    $query.=" and items.itemlost<>1";
+    $query.=" and (items.itemlost<>1 or items.itemlost is NULL)
+    and (wthdrawn <> 1 or wthdrawn is NULL)";
   }
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -680,7 +680,7 @@ sub itemissues {
       $data->{'date_due'}='Available';
     }
     $sth2->finish;
-    $query2="select * from issues,borrowers where itemnumber=$data->{'itemnumber'}
+    $query2="select * from issues,borrowers where itemnumber='$data->{'itemnumber'}'
     and issues.borrowernumber=borrowers.borrowernumber 
     order by date_due desc";
     my $sth2=$dbh->prepare($query2);
@@ -893,7 +893,8 @@ sub itemcount {
   my $query="Select * from items where     
   biblionumber=$bibnum ";
   if ($type ne 'intra'){
-    $query.=" and itemlost <>1";      
+    $query.=" and (itemlost <>1 or itemlost is NULL) and
+    (wthdrawn <> 1 or wthdrawn is NULL)";      
   }
   my $sth=$dbh->prepare($query);         
   #  print $query;           
@@ -910,7 +911,8 @@ sub itemcount {
     $count++;                     
     my $query2="select * from issues,items where issues.itemnumber=                          
     '$data->{'itemnumber'}' and returndate is NULL
-    and items.itemnumber=issues.itemnumber and items.itemlost <>1"; 
+    and items.itemnumber=issues.itemnumber and (items.itemlost <>1 or
+    items.itemlost is NULL)"; 
     my $sth2=$dbh->prepare($query2);     
     $sth2->execute;         
     if (my $data2=$sth2->fetchrow_hashref){         
