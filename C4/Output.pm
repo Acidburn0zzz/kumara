@@ -67,6 +67,8 @@ sub startmenu{
   my ($type)=@_;
   if ($type eq 'issue') {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc');
+  } elseif ($type eq 'opac') {
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-top.inc');
   } else {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-top.inc');
   }
@@ -82,6 +84,8 @@ sub endmenu{
   my ($type)=@_;
   if ($type eq 'issue'){
     open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc');
+  } elseif ($type eq 'opac') {
+    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-bottom.inc');
   } else {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/cat-bottom.inc');
   }
