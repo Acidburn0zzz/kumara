@@ -237,9 +237,18 @@ sub KeywordSearch {
     seriestitle like 'new zealand%' or seriestitle like '% new zealand %'
     or seriestitle like '% new zealand')"
   }
-
-  $query=$query.")) group by biblio.biblionumber order by author,title";
-  #print $query;
+  $query=$query."))";
+    if ($search->{'class'} ne ''){
+    my @temp=split(/\|/,$search->{'class'});
+    my $count=@temp;
+    $query.= "and ( itemtype='$temp[0]'";
+    for (my $i=1;$i<$count;$i++){
+      $query.=" or itemtype='$temp[$i]'";
+    }
+    $query.=")"; 
+  }
+   $query.="group by biblio.biblionumber order by author,title";
+#  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $i=0;
@@ -253,12 +262,22 @@ sub KeywordSearch {
   like '%$search->{'keyword'}%'");
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
-    my $sth2=$dbh->prepare("Select * from biblio where
-    biblionumber=$data->{'biblionumber'}");
+    $query="Select * from biblio,biblioitems where
+    biblio.biblionumber=$data->{'biblionumber'} and biblio.biblionumber=biblioitems.biblionumber";
+    if ($search->{'class'} ne ''){
+      my @temp=split(/\|/,$search->{'class'});
+      my $count=@temp;
+      $query.= " and ( itemtype='$temp[0]'";
+      for (my $i=1;$i<$count;$i++){
+        $query.=" or itemtype='$temp[$i]'";
+      }
+      $query.=")"; 
+    }
+    my $sth2=$dbh->prepare($query);
     $sth2->execute;
+#    print $query;
     while (my $data2=$sth2->fetchrow_hashref){
-
-$results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$data2->{'copyrightdate'}";
+       $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$data2->{'copyrightdate'}";
 #      print $results[$i];
       $i++;   
     }
@@ -308,8 +327,8 @@ sub CatSearch  {
 	my $count=@key;
 	my $i=1;
         $query="select count(*) from
-         biblio
-         where 
+         biblio,biblioitems
+         where biblioitems.biblionumber=biblio.biblionumber and
          ((biblio.author like '$key[0]%' or biblio.author like '% $key[0]%')";    
 	 while ($i < $count){ 
            $query=$query." and (author like '$key[$i]%' or author like '% $key[$i]%')";   
@@ -319,17 +338,25 @@ sub CatSearch  {
          if ($search->{'title'} ne ''){ 
 	   $query=$query. " and title like '%$search->{'title'}%'";
 	 }
-#	 if ($search->{'class'} ne ''){
-#	   $query.=" and biblioitems.itemtype='$search->{'class'}'";
-#	 }
+	 if ($search->{'class'} ne ''){
+      	   my @temp=split(/\|/,$search->{'class'});
+	   my $count=@temp;
+	   $query.= "and ( itemtype='$temp[0]'";
+	   for (my $i=1;$i<$count;$i++){
+	     $query.=" or itemtype='$temp[$i]'";
+	   }
+	   $query.=")";
+
+	 }
       } else {
           if ($search->{'title'} ne ''){
 	    my @key=split(' ',$search->{'title'});
 	    my $count=@key;
 	    my $i=1;
-            $query="select count(*) from biblio,bibliosubtitle
+            $query="select count(*) from biblio,bibliosubtitle,biblioitems
 	    where
-            (biblio.biblionumber=bibliosubtitle.biblionumber) and 
+            (biblio.biblionumber=bibliosubtitle.biblionumber and
+            biblioitems.biblionumber=biblio.biblionumber) and
 	    (((title like '$key[0]%' or title like '% $key[0] %' or title like '% $key[0]')";
 	    while ($i<$count){
 	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i] %' or title like '% $key[$i]')";
@@ -344,12 +371,24 @@ sub CatSearch  {
 	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i] %')";
 	    }
 	    $query=$query."))";
-#	    if ($search->{'class'} ne ''){
-#	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
-#	    }
+	    if ($search->{'class'} ne ''){
+	      my @temp=split(/\|/,$search->{'class'});
+	      my $count=@temp;
+	      $query.= " and ( itemtype='$temp[0]'";
+	      for (my $i=1;$i<$count;$i++){
+	       $query.=" or itemtype='$temp[$i]'";
+	      }
+	      $query.=")";
+	    }
 	  } elsif ($search->{'class'} ne ''){
-	     $query="select count(*) from biblioitems,biblio where itemtype =
-'$search->{'class'}' and biblio.biblionumber=biblioitems.biblionumber";
+	     $query="select count(*) from biblioitems,biblio where biblio.biblionumber=biblioitems.biblionumber";
+	     my @temp=split(/\|/,$search->{'class'});
+	      my $count=@temp;
+	      $query.= " and ( itemtype='$temp[0]'";
+	      for (my $i=1;$i<$count;$i++){
+	       $query.=" or itemtype='$temp[$i]'";
+	      }
+	      $query.=")";
 	  }
 	 
       }
