@@ -116,7 +116,7 @@ sub processitems {
 	 $it2p++;
          $amountdue += $charge;
       }
-      $env->{'loanlength'}="";
+      #$env->{'loanlength'}="";
    }
    $dbh->disconnect;
    #check to see if more books to process for this user
@@ -124,7 +124,7 @@ sub processitems {
    if ($reason eq 'Finished user'){
      remoteprint($env,$items2,$borrower);
      if ($amountdue > 0) {
-        &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
+     &reconcileaccount($env,$dbh,$borrower->{'borrowernumber'},$amountdue);
      } 	 
      @done = ("Issues");
    } elsif ($reason eq "Print"){

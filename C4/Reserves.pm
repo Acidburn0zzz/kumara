@@ -164,6 +164,8 @@ sub EnterReserves{
    	    my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
        	    if ($reason eq "") { 
        	      if ($borrnum ne "") {
+	        my ($fee,$amtowing) =
+                  CalcReserveFee($env,$borrnum,$biblionumber,$constraint,$bibitems);
                 CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
                 $donext = "Circ"
               }
@@ -180,6 +182,14 @@ sub EnterReserves{
   return ($donext);  
 }
 
+sub CalcReservFee {
+  my ($env,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
+  #check for issues;
+  my $dbh = &C4Connect;
+  my $const = lc substr($constraint,0,1);
+  my $query = "select * from borrowers";
+  
+}
 
 sub CreateReserve {
   my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
