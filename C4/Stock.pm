@@ -49,7 +49,21 @@ my $priv_func = sub {
 
 sub stockreport {
   my $dbh=C4Connect;
-  my $query="Select count(*) from items where homebranch='l'";
+  my @results;
+  my $query="Select count(*) from items where homebranch='C'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $count=$sth->fetchrow_hashref;
+  $results[0]="$count->{'count'}\t Levin";
+  $sth->finish;
+  $query="Select count(*) from items where homebranch='F'";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  $count=$sth->fetchrow_hashref;
+  $results[1]="$count->{'count'}\t Foxton";
+  $sth->finish;
+  $dbh->disconnect;
+  return(@results);
 }
 
 END { }       # module clean-up code here (global destructor)
