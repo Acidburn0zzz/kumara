@@ -40,7 +40,7 @@ print <<printend
 <input type=hidden name=type value=Add>
 </form>
 </P><br>
-<FONT SIZE=2  face="arial, helvetica">$data->{'title'} $data->{'othernames'}  $data->{'surname'} ($data->{'firstname'}, RL)<p>
+<FONT SIZE=2  face="arial, helvetica">$data->{'title'} $data->{'othernames'}  $data->{'surname'} ($data->{'firstname'}, $data->{'initials'})<p>
 Membership Number: $data->{'borrowernumber'}<BR>
 Card Number: $data->{'cardnumber'}<BR>
 Membership: $data->{'categorycode'}<BR>
