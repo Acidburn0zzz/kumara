@@ -1,16 +1,15 @@
 package C4::Database; #asummes C4/Database
 
 #requires DBI.pm to be installed
+#uses DBD:Pg
 
 use strict;
 require Exporter;
 use DBI;
-
-  
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
-$VERSION = 0.09;
+$VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&C4Connect);
