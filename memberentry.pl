@@ -51,7 +51,7 @@ Member# $member,   Card Number* <input type=text name=cardnumber size=10 value="
 
 <tr valign=top  ><td  COLSPAN=3 background="/images/background-mem.gif">
 <B>MEMBER PERSONAL DETAILS</b></td> <td  COLSPAN=2  ALIGN=RIGHT background="/images/background-mem.gif">
-* <input type="radio" name="sex" value="f"
+* <input type="radio" name="sex" value="F"
 printend
 ;
 if ($data->{'sex'} eq 'F'){
@@ -59,7 +59,7 @@ if ($data->{'sex'} eq 'F'){
 }
 print <<printend
 >F  
-<input type="radio" name="sex" value="m"
+<input type="radio" name="sex" value="M"
 printend
 ;
 if ($data->{'sex'} eq 'M'){
@@ -124,12 +124,37 @@ print <<printend
 <tr><td>&nbsp; </TD></TR>
 <tr valign=top bgcolor=white>
 <td colspan=2><SELECT NAME="ethnicity" SIZE="1">
-<OPTION value=" ">
-<OPTION value=european>European/Pakeha
-<OPTION value=maori>Maori
-<OPTION value=asian>Asian
-<OPTION value=pi>Pacific Island
-<OPTION value=other>Other - please specify-->
+printend
+;
+print "<OPTION value=\" \">
+<OPTION value=european";
+if ($data->{'ethnicity'} eq 'european'){
+  print " selected";
+}
+print "
+>European/Pakeha
+<OPTION value=maori";
+if ($data->{'ethnicity'} eq 'maori'){
+  print " selected";
+}
+print ">Maori
+<OPTION value=asian";
+if ($data->{'ethnicity'} eq 'asian'){
+  print " selected";
+}
+print ">Asian
+<OPTION value=pi";
+if ($data->{'ethnicity'} eq 'pi'){
+  print " selected";
+}
+print ">Pacific Island
+<OPTION value=other";
+if ($data->{'ethnicity'} eq 'other'){
+  print " selected";
+}
+
+print <<printend
+>Other - please specify-->
 </SELECT>
 </td>
 <td colspan=2><input type=text name=ethnicnotes size=40 ></td>
@@ -267,7 +292,7 @@ print <<printend
 
 <tr valign=top bgcolor=white>
 <td   COLSPAN=2 ><input type=text name=phone size=20 value="$data->{'phone'}"></td>
-<td><input type=text name=phoneday size=20 value="$data->{'workphone'}"></td>
+<td><input type=text name=phoneday size=20 value="$data->{'phoneday'}"></td>
 <td><input type=text name=faxnumber size=20 value="$data->{'faxnumber'}"></td>
 <td><input type=text name=emailaddress size=20 value="$data->{'emailaddress'}"></td></tr>
 

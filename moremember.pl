@@ -44,7 +44,7 @@ print <<printend
 Membership Number: $data->{'borrowernumber'}<BR>
 Card Number: $data->{'cardnumber'}<BR>
 Membership: $data->{'categorycode'}<BR>
-Area: $data->{'Area'}<BR>
+Area: $data->{'area'}<BR>
 Fee:$30/year, Paid<BR>
 Joined: $data->{'dateenrolled'},  Expires: <BR>
 Joining Branch: Levin<P>

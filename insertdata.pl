@@ -12,7 +12,7 @@ use strict;
 
 my $input= new CGI;
 print $input->header;
-print $input->dump;
+#print $input->dump;
 
 #get all the data into a hash
 my @names=$input->param;
@@ -30,9 +30,14 @@ my $sth=$dbh->prepare($query);
 $sth->execute;
 if (my $data=$sth->fetchrow_hashref){
   $query="update borrowers set title='$data{'title'}',expiry='$data{'expiry'}',
-  cardnumber='$data{'cardnumber'}',sex='$data{'sex'}',ethnicnotes='$data{'ethnicnotes'}',
-  address='$data{'address'},faxnumber='$data{'faxnumber'},firstname='$data{'firstname'}',
-  altnotes='$data{'altnotes'}',dateofbirth='$data{'dateofbirth'}'
+  cardnumber='$data{'cardnumber'}',sex='$data{'sex'}',ethnotes='$data{'ethnicnotes'}',
+  streetaddress='$data{'address'}',faxnumber='$data{'faxnumber'}',firstname='$data{'firstname'}',
+  altnotes='$data{'altnotes'}',dateofbirth='$data{'dateofbirth'}',contactname='$data{'contactname'}',
+  emailaddress='$data{'emailaddress'}',dateenrolled='$data{'joining'}',streetcity='$data{'streetcity'}',
+  altrelationship='$data{'altrelationship'}',othernames='$data{'othernames'}',phoneday='$data{'phoneday'}',
+  categorycode='$data{'categorycode'}',city='$data{'city'}',area='$data{'area'}',phone='$data{'phone'}',
+  borrowernotes='$data{'borrowernotes'}',altphone='$data{'altphone'}',surname='$data{'surname'}',
+  initials='$data{'initials'}',streetaddress='$data{'streetaddress'}',ethnicity='$data{'ethnicity'}'
   where borrowernumber=$data{'borrowernumber'}";
   print $query;
   my $sth2=$dbh->prepare($query);
@@ -43,3 +48,4 @@ if (my $data=$sth->fetchrow_hashref){
 
 $sth->finish;
 $dbh->disconnect;
+print $input->redirect("/cgi-bin/koha/moremember.pl?bornum=$data{'borrowernumber'}");
