@@ -958,13 +958,14 @@ sub itemcount {
     $sth2->finish;     
   } 
 #  if ($count == 0){
-    my $query2="Select * from aqorders where biblionumber=$bibnum";
+    my $query2="Select * from aqorders where biblionumber=$bibnum and
+quantity > quantityreceived";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;
     if (my $data=$sth2->fetchrow_hashref){
-      $ocount=$data->{'quantity'};
+      $ocount=$data->{'quantity'} - $data->{'quantityreceived'};
     }
-    $count+=$ocount;
+#    $count+=$ocount;
     $sth2->finish;
   $sth->finish; 
   $dbh->disconnect;                   
