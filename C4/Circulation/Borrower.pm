@@ -179,7 +179,14 @@ sub Borenq {
   #get borrower guff
   my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
   my ($data,$reason)=&borrowerwindow($env,$borrower);
-#  debug_msg("",$borrower->{'surname'});
+  if ($reason eq 'Modify'){
+    modifyuser($env,$borrower);
+  } elsif ($reason eq 'New'){
+    Borenq($env);
+  }
+#  debug_msg("",$reason);
+#  debug_msg("",$data);
+  
 }  
 
 END { }       # module clean-up code here (global destructor)

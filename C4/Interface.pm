@@ -205,13 +205,18 @@ sub returnwindow {
 sub borrowerwindow {
   my ($env,$borrower)=@_;
   my $bt1=Newt::Button("Modify Borrower");
+  $bt1->Tag("Modify");
   my $bt2=Newt::Button("New borrower");
+  $bt2->Tag("New");
   my $label=Newt::Label("Borrower");
   my $l1=Newt::Label("$borrower->{'firstname'} $borrower->{'surname'}");
   my $l2=Newt::Label("Street Address: $borrower->{'streetaddress'}");
   my $l3=Newt::Label("Suburb: $borrower->{'suburb'}");
   my $l4=Newt::Label("City: $borrower->{'city'}");
   my $l5=Newt::Label("Email: $borrower->{'email'}");
+  my $l6=Newt::Label("No Adress: $borrower->{'gonenoaddress'}");
+  my $l7=Newt::Label("Lost Card: $borrower->{'lost'}");
+  my $l8=Newt::Label("Debarred: $borrower->{'debarred'}");
   my $panel=Newt::Panel(10,10,'Borrower');
   $panel->Add(0,0,$label);
   $panel->Add(0,1,$l1);
@@ -219,11 +224,15 @@ sub borrowerwindow {
   $panel->Add(0,3,$l3);
   $panel->Add(0,4,$l4);
   $panel->Add(0,5,$l5);
-  $panel->Add(0,6,$bt1);
-  $panel->Add(1,6,$bt2);  
+  $panel->Add(0,6,$l6);
+  $panel->Add(0,7,$l7);
+  $panel->Add(0,8,$l8);
+  $panel->Add(0,9,$bt1);
+  $panel->Add(1,9,$bt2);  
   my ($reason,$data)=$panel->Run();
   $stuff=$data->Tag();
-  return($stuff);
+#  debug_msg("",$stuff);
+  return($reason,$stuff);
 }  
   
 sub issuewindow {
