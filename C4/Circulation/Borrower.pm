@@ -145,7 +145,7 @@ sub findoneborrower {
     my @borrows;
     my @bornums;
     while ($borrower= $sthb->fetchrow_hashref) {
-      my $line = $borrower->{'cardnumber'}.' '.$borrower->{'surname'}.
+      my $line = $borrower->{'cardnumber'}.' '.$borrower->{'categorycode'}.' '.$borrower->{'surname'}.
         ', '.$borrower->{'othernames'};
       $borrows[$cntbor] = fmtstr($env,$line,"L50");
       $bornums[$cntbor] =$borrower->{'borrowernumber'};
