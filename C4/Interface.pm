@@ -29,8 +29,6 @@ $VERSION = 0.01;
 # as well as any optionally exported functions
 
 @EXPORT_OK   = qw($Var1 %Hashit);
-
-
 # non-exported package globals go here
 use vars qw(@more $stuff);
 	
@@ -75,9 +73,7 @@ sub startint {
 sub menu {
   my ($type,$title,@items)=@_;
   if ($type eq 'console'){
-#  my ($reason,$data)=list($title,@items);
-  my ($reason,$data)=menu2($title,@items);
- 
+  my ($reason,$data)=menu2($title,@items); 
   return($reason,$data);
   # end of menu
   } 
@@ -94,8 +90,7 @@ sub menu2 {
   $b0->Tag(@items[0]);
   $b1->Tag(@items[1]);
   $b2->Tag(@items[2]);
-  $b3->Tag(@items[3]);
- 
+  $b3->Tag(@items[3]); 
   $panel->Add(0,0,$b0);
   $panel->Add(0,1,$b1);
   $panel->Add(0,2,$b2);
@@ -127,15 +122,15 @@ sub output {
   Newt::DrawRootText($left,$top,$msg);
 }
 
-sub textbox {
-  my ($width,$height,$text,$title,$top,$left)=@_;
-  my $panel = Newt::Panel(5, 4, "$title",$top,$left);
-  my $box = Newt::Textbox($width,$height, NEWT_FLAG_SCROLL |
-  NEWT_FLAG_RETURNEXIT | NEWT_FLAG_WRAP,$text);
-  $panel->Add(0,0,$box,NEWT_ANCHOR_LEFT);
-  $panel->AddHotKey(NEWT_KEY_F11);
-  my ($reason,$data)=$panel->Draw();
-}
+#sub textbox {
+#  my ($width,$height,$text,$title,$top,$left)=@_;
+#  my $panel = Newt::Panel(5, 4, "$title",$top,$left);
+#  my $box = Newt::Textbox($width,$height, NEWT_FLAG_SCROLL |
+#  NEWT_FLAG_RETURNEXIT | NEWT_FLAG_WRAP,$text);
+#  $panel->Add(0,0,$box,NEWT_ANCHOR_LEFT);
+#  $panel->AddHotKey(NEWT_KEY_F11);
+#  my ($reason,$data)=$panel->Draw();
+#}
 
 sub helptext {
   my ($text)=@_;
@@ -151,10 +146,6 @@ sub list {
   $panel->Add(0,0,$li,NEWT_ANCHOR_TOP);
   $panel->AddHotKey(NEWT_KEY_F11);
   my ($reason,$data)=$panel->Run();
-#  if ($reason eq NEWT_EXIT_HOTKEY) {   
-#    if ($data eq NEWT_KEY_F11) {  
-#        $reason="Quit";         
-#    } my $numitems=@items;
   my @stuff=$li->Get();
   $data=$stuff[0];
   return($reason,$data);
@@ -169,7 +160,6 @@ sub selborrower {
   if ($numbors>15) {
     $numbors = 15;
   }
-  
   my $li = Newt::Listbox($numbors, NEWT_FLAG_MULTIPLE | NEWT_FLAG_RETURNEXIT);
   $li->Add(@borrows);
   my $bdata;
@@ -181,16 +171,15 @@ sub selborrower {
   my @stuff=$li->Get();
   debug_msg("",@stuff[0]);
   my $data=(0,9,$stuff[0]);
-  if ($data ne "") {
-     my $bornum = substr($data,0,9);
-     my $query = "select * from borrowers where cardnumber = '$bornum'";
-     my $sth = $dbh->prepare($query);
-     $sth->execute;
-     if ($bdata =$sth->fetchrow_hashref) {
-        $data = $bdata->{'borrowernumber'}; 
-     }
-  }   
-  return($data,$bdata);
+  my $borrnum = substr($data,0,9);
+#     my $query = "select * from borrowers where cardnumber = '$bornum'";
+#     my $sth = $dbh->prepare($query);
+#     $sth->execute;
+#     if ($bdata =$sth->fetchrow_hashref) {
+#        $data = $bdata->{'borrowernumber'}; 
+#     }
+#  }   
+  return($borrnum);
   # end of selborrower
 }
 
