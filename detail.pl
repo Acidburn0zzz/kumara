@@ -160,7 +160,7 @@ print center();
 print mktablehdr;
 if ($type eq 'opac'){
 
-  print mktablerow(5,$main,'Item Type','Class','Branch','Date Due','Last Seen'); 
+  print mktablerow(6,$main,'Item Type','Class','Branch','Date Due','Last Seen'); 
 } else {
   print mktablerow(6,$main,'Itemtype','Class','Location','Date Due','Last Seen','Barcode',"/images/background-mem.gif"); 
 }
