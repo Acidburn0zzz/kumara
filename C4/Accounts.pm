@@ -65,15 +65,17 @@ sub checkaccount  {
   $sth->finish;
   if ($total > 0){
     &alert('console',"borrower owes $total",$interface);
+    &getinput($interface);
     if ($total > 5){
-      reconcileaccount();
+      reconcileaccount($interface);
     }
   }
   return($total);
 }    
 
 sub reconcileaccount {
-
+  my ($interface)=@_;
+  heading('console',$interface,'Accounts','red');
 }
 			
 END { }       # module clean-up code here (global destructor)
