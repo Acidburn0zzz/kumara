@@ -62,11 +62,15 @@ sub Start_circ{
   #start interface
   &startint($env,'Circulation');
   my $donext = 'Circ';
-  while ($donext eq 'Circ') {
-    clearscreen();
-    my ($reason,$data) = menu('console','Circulation', 
-    ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
-    debug_msg($env,"data = $data");
+  my $reason;
+  my $data;
+  while ($donext ne 'Quit') {
+    if ($donext  eq "Circ") {
+      clearscreen();        
+      ($reason,$data) = menu('console','Circulation', 
+        ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
+      debug_msg($env,"data = $data");
+    }
     if ($data eq 'Issues') {  
       $donext=Issue($env); #C4::Circulation::Issues
       #debug_msg("","do next $donext");
@@ -83,7 +87,7 @@ sub Start_circ{
     } elsif ($data eq 'Quit') { 
       $donext = $data;
     }
-    #debug_msg($env,"donext -  $donext");
+    debug_msg($env,"donext -  $donext");
   }
   &endint($env)  
 }
