@@ -132,7 +132,6 @@ sub recordpayment{
   $sth->execute;
   # offset transactions
   while (($accdata=$sth->fetchrow_hashref) and ($amountleft>0)){
-     print "\n$amountleft\t$accdata->{'amountoutstanding'}\t";
      if ($accdata->{'amountoutstanding'} < $amountleft) {
         $newamtos = 0;
 	$amountleft = $amountleft - $accdata->{'amountoutstanding'};
@@ -141,11 +140,8 @@ sub recordpayment{
 	$amountleft = 0;
      }
      my $thisacct = $accdata->{accountno};
-     print "$thisacct\t$newamtos\t$amountleft";
      $updquery = "update accountlines set amountoutstanding= '$newamtos'
      where (borrowernumber = '$bornumber') and (accountno='$thisacct')";
-     print "\n$updquery";
-     my $ow = getc;
      my $usth = $dbh->prepare($updquery);
      $usth->execute;
      $usth->finish;

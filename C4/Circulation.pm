@@ -179,7 +179,7 @@ sub processitems {
     &checkreserve;
     #if charge deal with it
     #now mark as issued
-    &updateissues;
+   &updateissues($item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
   }
   $dbh->disconnect;
   #check to see if more books to process for this user
@@ -196,7 +196,28 @@ sub processitems {
 }
 
 sub updateissues{
-
+  # issue the book
+   my ($itemno,$bitno,$dbh,$bornum)=@_;
+   my $loanlength=21;
+   my $query="Select loanlength from biblioitems,itemtypes
+   where (biblioitems.biblioitemnumber='$bitno') 
+   and (biblioitems.itemtype = itemtypes.itemtype)";
+   print "\n$query\n";
+   my $ow = getc;
+   my $sth=$dbh->prepare($query);
+   $sth->execute;
+   if (my $data=$sth->fetchrow_hashref) {
+      $loanlength = $data->{'loanlength'}
+   }
+   $sth->finish;
+   # this ought to also insert the branch, but doen't do so yet.
+   $query = "Insert into issues (borrowernumber,itemnumber,date_due)
+   values ($bornum,$itemno,datetime('now'::abstime)+$loanlength)";
+   my $sth=$dbh->prepare($query);
+   print "\n$query\n";
+   my $ow = getc;
+   $sth->execute;
+   $sth->finish;
 }
 
 sub checkoverdues{
