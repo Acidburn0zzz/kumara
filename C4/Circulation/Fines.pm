@@ -83,7 +83,7 @@ sub CalcFine {
   my $data=$sth->fetchrow_hashref;
   $sth->finish;
   my $amount=0;
-  if ($difference >= $data->{'startcharge'}){
+  if ($difference >= $data->{'firstremind'}){
       if ($data->{'chargeperiod'} != 0){
         my $temp=$difference % $data->{'chargeperiod'};
         $difference=$difference - $temp;
@@ -91,11 +91,11 @@ sub CalcFine {
       }
   }
   $dbh->disconnect;
-  return($amount);
+  return($amount,$data->{'chargename'});
 }
 
 sub UpdateFine {
-  my ($itemnum,$bornum,$amount)=@_;
+  my ($itemnum,$bornum,$amount,$type)=@_;
   my $dbh=C4Connect;
   my $query="Select * from accountlines where itemnumber=$itemnum and
   borrowernumber=$bornum and (accounttype='FU' or accounttype='O' or
@@ -113,8 +113,8 @@ sub UpdateFine {
       my $out=$data->{'amountoutstanding'}+$diff;
       my $query2="update accountlines set date=now(), amount=$amount,
       amountoutstanding=$out,accounttype='FU' where
-borrowernumber=$data->{'borrowernumber'} and itemnumber=$data->{'itemnumber'}
-and (accounttype='FU' or accounttype='O');";
+      borrowernumber=$data->{'borrowernumber'} and itemnumber=$data->{'itemnumber'}
+      and (accounttype='FU' or accounttype='O');";
       my $sth2=$dbh->prepare($query2);
       $sth2->execute;
       $sth2->finish;      
@@ -139,7 +139,7 @@ and (accounttype='FU' or accounttype='O');";
     $query2="Insert into accountlines
     (borrowernumber,itemnumber,date,amount,
     description,accounttype,amountoutstanding,accountno) values
-    ($bornum,$itemnum,now(),$amount,'Overdue Item $title->{'title'}','FU',
+    ($bornum,$itemnum,now(),$amount,'$type $title->{'title'}','FU',
     $amount,$accountno[0])";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;
