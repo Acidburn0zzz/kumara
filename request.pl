@@ -30,6 +30,7 @@ print <<printend
 <INPUT TYPE="image" name="submit"  VALUE="request" height=42  WIDTH=187 BORDER=0 src="/images/place-request.gif" align=right >
 <input type=hidden name=biblio value=$bib>
 <input type=hidden name=type value=str8>
+<input type=hidden name=title value="$dat->{'title'}">
 <FONT SIZE=6><em>Requesting: <a href=/cgi-bin/koha/detail.pl?bib=$bib>$dat->{'title'}</a> ($dat->{'author'})</em></FONT><P>
 <p>
 
