@@ -79,17 +79,34 @@ if ($existing eq 'YES'){
         $flag2="leastone";
       }
    }
+   my $loan;
    if ($flag eq 'notall' && $flag2 eq 'leastone'){
       $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
       modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size);
+      if ($itemtype =~ /REF/){
+        $loan=1;
+      } else {
+        $loan=0;
+      }
       for (my $i=0;$i<$count;$i++){
         if ($barcodes[$i] ne ''){
-	  moditem($items[$i]->{'itemnumber'},$bibitemnum);
+	  moditem($loan,$items[$i]->{'itemnumber'},$bibitemnum);
 	}
       }
       
    } elsif ($flag2 eq 'leastone') {
       modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc,$notes,$size);
+      if ($itemtype =~ /REF/){
+        $loan=1;
+      } else {
+        $loan=0;
+      }
+	for (my $i=0;$i<$count;$i++){                                             
+	  if ($barcodes[$i] ne ''){                                               
+	    moditem($loan,$items[$i]->{'itemnumber'},$bibitemnum);                
+	  }                                                                       
+	}
+      
    }
 }
 print $input->redirect("moredetail.pl?type=intra&bib=$bibnum&bi=$bibitemnum");

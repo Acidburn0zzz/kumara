@@ -629,13 +629,13 @@ sub makeitems {
 }
 
 sub moditem {
-  my ($itemnum,$bibitemnum,$barcode,$notes,$homebranch,$lost,$wthdrawn)=@_;
+  my ($loan,$itemnum,$bibitemnum,$barcode,$notes,$homebranch,$lost,$wthdrawn)=@_;
   my $dbh=C4Connect;
   my $query="update items set biblioitemnumber=$bibitemnum,
   barcode='$barcode',itemnotes='$notes'
   where itemnumber=$itemnum";
   if ($barcode eq ''){
-    $query="update items set biblioitemnumber=$bibitemnum where itemnumber=$itemnum";
+    $query="update items set biblioitemnumber=$bibitemnum,notforloan=$loan where itemnumber=$itemnum";
   }
   if ($lost ne ''){
     $query="update items set biblioitemnumber=$bibitemnum,

@@ -73,7 +73,7 @@ my $volumeddesc=checkinp($input->param('Volume'));
 #  }
 #} 
 #modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
-moditem($itemnum,$bibitemnum,$barcode,$notes,$homebranch,$lost,$wthdrawn);
+moditem('loan',$itemnum,$bibitemnum,$barcode,$notes,$homebranch,$lost,$wthdrawn);
 
 print $input->redirect("moredetail.pl?type=intra&bib=$bibnum&bi=$bibitemnum");
 #print $bibitemnum;
