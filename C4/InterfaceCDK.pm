@@ -253,7 +253,7 @@ sub borrower_dialog {
      'Vrows'=>     1, 
      'Vcols'=>     2);
   borrbind($env,$matrix);
-  $matrix->draw();
+  #$matrix->draw();
   my ($rows,$cols,$info) = $matrix->activate(); 
   if ((!defined $rows) && ($info->[0][0] eq "")) { 
     $result = "Circ";
@@ -261,8 +261,10 @@ sub borrower_dialog {
     $borrower = $info->[0][0];
     $book     = $info->[0][1];
   }
-  #$matrix->erase();
+  $matrix->erase();
+  $matrix->unregister();
   undef $matrix;
+  Cdk::refreshCdkScreen();
   return ($borrower,$result,$book);
 }
 
@@ -278,7 +280,10 @@ sub selborrower {
   } else {  
     $result = substr(@$borrows[$returnValue],0,9);
   }
+  $scroll->erase();
+  #$scroll->unregister();
   undef $scroll;
+  Cdk::refreshCdkScreen();
   return $result;
 }
 
@@ -321,12 +326,12 @@ sub issuewindow {
   if (!defined $barcode) {
     $reason="Finished user"
   }
- # $borrbox->erase();
- # $entryBox->erase();
- # $scroll2->erase();
- # $scroll1->erase();
- # $funcmenu->erase();
- # $loanlength->erase();
+  $borrbox->erase();
+  $entryBox->erase();
+  $scroll2->erase();
+  $scroll1->erase();
+  $funcmenu->erase();
+  $loanlength->erase();
   undef $titlepanel;
   undef $borrbox;
   undef $entryBox;
