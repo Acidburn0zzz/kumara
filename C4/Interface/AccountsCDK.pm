@@ -3,6 +3,7 @@ package C4::Interface::AccountsCDK; #asummes C4/Interface/AccountsCDK
 #uses Newt
 use C4::Format;
 use C4::InterfaceCDK;
+use C4::Accounts2;
 use strict;
 
 require Exporter;
@@ -62,18 +63,45 @@ sub accountsdialog {
   #  new Cdk::Label ('Message' =>\@borinfo, 'Ypos'=>4, 'Xpos'=>"RIGHT");
   my $borpanel = borrowerbox($env,$borrower,$amountowing);
   $borpanel->draw();
-  my $acctlist = new Cdk::Scroll ('Title'=>"Outstanding Items",
-      'List'=>\@$accountlines,'Height'=>12,'Width'=>76,
+  my @sel = ("N ","Y ");
+  my $acctlist = new Cdk::Selection ('Title'=>"Outstanding Items",
+      'List'=>\@$accountlines,'Choices'=>\@sel,'Height'=>12,'Width'=>80,
       'Xpos'=>1,'Ypos'=>10);
-  $acctlist->draw();
+  my @amounts=$acctlist->activate();
+  my $accountno;
+  my $amount2;
+  my $count=@amounts;
+  my $amount;
+  my $check=0;
+  for (my $i=0;$i<$count;$i++){
+    if ($amounts[$i] == 1){
+      $check=1;
+      if ($accountlines->[$i]=~ /(^[0-9]+)/){
+        $accountno=$1;
+      }
+      if ($accountlines->[$i]=~/([0-9]+\.[0-9]+)/){
+        $amount2=$1;
+      }
+      my $borrowerno=$borrower->{'borrowernumber'};
+      makepayment($borrowerno,$accountno,$amount2);
+      $amount+=$amount2;
+    }
+    
+  }
   my $amountentry = new Cdk::Entry('Label'=>"Amount:  ",
      'Max'=>"10",'Width'=>"10",
      'Xpos'=>"1",'Ypos'=>"3",
      'Type'=>"INT");
   $amountentry->preProcess ('Function' => sub{preamt(@_,$env,$acctlist);});
-  #$amountentry->set('Value'=>$amountowing);
-  my $amount =$amountentry->activate();                                                                
-  #debug_msg($env,"accounts $amount");
+  #
+  
+  if ($amount eq ''){
+    $amount =$amountentry->activate();                                                                
+  } else {
+    $amountentry->set('Value'=>$amount);
+    $amount=$amountentry->activate();
+  }
+#  debug_msg($env,"accounts $amount barcode=$accountno");
   if (!defined $amount) {
      #debug_msg($env,"escaped");
      #$reason="Finished user";
@@ -85,6 +113,9 @@ sub accountsdialog {
   undef $borpanel;
   undef $borpanel;
   undef $titlepanel;
+  if ($check == 1){
+    $amount=0;
+  }
   return($amount,$reason);
 }
 

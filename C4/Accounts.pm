@@ -109,7 +109,7 @@ sub reconcileaccount {
     my $line=$i+1;
     my $amount=0+$data->{'amountoutstanding'};
     my $itemdata = itemnodata($env,$dbh,$data->{'itemnumber'});
-    $line= $data->{'date'}." ".$data->{'accounttype'}." ";
+    $line= $data->{'accountno'}." ".$data->{'date'}." ".$data->{'accounttype'}." ";
     my $title = $itemdata->{'title'};
     if (length($title) > 15 ) {$title = substr($title,0,15);}
     $line= $line.$itemdata->{'barcode'}." $title ".$data->{'description'};
