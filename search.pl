@@ -9,6 +9,7 @@ use C4::Search;
 use CGI;
 use C4::Output;
 
+my $env;
 my $input = new CGI;
 print $input->header;
 #print $input->dump;
@@ -72,7 +73,7 @@ print mktablehdr;
 if ($subject ne ''){
   print mktablerow(1,'#cccc99','<b>SUBJECT</b>');
 } else {
-  print mktablerow(2,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>');
+  print mktablerow(3,'#cccc99','<b>TITLE</b>','<b>AUTHOR</b>','<b>ITEM COUNT</b>');
 }
 my $count2=@results;
 my $i=0;
@@ -89,22 +90,24 @@ while ($i < $count2){
       $word=~ s/\n//g;
       my $url="/cgi-bin/kumara/search.pl?author=$word&type=a";
       $stuff[2]=mklink($url,$stuff[2]);
+      my $count=itemcount($env,$stuff[0]);
+      $stuff[3]=$count;
     } else {
       my $word=$stuff[1];
       $word=~ s/ /%20/g;
       $stuff[1]=mklink("/cgi-bin/kumara/subjectsearch.pl?subject=$word",$stuff[1]);
     }
     if ($colour == 1){
-      print mktablerow(2,'#ffffcc',$stuff[1],$stuff[2]);
+      print mktablerow(3,'#ffffcc',$stuff[1],$stuff[2],$stuff[3]);
       $colour=0;
     } else{
-      print mktablerow(2,'white',$stuff[1],$stuff[2]);
+      print mktablerow(3,'white',$stuff[1],$stuff[2],$stuff[3]);
       $colour=1;
     }
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(2,'#cccc99',' &nbsp; ',' &nbsp; ');
+print mktablerow(3,'#cccc99',' &nbsp; ',' &nbsp; ',' &nbsp;');
 print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset";

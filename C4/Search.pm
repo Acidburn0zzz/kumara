@@ -15,7 +15,7 @@ $VERSION = 0.01;
     
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
-&itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata); 
+&itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -55,7 +55,7 @@ sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
   my $query ="Select count(*) from biblio where author like
-'%$search->{'keyword'}%' or
+  '%$search->{'keyword'}%' or
   title like '%$search->{'keyword'}%'";
 
   my $sth=$dbh->prepare($query);
@@ -154,14 +154,14 @@ sub CatSearch  {
   my $i=0;
   my $i2=0;
   my $limit=$num+$offset;
-
+#  print $query;
   if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
     while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
-      if ($i >= $offset){
+#      if ($i >= $offset){
         $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
         $i2++;
-      }
-      $i++;
+#      }
+#      $i++;
     }
   } else {
     while (my $data=$sth->fetchrow_hashref){
@@ -388,7 +388,41 @@ sub getacctlist {
    }
    return ($numlines,\@acctlines,$total);
 }
-				      
+
+sub itemcount {
+  my ($env,$bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from items where
+  biblionumber=$bibnum";
+  my $sth=$dbh->prepare($query); 
+#  print $query;
+  $sth->execute;
+  my $count=0;
+  my $lcount=0;
+  my $nacount=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $count++;
+    my $query2="select * from issues where itemnumber=
+    '$data->{'itemnumber'}'";
+#    print $query2;
+    my $sth2=$dbh->prepare($query2);
+    $sth2->execute;
+    if (my $data2=$sth2->fetchrow_hashref){
+      $nacount++;
+    } else {
+      if ($data->{'holdingbranch'}='L'){
+        $lcount++;
+      }
+    }
+    $sth2->finish;
+  }
+  $sth->finish;
+  print $lcount;
+  print $nacount;
+  return $count;
+  $dbh->disconnect;
+}
+
 END { }       # module clean-up code here (global destructor)
 
 

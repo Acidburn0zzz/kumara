@@ -2,6 +2,7 @@
 
 #script to guide user thru adding/modifying a borrower entry
 #written 22/11/99
+#update 21/12/99 by chris@katipo.co.nz
 
 use strict;
 #use C4::Search;
@@ -96,7 +97,7 @@ if ($action eq 'S') {
   $inputs{'contactname'}  ="18\tR\tContact Name\ttext\t40\t$data->{'contactname'}";
   $inputs{'borrowernotes'}="19\t\tNotes\ttextarea\t40x4\t$data->{'borrowernotes'}";
   $inputs{'type'}         ="20\t\t\thidden\tborrowers";
-  $inputs{'updtype'}      ="I";
+  $inputs{'updtype'}      ="21\t\t\thidden\tI";
   if ($action eq "M") {
     $inputs{'updtype'} = "\21\t\t\thidden\tM";
     $inputs{'borrowernumber'} ="22\t\t\thidden\t$data->{'borrowernumber'}";
