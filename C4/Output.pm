@@ -281,6 +281,9 @@ sub mkheadr {
   if ($type eq '2'){
     $string="<FONT SIZE=6><em>$text</em></FONT>";
   }
+    if ($type eq '3'){
+    $string="<FONT SIZE=6><em>$text</em></FONT><p>";
+  }
   return ($string);
 }
 

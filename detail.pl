@@ -26,8 +26,13 @@ if ($type eq 'opac'){
 print startpage();
 print startmenu($type);
 my $blah;
-
 my $bib=$input->param('bib');
+print "<a href=request.pl?bib=$bib><img height=42  WIDTH=187 BORDER=0 src=\"/images/place-request.gif\" align=right border=0></a>";
+print mkheadr(3,'Items');
+
+
+
+
 my $title=$input->param('title');
 
 
@@ -37,7 +42,11 @@ my $count=@items;
 my $i=0;
 print center();
 print mktablehdr;
-print mktablerow(5,$main,'Title','Barcode','DateDue','Location','Dewey'); 
+if ($type eq 'opac'){
+  print mktablerow(7,$main,'Title','Itemtype','Class','Location','DateDue','Lastseen','Barcode'); 
+} else {
+  print mktablerow(7,$main,'Title','Itemtype','Class','Location','DateDue','Lastseen','Barcode',"/images/background-mem.gif"); 
+}
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
@@ -48,10 +57,10 @@ while ($i < $count){
     $results[2]='Available';
   }
   if ($colour == 1){                                                                          
-    print mktablerow(5,$secondary,$results[0],$results[1],$results[2],$results[3],$results[4]);                                        
+    print mktablerow(7,$secondary,$results[0],$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                        
     $colour=0;                                                                                
   } else{                                                                                     
-    print mktablerow(5,'white',$results[0],$results[1],$results[2],$results[3],$results[4]);                                          
+    print mktablerow(7,'white',$results[0],$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
     $colour=1;                                                                                
   }
    $i++;

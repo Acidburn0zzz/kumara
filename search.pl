@@ -89,7 +89,7 @@ if ($type ne 'opac'){
   if ($subject ne ''){
    print mktablerow(1,$main,'<b>SUBJECT</b>','/images/background-mem.gif');
   } else {
-   print mktablerow(4,$main,'<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('LOCATION'),'/images/background-mem.gif');
+   print mktablerow(5,$main,'<b>TITLE</b>','<b>AUTHOR</b>',bold('&copy;'),'<b>COUNT</b>',bold('LOCATION'),'/images/background-mem.gif');
   }
 } else {
   if ($subject ne ''){

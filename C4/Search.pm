@@ -353,14 +353,16 @@ sub ItemInfo {
     my $class = $data->{'classification'};
     my $dewey = $data->{'dewey'};
     $dewey =~ s/0+$//;
-
+    
     if ($dewey < 10){$dewey='00'.$dewey;}
     if ($dewey < 100 && $dewey > 10){$dewey='0'.$dewey;}
     if ($dewey eq "000.") { $dewey = "";};
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
-     $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class\t$data->{'itemnumber'}";
+    my @temp=split('-',$data->{'datelastseen'});
+    my $date="$temp[2]/$temp[1]/$temp[0]";
+$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class\t$data->{'itemnumber'}\t$data->{'itemtype'}\t$date";
 
     $i++;
   }
