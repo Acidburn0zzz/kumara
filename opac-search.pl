@@ -55,6 +55,7 @@ my $i=0;
 my $colour=1;
 while ($i < $count2){
     my @stuff=split('\t',$results[$i]);
+    $stuff[1]=~ s/\`/\'/g;
     my $title2=$stuff[1];
     $title2=~ s/ /%20/g;
 
