@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#script to keep total of number of issues;
+#script to show amount paid today;
 
 use C4::Output;
 use C4::Stats;
