@@ -55,7 +55,7 @@ if ($itemnumber ne '' || $isbn ne ''){
       ($count,@results)=&KeywordSearch(\$blah,'intra',\%search,$num,$offset);
     } else {
       ($count,@results)=&CatSearch(\$blah,'loose',\%search,$num,$offset);
-            print "hey";
+#            print "hey";
     }
   }
 }
