@@ -202,7 +202,10 @@ sub updateissues{
     $loanlength = $data->{'loanlength'}
   }
   $sth->finish;
-  my $datedue = time + $loanlength;
+  my $ti = time;
+
+  my $datedue = time + ($loanlength * 86400) ;
+  
   my @datearr = localtime($datedue);
   my $dateduef = (1900+$datearr[5])."-".$datearr[4]."-".$datearr[3];
   $query = "Insert into issues (borrowernumber,itemnumber, date_due,branchcode)
@@ -210,7 +213,6 @@ sub updateissues{
   my $sth=$dbh->prepare($query);
   $sth->execute;
   $sth->finish;
-  #debug_msg("","date $datedue");
   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($datedue);
   $datedue="$mday-$mon-$year";
   return($datedue);

@@ -259,7 +259,9 @@ sub issuewindow {
   }
   $i = 0;
   while ($items2->[$i]) {
-    $li2->Add($items2->[$i]); 
+    my $fitem = fmtstr("",$items2->[$i],"L29");
+    #$li2->Add($items2->[$i]); 
+    $li2->Add($fitem);
     $i++;
   }  
   $panel->AddHotKey(NEWT_KEY_F11);
