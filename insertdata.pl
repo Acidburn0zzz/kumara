@@ -30,5 +30,6 @@ if ($data{'type'} eq 'biblio'){
   my $num=$bornum->{'max'};
   $num++;
   $data{'borrowernumber'}=$num;
+  $data{'branchcode'}="L";
 }  
 &sqlinsert($data{'type'},%data);
