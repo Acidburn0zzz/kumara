@@ -40,6 +40,11 @@ if ($type ne 'opac'){
 my @items=ItemInfo(\$blah,$bib,$type);
 my $dat=bibdata($bib);
 my $count=@items;
+my ($count3,$addauthor)=addauthor($bib);
+my $additional=$addauthor->[0]->{'author'};                                                             
+for (my $i=1;$i<$count3;$i++){                                                                          
+  $additional=$additional."|".$addauthor->[$i]->{'author'};                                             
+}  
 my @temp=split('\t',$items[0]);
 print mkheadr(3,"$dat->{'title'} ($dat->{'author'}) $temp[4]");
 print <<printend
@@ -79,7 +84,7 @@ if ($type ne 'opac'){
 print <<printend
 <b>Subtitle:</b> $dat->{'subtitle'}<br>
 <b>Author:</b> $dat->{'author'}<br>
-<b>Additional Author:</b> <br>
+<b>Additional Author:</b> $additional<br>
 <b>Series Title:</b> $dat->{'seriestitle'}<br>
 <b>Subject:</b> $dat->{'subject'}<br>
 <b>Copyright:</b> $dat->{'copyrightdate'}<br>

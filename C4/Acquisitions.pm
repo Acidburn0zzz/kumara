@@ -14,7 +14,7 @@ $VERSION = 0.01;
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
-&getcurrencies &modsubtitle &modsubject);
+&getcurrencies &modsubtitle &modsubject &modaddauthor);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -302,13 +302,21 @@ sub modsubtitle {
   my ($bibnum,$subtitle)=@_;
   my $dbh=C4Connect;
   my $query="update bibliosubtitle set subtitle='$subtitle' where biblionumber=$bibnum";
-#  print $query;
   my $sth=$dbh->prepare($query);
-#  print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
 }
+
+sub modaddauthor {
+  my ($bibnum,$author)=@_;
+  my $dbh=C4Connect;
+  my $query="update additionalauthors set author='$author' where biblionumber=$bibnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+} 
 
 sub modsubject {
   my ($bibnum,@subject)=@_;

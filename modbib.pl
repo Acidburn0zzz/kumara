@@ -16,17 +16,25 @@ my $bibitemnum=$input->param('bibitem');
 my $data=bibitemdata($bibitemnum);
 my ($count,$subject)=subject($data->{'biblionumber'});
 my ($count2,$subtitle)=subtitle($data->{'biblionumber'});
+my ($count3,$addauthor)=addauthor($data->{'biblionumber'});
+
 #my ($analytictitle)=analytic($biblionumber,'t');
 #my ($analyticauthor)=analytic($biblionumber,'a');
 print startpage();
 print startmenu();
 my %inputs;
 
-#have to get all subtitles, subjects
+#have to get all subtitles, subjects and additional authors
 my $sub=$subject->[0]->{'subject'};
 for (my $i=1;$i<$count;$i++){
   $sub=$sub."|".$subject->[$i]->{'subject'};
 }
+my $additional=$addauthor->[0]->{'author'};
+for (my $i=1;$i<$count3;$i++){
+  $additional=$additional."|".$addauthor->[$i]->{'author'};
+}
+
+
 #hash is set up with input name being the key then
 #the value is a tab separated list, the first item being the input type
 $inputs{'Author'}="text\t$data->{'author'}\t0";
@@ -45,7 +53,7 @@ $inputs{'Publication Year'}="text\t$data->{'publicationyear'}\t8";
 $inputs{'Pages'}="text\t$data->{'pages'}\t9";
 $inputs{'Illustrations'}="text\t$data->{'illustration'}\t10";
 $inputs{'Series Title'}="text\t$data->{'seriestitle'}\t11";
-$inputs{'Additional Author'}="text\t$data->{'addauthor'}\t12";
+$inputs{'Additional Author'}="text\t$additional\t12";
 $inputs{'Subtitle'}="text\t$subtitle->[0]->{'subtitle'}\t13";
 $inputs{'Unititle'}="text\t$data->{'unititle'}\t14";
 $inputs{'Notes'}="textarea\t$data->{'notes'}\t15";

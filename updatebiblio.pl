@@ -57,6 +57,10 @@ my @sub=split(/\|/,$subject);
 #print @sub;
 #
 
+my $addauthor=checkinp($input->param('Additional'));
+modaddauthor($bibnum,$addauthor);
+
+
 my $error=modsubject($bibnum,@sub);
 if ($error ne ''){
   print $input->header();

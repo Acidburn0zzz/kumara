@@ -7,7 +7,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-#use C4::InterfaceCDK;
+
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
 # set the version for version checking
@@ -17,7 +17,8 @@ $VERSION = 0.01;
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
-&getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle); 
+&getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle
+&addauthor); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -603,6 +604,23 @@ sub subject {
   my ($bibnum)=@_;
   my $dbh=C4Connect;
   my $query="Select * from bibliosubject where biblionumber=$bibnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@results);
+}
+
+sub addauthor {
+  my ($bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from additionalauthors where biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
