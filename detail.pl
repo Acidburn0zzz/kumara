@@ -77,10 +77,18 @@ print <<printend
 
 <tr VALIGN=TOP  >
 <TD>
+printend
+;
+if ($type ne 'opac'){
+  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
+}
+print <<printend
 <br>
 <FONT SIZE=2  face="arial, helvetica">
 printend
 ;
+
+
 if ($type ne 'opac'){
 print <<printend
 <b>Subtitle:</b> $dat->{'subtitle'}<br>
@@ -131,9 +139,6 @@ print "<b>Total Number of Items:</b> $count
 <p>
 ";
 
-}
-if ($type ne 'opac'){
-  print "<INPUT TYPE=\"image\" name=\"submit\"  VALUE=\"modify\" height=42  WIDTH=93 BORDER=0 src=\"/images/modify-mem.gif\">"; 
 }
 print <<printend
 </form>
