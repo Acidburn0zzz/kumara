@@ -170,15 +170,24 @@ sub issueitem{
    if ($item=$sth->fetchrow_hashref) {
      $sth->finish;
      #check if item is restricted
-     if ($item->{'restricted'} == 1 ){
+     if ($item->{'notforloan'} == 1) {
+       error_msg($env,"Item Not for Loan");
+       $canissue = 0;
+     } elsif ($item->{'wthdrawn'} == 1) {
+       error_msg($env,"Item Withdrawn");
+       $canissue = 0;
+     } elsif ($item->{'itemlost'} == 1) {
+       error_msg($env,"Item Lost");      
+       $canissue = 0;
+     } elsif ($item->{'restricted'} == 1 ){
        error_msg($env,"Restricted Item");
        #check borrowers status to take out restricted items
        # if borrower allowed {
        #  $canissue = 1
        # } else {
-       $canissue = 0
+       $canissue = 0;
        # }
-     } 
+     }
      #check if item is on issue already
      if ($canissue == 1) {
        my ($currbor,$issuestat) = &C4::Circulation::Main::previousissue($env,$item->{'itemnumber'},$dbh,$bornum);
