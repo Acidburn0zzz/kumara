@@ -61,7 +61,6 @@ sub EnterReserves{
   my @fldlens = ("5","15","15","50","50","50","50");
   my ($reason,$num,$itemnumber,$isbn,$title,$keyword,$author,$subject) =
      FindBiblioScreen($env,"Reserves",7,\@flds,\@fldlens);
-  debug_msg($env,"reason $reason");
   my $donext ="Circ";
   if ($reason ne "1") {
     $donext = $reason;
@@ -146,13 +145,12 @@ sub EnterReserves{
         $donext = "";
 	while ($donext eq "") {
 	  clearscreen();
-          debug_msg($env,"after clear");
           titlepanel($env,"Reserves","Create Reserve");
        	  my ($reason,$borcode,$branch,$constraint,$bibitems) =
             MakeReserveScreen($env, $data, \@items, \@branches);
-	  debug_msg($env,$reason);  
       	  my ($borrnum,$borrower) = findoneborrower($env,$dbh,$borcode);
           $dbh->disconnect;
+	  debug_msg ($env,$reason);
       	  if ($reason eq "") { 
        	    if ($borrnum ne "") {
               CreateReserve($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems);
@@ -176,36 +174,38 @@ sub CreateReserve {
   my ($env,$branch,$borrnum,$biblionumber,$constraint,$bibitems) = @_;
   my $dbh = &C4Connect;
   $dbh->{RaiseError} = 1;
-  $dbh->{AutoCommit} = 0;	   
+  $dbh->{AutoCommit} = 0;
+  debug_msg($env,"making reserve");
   my $const = lc substr($constraint,0,1);
+  debug_msg($env,"constraint $const");
   my @datearr = localtime(time);
   my $resdate = (1900+$datearr[5])."-".($datearr[4]+1)."-".$datearr[3];
   eval {     
-    my $resdate;
     # updates take place here
-    my $query="insert into reserves 
-      (borrowernumber,biblionumber,reservedate,branch,constrainttype) 
-      values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
+    my $query="insert into reserves (borrowernumber,biblionumber,reservedate,branchcode,constrainttype) values ('$borrnum','$biblionumber','$resdate','$branch','$const')";
     my $sth = $dbh->prepare($query);
     $sth->execute();
-    if ($const ne "a") {
-      my $numitems = @$bibitems;
-      my $i = 0;
-      while ($i < $numitems) {
-        my $biblioitem = @$bibitems[$i];
-	my $query = "insert into reserveconstraints
-	   (borrowernumber,reservedate,biblionumber,biblioitemnumber)
-	   values ('$borrnum','$biblionumber','$resdate','$biblioitem')";
-	my $sth = $dbh->prepare($query);
-	$sth->execute();
-      }
-    }
+    #if (($const eq "o") || ($const eq "e")) {
+    #  my $numitems = @$bibitems;
+    #  my $i = 0;
+    #  while ($i < $numitems) {
+    #    my $biblioitem = @$bibitems[$i];
+    #	my $query = "insert into reserveconstraints
+    #	   (borrowernumber,reservedate,biblionumber,biblioitemnumber)
+    #	   values ('$borrnum','$biblionumber','$resdate','$biblioitem')";
+    #	my $sth = $dbh->prepare($query);
+    #	$sth->execute();
+    #  }
+    #}
     $dbh->commit();
   };
   if (@_) {
     # update failed
+    my $temp = @_;
+    error_msg($env,"error trap @_");
+    
     $dbh->rollback();
-    }
+  }
   $dbh->disconnect();
   return();
 }    

@@ -1,4 +1,4 @@
-package C4::Circulation::Borrower; #asummes C4/Circulation/Borrower
+package C4::Circulation; #assumes C4/Circulation/Borrower
 
 #package to deal with Issues
 #written 3/11/99 by chris@katipo.co.nz
@@ -72,7 +72,6 @@ sub findborrower  {
     #get borrowerbarcode from scanner
     ($borcode,$reason,$book)=&scanborrower(); #C4::Circulation
     if ($borcode ne '') {
-      debug_msg($env,"a");
       ($bornum,$borrower) = findoneborrower($env,$dbh,$borcode);
     } elsif ($book ne "") {
       my $query = "select * from issues,items where (barcode = '$book') 

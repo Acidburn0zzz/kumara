@@ -132,6 +132,7 @@ sub pause {
 sub output {
   my($left,$top,$msg)=@_;
   Newt::DrawRootText($left,$top,$msg);
+  Newt::Refresh() ;
 }
 
 sub helptext {
