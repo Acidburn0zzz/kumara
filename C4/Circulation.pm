@@ -60,11 +60,16 @@ sub Start_circ{
   &startint($env,'Circulation');
   my $donext = 'Circ';
   while ($donext eq 'Circ') {
-    my ($reason,$data)=menu('console','Circulation',('Issues','Returns','Borrower Enquiries'));
+    my ($reason,$data) = menu('console','Circulation', 
+    ('Issues','Returns','Borrower Enquiries','Log In'));
     if ($data eq 'Issues') {  
       $donext=Issue($env);
     } elsif ($data eq 'Returns') {
       $donext=Returns($env);
+    } elsif ($data eq 'Log In') {
+      &endint($env);
+      &login($env);
+      &startint($env,'Circulation');
     } elsif ($data eq 'Quit') { 
       $donext = $data;
     }  

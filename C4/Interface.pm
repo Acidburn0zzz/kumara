@@ -90,13 +90,15 @@ sub menu2 {
   my $b0 = Newt::Button(fmtstr("",@items[0],"C30"));
   my $b1 = Newt::Button(fmtstr("",@items[1],"C30"));
   my $b2 = Newt::Button(fmtstr("",@items[2],"C30"));
-  $b0->Tag(@items[0]);
+  my $b3 = Newt::Button(fmtstr("",@items[3],"C30"));
+   $b0->Tag(@items[0]);
   $b1->Tag(@items[1]);
   $b2->Tag(@items[2]);
        
   $panel->Add(0,0,$b0);
   $panel->Add(0,1,$b1);
   $panel->Add(0,2,$b2);
+  $panel->Add(0,3,$b3);
   $panel->AddHotKey(NEWT_KEY_F11);
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
