@@ -101,7 +101,6 @@ sub findborrower  {
     $env->{'bornum'} = $bornum;
     $env->{'bcard'} = $borrower->{'cardnumber'};
     my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},$borrower->{'surname'}));
-#    output(1,1,$borrowers);
     $issuesallowed = &checktraps($env,$dbh,$bornum,$borrower);
   }
   return ($bornum, $issuesallowed,$borrower,$reason);
@@ -166,43 +165,31 @@ sub findoneborrower {
 sub checktraps {
   my ($env,$dbh,$bornum,$borrower) = @_;
   my $issuesallowed = "1";
-  #process borrower traps (could be function)
-  #check first GNA trap (no address this is the 22nd item in the table)
   my @traps_set;
-  if ($borrower->{'gonenoaddress'} == 1){
-    push (@traps_set,"GNA");
-  }
-  #check if member has a card reported as lost
-  if ($borrower->{'lost'} ==1){
-    push (@traps_set,"LOST");
-  }
-  #check the notes field if notes exist display them
-  if ($borrower->{'borrowernotes'} ne ''){
-    push (@traps_set,"NOTES");
-  }
-  #check if borrower has overdue items
-  #call overdue checker
-  my $odues = &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
-  if ($odues > 0) {
-    push (@traps_set,"ODUES");
-  }  
   #check amountowing
-  my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
-  if ($amount > 0) {
-    push (@traps_set,"FINES");
-  }  
-  #check if borrower has any items waiting
-  my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
-  if (@traps_set[0] ne "" ) {
-     $issuesallowed = 
-       process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set);
+  my $traps_done; 
+  my $odues;
+  while ($traps_done ne "DONE") {
+    my $amount=checkaccount($env,$bornum,$dbh);    #from C4::Accounts
+    if ($amount > 0) { push (@traps_set,"FINES");}  
+    if ($borrower->{'gonenoaddress'} == 1){ push (@traps_set,"GNA");}
+    #check if member has a card reported as lost
+    if ($borrower->{'lost'} ==1){push (@traps_set,"LOST");}
+    #check the notes field if notes exist display them
+    if ($borrower->{'borrowernotes'} ne ''){ push (@traps_set,"NOTES");}
+    #check if borrower has overdue items
+    #call overdue checker
+    my $odues = &C4::Circulation::Main::checkoverdues($env,$bornum,$dbh);
+    if ($odues > 0) {push (@traps_set,"ODUES");}  
+    #check if borrower has any items waiting
+    my $itemswaiting = &C4::Circulation::Main::checkwaiting($env,$dbh,$bornum);
+    if (@traps_set[0] ne "" ) {
+       $issuesallowed,$traps_done = 
+         process_traps($env,$dbh,$bornum,$borrower,$amount,$odues,\@traps_set); 
+    } else {
+       $traps_done = "DONE";
+    }   
   }
-	   
-  #deal with any money still owing
-  if ($amount > 0){
-    &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
-  }
-  
   return ($issuesallowed, $odues);
 }
 
@@ -215,6 +202,7 @@ sub process_traps {
     $traps{'@$traps_set[$x]'} = 1; 
     $x++;
   }
+  my $traps_done;
   my $trapact;
   while ($trapact ne "NONE") {
      $trapact = &trapscreen($env,$bornum,$borrower,$amount,$traps_set);
@@ -222,17 +210,17 @@ sub process_traps {
        &reconcileaccount($env,$dbh,$bornum,$amount,$borrower,$odues);
      } elsif  ($trapact eq "NOTES") {
        my $notes = trapsnotes($env,$bornum,$borrower,$amount);
-       if ($notes ne $borrower->{'borrowernotes'}) {
-          my $query = "update borrowers set borrowernotes = '$notes' 
+       if ($notes ne $borrower->{'borrowernotes'}) {   
+	  my $query = "update borrowers set borrowernotes = '$notes' 
 	    where borrowernumber = $bornum";
 	  my $sth = $dbh->prepare($query);
 	  $sth->execute();
 	  $sth->finish();
           $borrower->{'borrowernotes'} = $notes;
-       }	  
+       }
      }
   }
-  return ($issuesallowed);
+  return ($issuesallowed,$traps_done);
 }
 
 

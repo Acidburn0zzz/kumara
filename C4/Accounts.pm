@@ -64,17 +64,17 @@ sub checkaccount  {
   $sth->execute;
   my $total=0;
   while (my $data=$sth->fetchrow_hashref){
-    $total=$total+$data->{'sum'};
+    $total=$total+$data->{'sum(amountoutstanding)'};
   }
   $sth->finish;
-#      output(1,2,"borrower owes $total");
+  # output(1,2,"borrower owes $total");
   if ($total > 0){
-    output(1,2,"borrower owes $total");
+    # output(1,2,"borrower owes $total");
     if ($total > 5){
       reconcileaccount($env,$dbh,$bornumber,$total);
     }
   }
-#  pause();
+  #  pause();
   return($total);
 }    
 
@@ -168,9 +168,13 @@ sub recordpayment{
      $usth->finish;
   }
   # create new line
+  #$updquery = "insert into accountlines (borrowernumber,
+  #accountno,date,amount,description,accounttype,amountoutstanding) values
+  #($bornumber,$nextaccntno,datetime('now'::abstime),0-$data,'Payment,thanks',
+  #'Pay',0-$amountleft)";
   $updquery = "insert into accountlines 
   (borrowernumber, accountno,date,amount,description,accounttype,amountoutstanding)  
-  values ($bornumber,$nextaccntno,datetime('now'::abstime),0-$data,'Payment,thanks',
+  values ($bornumber,$nextaccntno,now(),0-$data,'Payment,thanks',
   'Pay',0-$amountleft)";
   my $usth = $dbh->prepare($updquery);
   $usth->execute;

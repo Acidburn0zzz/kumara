@@ -248,8 +248,10 @@ $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchnam
 
 sub GetItems {
    my ($env,$biblionumber)=@_;
+   debug_msg($env,"GetItems");
    my $dbh = &C4Connect;
    my $query = "Select * from biblioitems where (biblionumber = $biblionumber)";
+   debug_msg($env,$query);
    my $sth=$dbh->prepare($query);
    $sth->execute;
    debug_msg($env,"executed query");

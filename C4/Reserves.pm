@@ -129,10 +129,9 @@ sub EnterReserves{
       if ($biblionumber eq "") {
         error_msg($env,"No items found");   
       } else {
-        debug_msg($env,"getting items ");
-	
-        my @items = GetItems($env,$biblionumber);
-         debug_msg($env,"got items ");
+        debug_msg($env,"getting items $biblionumber");	
+        my @items = C4::Search::GetItems($env,$biblionumber);
+        debug_msg($env,"got items ");
 	 
 	my $cnt_it = @items;
 	my $dbh = &C4Connect;

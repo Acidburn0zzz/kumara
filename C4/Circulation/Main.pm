@@ -66,21 +66,9 @@ sub pastitems{
     and (returndate is null) order by date_due";
   my $sth=$dbh->prepare($query1);
   $sth->execute;
-  #my $sth=$dbh->prepare("Select * from issues,items,biblio,biblioitems
-  #  where (borrowernumber=$bornum
-  #  and (returndate is null)
-  #  and ((issues.itemnumber=items.itemnumber) 
-  #  and items.biblionumber=biblio.biblionumber
-  #  and biblioitems.biblioitemnumber=items.biblioitemnumber))     
-  #  order by date_due");
-  #$sth->execute;
   my $i=0;
   my @items;
   my @items2;
-  #$items[0]=" "x29;
-  #$items2[0]=" "x29;
-  $items[0]=" "x72;
-  $items2[0]=" "x72;
   while (my $data1=$sth->fetchrow_hashref) {
     my $data = itemnodata($env,$dbh,$data1->{'itemnumber'}); #C4::Search
     my $line = C4::Circulation::Issues::formatitem($env,$data,$data1->{'date_due'},"");
