@@ -294,9 +294,8 @@ sub find_reserves {
     } elsif ($resrec->{'constrainttype'} eq "a") {
       $resfound = "y";
     } else {
-      my $conquery = "select * from reserveconstraints
-        where borrowernumber = $resrec->{'borrowernumber'} and reservedate =
-$resrec->{'reservedate'} and biblionumber = $resrec->{'biblionumber'} and biblioitemnumber = $itemdata->{'biblioitemnumber'}";
+      my $conquery = "select * from reserveconstraints where borrowernumber
+= $resrec->{'borrowernumber'} and reservedate = '$resrec->{'reservedate'}' and biblionumber = $resrec->{'biblionumber'} and biblioitemnumber = $itemdata->{'biblioitemnumber'}";
       my $consth = $dbh->prepare($conquery);
       $consth->execute;
       if (my $conrec=$consth->fetchrow_hashref) {
