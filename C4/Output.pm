@@ -71,17 +71,17 @@ sub startmenu{
   # edit the paths in here
   my ($type)=@_;
   if ($type eq 'issue') {
-    open (FILE,'$path/issues-top.inc') || die;
+    open (FILE,"$path/issues-top.inc") || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'$path/opac-top.inc') || die;
+    open (FILE,"$path/opac-top.inc") || die;
   } elsif ($type eq 'member') {
-    open (FILE,'$path/members-top.inc') || die;
+    open (FILE,"$path/members-top.inc") || die;
   } elsif ($type eq 'acquisitions'){
-    open (FILE,'$path/aquisitions-top.inc') || die;
+    open (FILE,"$path/aquisitions-top.inc")|| die;
   } elsif ($type eq 'report'){
-    open (FILE,'$path/reports-top.inc') || die;
+    open (FILE,"$path/reports-top.inc") || die;
   } else {
-    open (FILE,'$path/cat-top.inc') || die;
+    open (FILE,"$path/cat-top.inc") || die;
   }
   my @string=<FILE>;
   close FILE;
@@ -94,17 +94,17 @@ sub startmenu{
 sub endmenu{
   my ($type)=@_;
   if ($type eq 'issue'){
-    open (FILE,'$path/issues-bottom.inc') || die;
+    open (FILE,"$path/issues-bottom.inc") || die;
   } elsif ($type eq 'opac') {
-    open (FILE,'$path/opac-bottom.inc') || die;
+    open (FILE,"$path/opac-bottom.inc") || die;
   } elsif ($type eq 'member') {
-    open (FILE,'$path/members-bottom.inc') || die;
+    open (FILE,"$path/members-bottom.inc") || die;
   } elsif ($type eq 'acquisitions') {
-    open (FILE,'$path/aquisitions-bottom.inc') || die;
+    open (FILE,"$path/aquisitions-bottom.inc") || die;
   } elsif ($type eq 'report') {
-    open (FILE,'$path/reports-bottom.inc') || die;
+    open (FILE,"$path/reports-bottom.inc") || die;
   } else {
-    open (FILE,'$path/cat-bottom.inc') || die;
+    open (FILE,"$path/cat-bottom.inc") || die;
   }
   my @string=<FILE>;
   close FILE;
