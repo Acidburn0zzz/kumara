@@ -43,6 +43,7 @@ for (my $i=1;$i<$count3;$i++){
 #hash is set up with input name being the key then
 #the value is a tab separated list, the first item being the input type
 $inputs{'Author'}="text\t$data->{'author'}\t0";
+$data->{'title'}=tidyhtml($data->{'title'});
 $inputs{'Title'}="text\t$data->{'title'}\t1";
 my $dewey = $data->{'dewey'};                                                      
 $dewey =~ s/0+$//;                                                                 
@@ -81,3 +82,9 @@ print mkform3('updatebiblio.pl',%inputs);
 #print mktableft();
 print endmenu();
 print endpage();
+
+sub tidyhtml {
+  my ($inp)=@_;
+  $inp=~ s/\"/\&quot\;/g;
+  return($inp);
+}
