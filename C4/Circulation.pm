@@ -7,6 +7,7 @@ require Exporter;
 use DBI;
 use C4::Database;
 use C4::Accounts;
+use C4::Interface;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -87,6 +88,7 @@ sub Issue  {
   }
   #deal with alternative loans
   #now check items
+  &processitems;
   $dbh->disconnect;
   return (@borrower);
 }    
@@ -98,6 +100,7 @@ sub processitems {
   my $sth=$dbh->prepare("Select * from items where barcode = '$itemnum'");
   $sth->execute;
   my @item=$sth->fetchrow_array;  
+  print $itemnum,"\n",$item[0],"\n";
   $sth->finish;
   #check if item is restricted
   if ($item[23] ==1 ){
@@ -150,7 +153,8 @@ sub checkwaiting{
 
 sub scan {
   #scan barcode
-  my $number=12;
+#  my $number='L01470967';  
+  &userdialog('console','Please enter a book barcode');
   return ($number);
 }
 
