@@ -245,6 +245,7 @@ sub issuewindow {
   my $l3  = Newt::Label("Borrower Info");
   my $l4  = Newt::Label("Total Due");
   my $amt = Newt::Label($amountowing);
+  my $b0  = Newt::Label("$borrower->{'cardnumber'}");
   my $b1  = Newt::Label("$borrower->{title} $borrower->{'firstname'}");
   my $b2  = Newt::Label("$borrower->{'streetaddres'}");
   my $b3  = Newt::Label("$borrower->{'city'}");
@@ -261,23 +262,22 @@ sub issuewindow {
     $li2->Add($items2->[$i]); 
     $i++;
   }  
-  # $li3->Add("$borrower->{title} $borrower->{'firstname'}","$borrower->{'streetaddres'}",
-  # "$borrower->{'city'}");
   $panel->AddHotKey(NEWT_KEY_F11);
   $panel->AddHotKey(NEWT_KEY_F10);
   $panel->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel->Add(0,0,$entry,NEWT_ANCHOR_LEFT,0,0,30);
   $panel->Add(0,1,$l3,NEWT_ANCHOR_LEFT);
   $panel->Add(1,1,$l4,NEWT_ANCHOR_RIGHT);
+#  $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);
+  $panel->Add(0,2,$b0,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,3,$b1,NEWT_ANCHOR_LEFT);
   $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);
-  $panel->Add(0,2,$b1,NEWT_ANCHOR_LEFT);
-  $panel->Add(1,2,$amt,NEWT_ANCHOR_RIGHT);
-  $panel->Add(0,3,$b2,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,4,$b3,NEWT_ANCHOR_LEFT);  
-  $panel->Add(0,5,$l1,NEWT_ANCHOR_LEFT);
-  $panel->Add(0,6,$li1,NEWT_ANCHOR_LEFT);  
-  $panel->Add(1,5,$l2,NEWT_ANCHOR_RIGHT);
-  $panel->Add(1,6,$li2,NEWT_ANCHOR_RIGHT);  
+  $panel->Add(0,4,$b2,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,5,$b3,NEWT_ANCHOR_LEFT);  
+  $panel->Add(0,6,$l1,NEWT_ANCHOR_LEFT);
+  $panel->Add(0,7,$li1,NEWT_ANCHOR_LEFT);  
+  $panel->Add(1,6,$l2,NEWT_ANCHOR_RIGHT);
+  $panel->Add(1,7,$li2,NEWT_ANCHOR_RIGHT);  
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
