@@ -3,15 +3,10 @@
 use strict;
 #use DBI;
 use C4::Database;
+use C4::Circulation;
 
-my $dbh=&C4Connect();
-my $sth=$dbh->prepare("Select * from test");
-$sth->execute;
-my @data=$sth->fetchrow_array;
+my $num=$ARGV[0];
+
+my @data=Issue($num,3);
 print @data;
-$sth->finish;
-
-my @names=$dbh->tables;
-$dbh->disconnect;
-
-print @names;
+print "\n$data[21]\n";
