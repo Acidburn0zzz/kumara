@@ -70,9 +70,9 @@ sub Start_circ{
     } elsif ($data eq 'Returns') {
       $donext=Returns($env); #C4::Circulation::Returns
     } elsif ($data eq 'Log In') {
-    debug_msg("","New user"); #C4::Security
+      debug_msg("","New user"); 
       &endint($env);
-      &Login($env);
+      &Login($env); #C4::Security
       &startint($env,'Circulation');
     } elsif ($data eq 'Quit') { 
       $donext = $data;
@@ -202,9 +202,10 @@ sub scanbook {
 sub scanborrower {
   my ($env,$interface)=@_;
   #scan barcode
-  my ($number,$reason,$book)=&borrower_dialog($env);
+  my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
   $number= $number;
   $book=uc $book;
+  debug_msg("",$reason);
   return ($number,$reason,$book);
 }
 
