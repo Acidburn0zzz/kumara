@@ -67,10 +67,11 @@ sub Returns {
   my $itemno;
   my $itemrec;
   my $bornum;
-  until (($reason eq "Circ") || ($reason eq "Quit") {
-    ($reason,$item) = returnwindow($env,"Enter Returns",\@items);
-    if (($reason ne "Circ") || ($reason eq "Quit")) {
-      ($reason,$bornum,$borrower,$itemno,$itemrec) = checkissue($env,$dbh,$item);
+  my $amt_owing;
+  until (($reason eq "Circ") || ($reason eq "Quit")) {
+    ($reason,$item) =  returnwindow($env,"Enter Returns",$item,\@items,$borrower,$amt_owing);
+    if (($reason ne "Circ") && ($reason ne "Quit")) {
+      ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing) = checkissue($env,$dbh,$item);
       if (($reason ne "") && ($reason ne "Circ")  && ($reason ne "Quit")) {
         debug_msg($env,$reason);
       }
@@ -87,18 +88,25 @@ sub checkissue {
   my $borrower;
   my $itemno;
   my $itemrec;
+  my $amt_owing; 
   my $query = "select * from items where barcode = '$item'";
   my $sth=$dbh->prepare($query); 
   $sth->execute;
   if ($itemrec=$sth->fetchrow_hashref) {
      $sth->finish;
      $query = "select * from issues where
-        (itemnumber='$itemrec->{'itemnumber'}') and (returndate is null)";
+       (itemnumber='$itemrec->{'itemnumber'}') and (returndate is null)";
      my $sth=$dbh->prepare($query);
      $sth->execute;
      if (my $issuerec=$sth->fetchrow_hashref) {
      $sth->finish;
-       $reason = "Issued to $issuerec->{'borrowernumber'}";
+     $query = "select * from borrowers where
+       (borrowernumber = = '$issuerec->{'borrowernumber'}')";
+     my $sth->prepare($query);
+     $sth->execute;
+     $borrower = $sth->fetchrow_hashref;
+     $amt_owing = returnrecord($env,$dbh,$bornum,$itemno);   
+     $reason = "Returned";
      } else {
        $sth->finish;
        $reason = "Item not issued";
@@ -107,7 +115,7 @@ sub checkissue {
      $sth->finish;
      $reason = "Item not found";
   }   
-  return ($reason,$bornum,$borrower,$itemno,$itemrec);
+  return ($reason,$bornum,$borrower,$itemno,$itemrec,$amt_owing);
   # end checkissue
   }
   
@@ -125,7 +133,6 @@ sub returnrecord {
   $sth->finish;
     debug_msg($env,"after return before stats");
   UpdateStats($env,'branch','return','0');
-  #pause();
     debug_msg($env,"after stats");
   return($amt_owing);
 }

@@ -191,7 +191,7 @@ sub selborrower {
 }
 
 sub returnwindow {
-  my ($env,$title,$item,$items,$odueitems,$borrower,$amountowing)=@_;
+  my ($env,$title,$item,$items,$borrower,$amountowing)=@_;
   my $panel    = Newt::Panel(5,10,$title);
   my $entry    = Newt::Entry(10,NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
   my $accchk   = Newt::Checkbox("Accumulate", " ", " NY");
