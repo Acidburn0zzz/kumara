@@ -161,7 +161,7 @@ for (my $i=0;$i<$count;$i++){
   #check item is not reserved
   my ($rescount,$reserves)=FindReserves($issue->[$i]{'biblionumber'},'');
   if ($rescount >0){
-    print "<TD>Reserved";
+    print "<TD>On Request";
   } else {
     print "<TD>";
   }
