@@ -70,7 +70,6 @@ sub renewstatus {
     and returndate is null";
   my $sth1 = $dbh->prepare($q1);
   $sth1->execute;
-  debug_msg($env, "test 1");
   if (my $data1 = $sth1->fetchrow_hashref) {
     my $q2 = "select renewalsallowed from items,biblioitems,itemtypes
        where (items.itemnumber = '$itemno')
@@ -78,7 +77,6 @@ sub renewstatus {
        and (biblioitems.itemtype = itemtypes.itemtype)";
      my $sth2 = $dbh->prepare($q2);
      $sth2->execute;
-     debug_msg($env, "test 2");
        
      if (my $data2=$sth2->fetchrow_hashref) {
        $renews = $data2->{'renewalsallowed'};
@@ -87,10 +85,8 @@ sub renewstatus {
        $renewokay = 1;
      }
   }   
-  debug_msg($env, "test 3");
     
   my $amt_owing = calc_odues($env,$dbh,$bornum,$itemno);
-  debug_msg($env, "test 4");
   return($renewokay);    
 }
 

@@ -154,7 +154,7 @@ sub issueitem{
        #if charge deal with it
      }   
      if ($canissue == 1) {
-       $charge = calc_charges($env,$dbh,$itemnum,$bornum);
+       $charge = calc_charges($env,$dbh,$item->{'itemnumber'},$bornum);
               debug_msg($env,"after charge");
      }
      if ($canissue == 1) {
@@ -199,25 +199,23 @@ sub calc_charges {
   my ($env, $dbh, $itemno, $bornum)=@_;
   my $charge=0;
   my $item_type;
-         debug_msg($env,"before charge");
-  my $q1 = "select itemtypes.itemtype,rentalcharge from items,biblioitems,itemtypes 
+  my $q1 = "select itemtypes.itemtype,rentalcharge from items,biblioitems,itemtypes
     where (items.itemnumber ='$itemno')
     and (biblioitems.biblioitemnumber = items.biblioitemnumber)
     and (biblioitems.itemtype = itemtypes.itemtype)";
   my $sth1= $dbh->prepare($q1);
   $sth1->execute;
-         debug_msg($env,"after first charge query");
   if (my $data1=$sth1->fetchrow_hashref) {
      $item_type = $data1->{'itemtype'};
      $charge = $data1->{'rentalcharge'};
-      my $q2 = "select discount from borrowers,categoryitem 
+      my $q2 = "select rentaldiscount from borrowers,categoryitem 
         where (borrowers.borrowernumber = '$bornum') 
         and (borrower.categorycode = categories.categorycode)
         and (categoryitem.itemtype = '$item_type')";
      my $sth2=$dbh->prepare($q2);
      $sth2->execute;
      if (my $data2=$sth2->fetchrow_hashref) {
-        my $discount = $data2->{'discount'};
+        my $discount = $data2->{'rentaldiscount'};
 	$charge = ($charge * $discount) / 100;
      }
      $sth2->{'finish'};
