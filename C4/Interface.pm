@@ -79,6 +79,7 @@ sub menu {
  my ($reason,$data)=menu2($title,@items);
  
   return($reason,$data);
+  # end of menu
   } 
 }
 
@@ -106,6 +107,7 @@ sub menu2 {
     $stuff = $data->Tag();  
   }
   return($reason,$stuff);
+  # end of menu2
 }
   
 sub clearscreen{
@@ -153,6 +155,7 @@ sub list {
   my @stuff=$li->Get();
   $data=$stuff[0];
   return($reason,$data);
+  # end of list
 }
 
 
@@ -184,6 +187,7 @@ sub selborrower {
      }
   }   
   return($data,$bdata);
+  # end of selborrower
 }
 
 sub returnwindow {
@@ -206,7 +210,7 @@ sub returnwindow {
   my ($reason,$data)=$panel->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {
     if ($data eq NEWT_KEY_F11) {
-      $reason="Finished user";
+      $reason="Circ";
     }
     if ($data eq NEWT_KEY_F10) {
       $reason="Finished issues";
@@ -326,7 +330,7 @@ sub borrower_dialog {
   my ($reason,$data)=$panel1->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
-      $reason="Finished user";         
+      $reason="Circ";         
     }
     if ($data eq NEWT_KEY_F10) {  
       $reason="Finished issues";         

@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&returnrecord &calc_odues);
+@EXPORT = qw(&returnrecord &calc_odues &Returns);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -54,7 +54,10 @@ my $priv_func = sub {
 						    
 # make all your functions, whether exported or not;
 
-    
+sub Returns {
+  my ($env)=@_;
+  returnwindow($env);
+  }
 sub returnrecord {
   # mark items as returned
   my ($env,$dbh,$bornum,$itemno)=@_;

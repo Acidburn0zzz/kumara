@@ -62,9 +62,12 @@ sub Start_circ{
   my $donext;
   if ($data eq 'Issues'){  
     $donext=Issue($env);
+  } elsif ($data eq 'Returns') {
+    $donext=Returns($env);
   } else {
     &endint($env);
   }
+  debug_msg($env,"donext -  $donext");
   if ($donext eq 'Circ'){
     Start_circ($env);
   } else {
