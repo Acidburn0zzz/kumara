@@ -127,7 +127,7 @@ sub findoneborrower {
   my $borrower;
   my $ucborcode = uc $borcode;
   my $lcborcode = lc $borcode;
-  my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$ucborcode'");
+  my $sth=$dbh->prepare("Select * from borrowers where cardnumber=\"$ucborcode\"");
   $sth->execute;
   if ($borrower=$sth->fetchrow_hashref) {
     $bornum=$borrower->{'borrowernumber'};
@@ -138,7 +138,7 @@ sub findoneborrower {
     # where surname ~* '$borcode' order by surname";
 	      
     my $borquery = "Select * from borrowers 
-      where lower(surname) = '$lcborcode' order by surname,firstname";
+      where lower(surname) = \"$lcborcode\" order by surname,firstname";
     my $sthb =$dbh->prepare($borquery);
     $sthb->execute;
     my $cntbor = 0;
