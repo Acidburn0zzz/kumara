@@ -745,20 +745,23 @@ sub delbibitem{
   my $query="select * from biblioitems where biblioitemnumber=$itemnum";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  my @data=$sth->fetchrow_array;
-  $sth->finish;
-  $query="Insert into deletedbibitems values (";
-  foreach my $temp (@data){
-    $query=$query."'$temp',";
+  if (my @data=$sth->fetchrow_array){
+    $sth->finish;
+    $query="Insert into deletedbiblioitems values (";
+    foreach my $temp (@data){
+      $temp=~ s/\'/\\\'/g;
+      $query=$query."'$temp',";
+    }
+    $query=~ s/\,$/\)/;
+#   print $query;
+    $sth=$dbh->prepare($query);
+    $sth->execute;
+    $sth->finish;
+    $query = "Delete from biblioitems where biblioitemnumber=$itemnum";
+    $sth=$dbh->prepare($query);
+    $sth->execute;
+    $sth->finish;
   }
-  $query=~ s/\,$/\)/;
-#  print $query;
-  $sth=$dbh->prepare($query);
-  $sth->execute;
-  $sth->finish;
-  $query = "Delete from biblioitems where biblioitemnumber=$itemnum";
-  $sth=$dbh->prepare($query);
-  $sth->execute;
   $sth->finish;
   $dbh->disconnect;
 }
