@@ -788,9 +788,11 @@ sub getboracctrecord {
    my $dbh=C4Connect;
    my @acctlines;
    my $numlines;
-   my $query = "Select * from accountlines
-   where borrowernumber = $params->{'borrowernumber'}
-order by date desc";
+   my $query = "Select * from accountlines,items,biblio
+   where (borrowernumber = $params->{'borrowernumber'}) and
+   ((accountlines.itemnumber=items.itemnumber and
+   items.biblionumber=biblio.biblionumber))
+   order by date desc";
    my $sth=$dbh->prepare($query);
 #   print $query;
    $sth->execute;
