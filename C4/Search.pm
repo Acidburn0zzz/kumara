@@ -339,7 +339,8 @@ sub ItemInfo {
     $class = $class.$dewey;
     $class = $class.$data->{'subclass'};
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
-    $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class"; 
+     $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class\t$data->{'itemnumber'}";
+
     $i++;
   }
   $sth->finish;

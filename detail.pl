@@ -41,14 +41,17 @@ print mktablerow(5,$main,'Title','Barcode','DateDue','Location','Dewey');
 my $colour=1;
 while ($i < $count){
   my @results=split('\t',$items[$i]);
+  if ($type ne 'opac'){
+    $results[0]=mklink("/cgi-bin/koha/moredetail.pl?item=$results[5]",$results[0]);
+  }
   if ($results[2] eq ''){
     $results[2]='Available';
   }
   if ($colour == 1){                                                                          
-    print mktablerow(5,$secondary,@results);                                        
+    print mktablerow(5,$secondary,$results[0],$results[1],$results[2],$results[3],$results[4]);                                        
     $colour=0;                                                                                
   } else{                                                                                     
-    print mktablerow(5,'white',@results);                                          
+    print mktablerow(5,'white',$results[0],$results[1],$results[2],$results[3],$results[4]);                                          
     $colour=1;                                                                                
   }
    $i++;

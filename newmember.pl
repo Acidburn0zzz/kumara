@@ -25,6 +25,12 @@ print startmenu('member');
 my $main="#99cc33";
 my $image="/images/background-mem.gif";
 if ($insert eq ''){
+  #check that all compulsary fields are entered
+  my $string="The following compulsary fields have been left blank. Please push the back button
+  and try again<p>";
+  if ($data{'cardnumber'} eq ''){
+    $string.=" Cardnumber<br>";
+  }
   #we are printing confirmation page
   print mkheadr(1,'Confirm New Adult Member');
   print mktablehdr;
