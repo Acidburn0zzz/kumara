@@ -10,7 +10,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&getorders &bookseller &breakdown);
+@EXPORT = qw(&getorders &bookseller &breakdown &basket);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -48,10 +48,10 @@ my $priv_func = sub {
 # make all your functions, whether exported or not;
 
 sub getorders {
-  my ($num,$limit)=@_;
+  my ($supplierid)=@_;
   my $dbh=C4Connect;
-  my $query = "Select * from aqorders where entrydate is not NULL";
-  $query.=" order by entrydate limit $num,$limit";
+  my $query = "Select count(*),authorisedby,entrydate,basketno from aqorders where booksellerid='$supplierid'";
+  $query.=" group by basketno order by entrydate";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my @results;
@@ -66,15 +66,21 @@ sub getorders {
 }
 
 sub bookseller {
-  my ($id)=@_;
+  my ($searchstring)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from aqbooksellers where id='$id'";
+  my $query="Select * from aqbooksellers where name like '$searchstring%' or
+  id like '$searchstring%'";
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  my $data=$sth->fetchrow_hashref;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
   $sth->finish;
   $dbh->disconnect;
-  return($data);
+  return($i,@results);
 }
 
 sub breakdown {
@@ -92,6 +98,23 @@ sub breakdown {
   $sth->finish;
   $dbh->disconnect;
   return($i,\@results);
+}
+
+sub basket {
+  my ($basketno)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from aqorders where basketno='$basketno'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
 }
 
 END { }       # module clean-up code here (global destructor)
