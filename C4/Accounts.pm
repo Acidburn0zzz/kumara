@@ -56,8 +56,8 @@ sub checkaccount  {
   #take borrower number
   #check accounts and list amounts owing
   my ($bornumber,$dbh)=@_;
-  my $sth=$dbh->prepare("Select sum(amount) from accountlines where
-  borrowernumber=$bornumber");
+  my $sth=$dbh->prepare("Select sum(amountoutstanding) from accountlines where
+  borrowernumber=$bornumber and amountoutstanding<>0");
   $sth->execute;
   my $total=0;
   while (my $data=$sth->fetchrow_hashref){
@@ -80,7 +80,7 @@ sub reconcileaccount {
   my ($dbh,$bornumber,$total)=@_;
   #get borrower information
   my $sth=$dbh->prepare("Select * from accountlines where 
-  borrowernumber=$bornumber");   
+  borrowernumber=$bornumber and amountoutstanding<>0 order by date");   
   $sth->execute;     
   #display account information
   &clearscreen();
@@ -90,11 +90,11 @@ sub reconcileaccount {
   my $i=0;
   my $text;
   output (1,2,"Account Info");
-  output (1,3,"Item\tDate\tDescription\tAmount");
+  output (1,3,"Item\tDate      \tAmount\tDescription");
   while (my $data=$sth->fetchrow_hashref){
     my $line=$i+1;
-    my $amount=0+$data->{'amount'};
-    $text="$line\t$data->{'date'}\t$data->{'description'}\t$amount";
+    my $amount=0+$data->{'amountoutstanding'};
+    $text="$line\t$data->{'date'}\t$amount\t$data->{'description'}";
     output (1,$row,$text);
     $row++;
     $i++;
@@ -103,11 +103,12 @@ sub reconcileaccount {
   output (1,$row,$text);
   #get amount paid and update database
   my ($data,$reason)=&dialog("Amount to pay");
-  &recordpayment($bornumber,$dbh,$data);
-  #Check if the boorower still owes
+  if ($data>0) {
+    &recordpayment($bornumber,$dbh,$data);
+  #Check if the borrower still owes
 #  pause();
-  $total=&checkaccount($bornumber,$dbh);
-  
+    $total=&checkaccount($bornumber,$dbh);
+  }
   return($total);
 
 }
@@ -125,27 +126,31 @@ sub recordpayment{
   my $nextaccntno = getnextacctno($bornumber,$dbh);
   # get lines with outstanding amounts to offset
   my $query = "select * from accountlines 
-  where (borrowernumber = '$bornumber') and (amountoutstanding <> '0')
+  where (borrowernumber = '$bornumber') and (amountoutstanding<>0)
   order by date";
   my $sth = $dbh->prepare($query);
   $sth->execute;
   # offset transactions
   while (($accdata=$sth->fetchrow_hashref) and ($amountleft>0)){
-     if ($accdata->{'amountoutstanding'} > $amountleft) {
+     print "\n$amountleft\t$accdata->{'amountoutstanding'}\t";
+     if ($accdata->{'amountoutstanding'} < $amountleft) {
         $newamtos = 0;
-	$amountleft -= $accdata->{'amountoutstanding'};
+	$amountleft = $amountleft - $accdata->{'amountoutstanding'};
      }  else {
         $newamtos = $accdata->{'amountoutstanding'} - $amountleft;
 	$amountleft = 0;
      }
-     $updquery = "update accountlines where (borrowernumber = '$bornumber')
-     and (accountno = '$accdata->{'accountno'}')	
-     set amountoutstanding = $newamtos";
-     my $usth = $dbh->prepare($query);
+     my $thisacct = $accdata->{accountno};
+     print "$thisacct\t$newamtos\t$amountleft";
+     $updquery = "update accountlines set amountoutstanding= '$newamtos'
+     where (borrowernumber = '$bornumber') and (accountno='$thisacct')";
+     print "\n$updquery";
+     my $ow = getc;
+     my $usth = $dbh->prepare($updquery);
      $usth->execute;
      $usth->finish;
      $updquery = "insert into accountoffsets 
-    (borrowernumber, accountno, offsetaccount,  offsetamount)
+     (borrowernumber, accountno, offsetaccount,  offsetamount)
      values ($bornumber,$accdata->{'accountno'},$nextaccntno,$newamtos)";
      my $usth = $dbh->prepare($updquery);
 #     print $updquery
@@ -155,7 +160,7 @@ sub recordpayment{
   # create new line
   $updquery = "insert into accountlines 
   (borrowernumber, accountno,date,amount,description,accounttype,amountoutstanding)  
-  values ($bornumber,$accdata->{'accountno'},datetime('now'::abstime),0-$data,'Payment,thanks',
+  values ($bornumber,$nextaccntno,datetime('now'::abstime),0-$data,'Payment,thanks',
   'Pay',0-$amountleft)";
   my $usth = $dbh->prepare($updquery);
   $usth->execute;
@@ -172,7 +177,7 @@ sub getnextacctno {
   my $nextaccntno = 1;
   my $query = "select * from accountlines
   where (borrowernumber = '$bornumber')
-  order by description,accountno";
+  order by accountno desc";
   my $sth = $dbh->prepare($query);
   $sth->execute;
   if (my $accdata=$sth->fetchrow_hashref){
