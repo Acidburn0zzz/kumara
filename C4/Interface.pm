@@ -246,7 +246,7 @@ sub issuewindow {
   my $l4  = Newt::Label("Total Due");
   my $amt = Newt::Label($amountowing);
   my $b0  = Newt::Label("$borrower->{'cardnumber'}");
-  my $b1  = Newt::Label("$borrower->{title} $borrower->{'firstname'}");
+  my $b1  = Newt::Label("$borrower->{'surname'}, $borrower->{'title'} $borrower->{'firstname'} ");
   my $b2  = Newt::Label("$borrower->{'streetaddres'}");
   my $b3  = Newt::Label("$borrower->{'city'}");
   my $li1 = Newt::Listbox(10,NEWT_FLAG_SCROLL | NEWT_FLAG_BORDER );
