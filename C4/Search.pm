@@ -804,8 +804,9 @@ sub getboracctrecord {
    }
    $sth->finish;
    $query="Select * from accountlines where
-   borrowernumber=$params->{'borrowernumber'} and itemtype = 'Pay' is NULL order by
+   borrowernumber=$params->{'borrowernumber'} and itemnumber is NULL order by
    date desc";
+   $sth=$dbh->prepare($query);
    $sth->execute;
    while (my $data=$sth->fetchrow_hashref){
       $acctlines[$numlines] = $data;
