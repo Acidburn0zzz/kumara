@@ -59,7 +59,7 @@ sub UpdateStats {
   my $user = $env->{'usercode'};
   my $sth=$dbh->prepare("Insert into statistics
      (datetime,branch,type,usercode,value,other) 
-     values (datetime('now'::abstime),'$branch',
+     values (now(),'$branch',
      '$type','$user','$amount','$other')");
   $sth->execute;
   $sth->finish;
