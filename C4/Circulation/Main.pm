@@ -103,7 +103,7 @@ sub previousissue {
      and issues.returndate is NULL");
   $sth->execute;
   my $borrower=$sth->fetchrow_hashref;
-  my $cannissue = 0;
+  my $canissue = "Y";
   $sth->finish;
   if ($borrower->{'borrowernumber'} ne ''){
     if ($bornum eq $borrower->{'borrowernumber'}){
@@ -112,16 +112,19 @@ sub previousissue {
       my $resp = &msg_yn("Book is issued to this borrower", "Renew?");
       if ($resp == "y") {
         &renewbook($env,$dbh,$bornum,$itemnum);
+	my $canissue = "R";
       }	 
     } else {
       my $text="Issued to $borrower->{'firstname'} $borrower->{'surname'} ($borrower->{'cardnumber'})";    
       my $resp = &msg_yn($text,"Mark as returned?");
       if ($resp == "y") {
         &returnrecord($env,$dbh,$borrower->{'borrowernumber'},$itemnum);
-      }	
+      }	else {
+        my $canissue = "N";
+      }
     }
   } 
-  return($borrower->{'borrowernumber'});
+  return($borrower->{'borrowernumber'},$canissue);
 }
 
 
