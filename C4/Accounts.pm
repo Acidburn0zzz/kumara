@@ -167,8 +167,8 @@ sub getnextacctno {
   order by desc accountno";
   my $sth = $dbh->prepare($query);
   $sth->execute;
-  if (my$accdata=$sth->fetchro_hashref){
-    $nextaccntno = #accdata->{'accountno'} + 1;
+  if (my $accdata=$sth->fetchrow_hashref){
+    $nextaccntno = $accdata->{'accountno'} + 1;
   }
   $sth->finish;
   return($nextaccntno);
