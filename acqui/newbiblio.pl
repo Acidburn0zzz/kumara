@@ -131,7 +131,7 @@ Shopping Basket For: $booksellers[0]->{'name'}
 </td>
 </tr>
 <TR VALIGN=TOP>
-<TD>Copyright</td>
+<TD>Copyright Date</td>
 <td><input type=text size=20 name=copyright value="$data->{'copyrightdate'}">
 </td>
 </tr>
