@@ -35,7 +35,7 @@ for (my $i=0;$i<$count;$i++){
 	  }
 	  if ($amount > 0){
             UpdateFine($data->[$i]->{'itemnumber'},$bornum,$amount);
-   	    print "$i $borrower->{'description'} $difference $amount $data->[$i]->{'date_due'} $date $date2 \n";
+              print "$borrower->{'firstname'} $borrower->{'surname'} $data->[$i]->{'date_due'}\n";
 	  } else {
 #	    print "0 fine\n";
 	  }
