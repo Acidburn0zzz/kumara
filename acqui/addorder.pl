@@ -48,6 +48,9 @@ if ($existing eq 'no'){
 } else {
   $bibnum=$input->param('biblio');
   $bibitemnum=$input->param('bibitemnum');
+  if ($bibitemnum eq ''){
+    $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
+  }
   modbiblio($bibnum,$title,$author,$copyright);
 
 }
