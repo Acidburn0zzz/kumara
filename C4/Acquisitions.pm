@@ -109,7 +109,7 @@ sub invoice {
 }
 
 sub ordersearch {
-  my ($search)=@_;
+  my ($search,$biblio)=@_;
   my $dbh=C4Connect;
   my $query="Select * from aqorders,biblioitems
   where aqorders.biblioitemnumber=
@@ -122,7 +122,7 @@ sub ordersearch {
   }
   $query=~ s/ and $//;
   $query.=" ) or biblioitems.isbn='$search' 
-  or aqorders.ordernumber='$search') 
+  or (aqorders.ordernumber='$search' and aqorders.biblionumber='$biblio')) 
   group by aqorders.ordernumber";
   my $sth=$dbh->prepare($query);
 #  print $query;

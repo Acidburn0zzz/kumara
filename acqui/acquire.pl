@@ -20,8 +20,9 @@ print startmenu('acquisitions');
 my $search=$input->param('recieve');
 my $invoice=$input->param('invoice');
 my $freight=$input->param('freight');
+my $biblio=$input->param('biblio');
 my $gst=$input->param('gst');
-my ($count,@results)=ordersearch($search);
+my ($count,@results)=ordersearch($search,$biblio);
 my ($count2,@booksellers)=bookseller($results[0]->{'booksellerid'}); 
 #print $count;
 
@@ -209,7 +210,7 @@ EOP
 ;
 for (my $i=0;$i<$count;$i++){
   print "<tr><td>$results[$i]->{'isbn'}</td>
-  <td><a href=acquire.pl?recieve=$results[$i]->{'ordernumber'}&invoice=$invoice&freight=$freight&gst=$gst>$results[$i]->{'title'}</a></td>
+  <td><a href=acquire.pl?recieve=$results[$i]->{'ordernumber'}&biblio=$results[$i]->{'biblionumber'}&invoice=$invoice&freight=$freight&gst=$gst>$results[$i]->{'title'}</a></td>
   <td>$results[$i]->{'author'}</td></tr>";
 }
 print "</table></center>";
