@@ -46,7 +46,7 @@ if ($volinf ne ''){
 }
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
 modbiblio($biblio,$title,$author,$copyright,$series);
-modbibitem($bibitemno,$itemtype,$isbn,$volinf,$class);
+modbibitem($bibitemno,$itemtype,$isbn,'','',$class,'','','','',$volinf,'','');
 my $barcode=$input->param('barcode');
 my @barcodes;
 if ($barcode =~ /\,/){

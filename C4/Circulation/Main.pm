@@ -191,6 +191,7 @@ sub checkreserve{
   my $resbor = "";
   my $query = "select * from reserves,items 
     where (items.itemnumber = '$itemnum')
+    and (reserves.cancellationdate is NULL)
     and (items.biblionumber = reserves.biblionumber)
     and ((reserves.found = 'W' 
       and items.itemnumber = reserves.itemnumber)
