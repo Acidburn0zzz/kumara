@@ -68,5 +68,29 @@ sub CatSearch  {
   $dbh->disconnect;
   
 }    
-			
+
+
+sub BornameSearch  {
+  my ($searchstring,$type)=@_;
+  my $dbh = &C4Connect;
+  my $query="Select * from borrowers where surname like
+  '%$searchstring%' or firstname like '%$searchstring%' or othernames like 
+  '%$searchstring'";
+  print $query,"\n";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my @data=$sth->fetchrow_array){
+    print "$data[0]\n";
+  }
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+  }
+			    
 END { }       # module clean-up code here (global destructor)
+
+
+
+
+
+
