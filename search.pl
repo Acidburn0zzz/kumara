@@ -52,6 +52,8 @@ $search{'date-before'};
 my $class=$input->param('class');
 $search{'class'}=$class;
 $search{'ttype'}=$ttype;
+my $dewey=$input->param('dewey');
+$search{'dewey'}=$dewey;
 my @results;
 my $offset=$input->param('offset');
 if ($offset eq ''){
@@ -92,7 +94,7 @@ if ($itemnumber ne '' || $isbn ne ''){
 }
 print "You searched on ";
 while ( my ($key, $value) = each %search) {                                 
-  if ($value ne ''){
+  if ($value ne '' && $key ne 'ttype'){
     $value=~ s/\\//g;
     print bold("$key $value,");
   }                          
