@@ -488,7 +488,7 @@ sub bibitemdata {
 sub itemnodata {
   my ($env,$dbh,$itemnumber) = @_;
   my $query="Select * from biblio,items,biblioitems
-    where items.itemnumber = $itemnumber
+    where items.itemnumber = '$itemnumber'
     and biblio.biblionumber = items.biblionumber
     and biblioitems.biblioitemnumber = items.biblioitemnumber";
   my $sth=$dbh->prepare($query);
