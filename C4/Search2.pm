@@ -511,9 +511,10 @@ if ($type ne 'precise' && $type ne 'subject'){
       $query=$query." order by subject";
   }
 }
+#print $query;
 my $sth=$dbh->prepare($query);
 $sth->execute;
-my $count=0;
+my $count=1;
 my $i=0;
 my $limit= $num+$offset;
 while (my $data=$sth->fetchrow_hashref){
@@ -530,7 +531,9 @@ while (my $data=$sth->fetchrow_hashref){
   $count++;
 }
 $sth->finish;
-$count--;
+#if ($type ne 'precise'){
+  $count--;
+#}
 #$count--;
 return($count,@results);
 }
