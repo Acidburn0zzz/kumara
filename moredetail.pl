@@ -32,9 +32,10 @@ my $title=$input->param('title');
 my $bi=$input->param('bi');
 my $data=bibitemdata($bi);
 
-my @items=ItemInfo(\$blah,$bib,$title);
+my (@items)=itemissues($bi);
 #print @items;
 my $count=@items;
+
 my $i=0;
 print center();
 
@@ -47,7 +48,7 @@ print <<printend
 <!-------------------BIBLIO ITEM------------>
 <TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left>
 <TR VALIGN=TOP>
-<td  bgcolor="99cc33" background="/images/background-mem.gif" ><B>$data->{'biblioitemnumber'} GROUP - Largeprint </b> </TD>
+<td  bgcolor="99cc33" background="/images/background-mem.gif" ><B>$data->{'biblioitemnumber'} GROUP - $data->{'description'} </b> </TD>
 </TR>
 <tr VALIGN=TOP  >
 <TD width=210 >
@@ -55,133 +56,54 @@ print <<printend
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
 <br>
 <FONT SIZE=2  face="arial, helvetica">
-Group Number: <br>
-Volume: <br>
-Number: <br>
-Classification: <br>
-	Itemtype: <br>
-	ISBN: <br>
-	ISSN: <br>
-	Dewey: <br>
-	Subclass: <br>
-	Copyright: <br>
-	Number of Items: 2 <br>
-	
-	        </font>
-		        
-			
-			        </TD>
-				
-				</tr>
-				</table>
-				
-				
-				<img src="/images/holder.gif" width=16 height=250 align=left>
-				
-				
-				<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=220 >
-				
-				<TR VALIGN=TOP>
-				
-				<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BARCODE LO123456</b></TD>
-				
-				
-				</TR>
-				
-				
-				        <tr VALIGN=TOP  >
-					<TD width=220 >
-					
-					<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
-					
-					<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
-					
-					<br>
-					
-					<FONT SIZE=2  face="arial, helvetica">
-					Item Number: <br>
-					Due Date: <br>
-					Member: <br>
-					Reserves: <br>
-					Home Branch: <br>
-					
-					[rest of item info]<br>
-					&nbsp; |<br>
-					&nbsp; |<br>
-					&nbsp; |<br>
-					&nbsp; |<br>
-					&nbsp; |<br>
-					&nbsp; |<br>
-					&nbsp;\/
-					        </font>
-						        
-							
-							        </TD>
-								
-								
-								
-								</tr>
-								        
-									</table>
-									
-									<img src="/images/holder.gif" width=16 height=250 align=left>
-									
-									
-									<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=220 >
-									
-									<TR VALIGN=TOP>
-									
-									<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BARCODE LO123457</b></TD>
-									
-									
-									</TR>
-									
-									
-									        <tr VALIGN=TOP  >
-										<TD width=220 >
-										
-										<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
-										
-										<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
-										
-										<br>
-										
-										<FONT SIZE=2  face="arial, helvetica">
-										Item Number: <br>
-										Due Date: <br>
-										Member: <br>
-										Reserves: <br>
-										Home Branch: <br>
-										
-										[rest of item info]<br>
-										&nbsp; |<br>
-										&nbsp; |<br>
-										&nbsp; |<br>
-										&nbsp; |<br>
-										&nbsp; |<br>
-										&nbsp; |<br>
-										&nbsp;\/
-										        </font>
-											        
-												
-												        </TD>
-													
-													
-													
-													</tr>
-													        
-														</table>
-														
-														
-														<p>
-														
-														
-														
-														
-														</form>
-														
-														
-														
+Biblionumber:$bib<br>
+Item Type:$data->{'itemtype'}<br>
+Loan Length: $data->{'loanlength'}<br>
+Rental Charge: $data->{'rentalscharge'}<br>
+Classification:$data->{'classification'}$data->{'dewey'}$data->{'subclass'}<br>
+ISBN: $data->{'isbn'}<br>
+Publisher: <br>
+Place:<br>
+Date:$data->{'publicationdate'}<br>
+Pages:$data->{'pages'}<br>
+Illus:$data->{'illus'}<br>
+No. of Items:$count
+</font>
+</TD>
+</tr>
+</table>
+printend
+;
+
+for (my $i=0;$i<$count;$i++){
+print <<printend
+<img src="/images/holder.gif" width=16 height=250 align=left>
+<TABLE  CELLSPACING=0  CELLPADDING=5 border=1 align=left width=220 >				
+<TR VALIGN=TOP>
+<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>BARCODE $items[$i]->{'barcode'}</b></TD>
+</TR>
+<tr VALIGN=TOP  >
+<TD width=220 >
+<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
+<INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
+<br>
+<FONT SIZE=2  face="arial, helvetica">
+Due Date: $items[$i]->{'date_due'}<br>
+Member: $items[$i]->{'card'}<br>
+Last seen: $items[$i]->{'datalastseen'}<br>
+No. issues: $items[$i]->{'issues'}<br>
+No. Reserves: $items[$i]->{'reserves'}<br>
+Notes: $items[$i]->{'itemnotes'}
+</font>
+</TD>
+</tr>
+</table>
+printend
+;
+}
+print <<printend
+<p>
+</form>
 printend
 ;
 
