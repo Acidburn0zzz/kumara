@@ -165,7 +165,7 @@ sub checkissue {
        my $resborrower = $btsh->fetchrow_hashref;
        #printreserve($env,$resrec,$resborrower,$itemrec);
        my $mess = "Reserved for collection at branch $resrec->{'branchcode'}"; 
-       error_msg($env,$mess);
+       C4::InterfaceCDK::error_msg($env,$mess);
        $btsh->finish;
      }  
    } else {
@@ -238,7 +238,7 @@ sub returnrecord {
     my $usth = $dbh->prepare($uquery);
     $usth->execute();
     $usth->finish;
-    my $nextaccntno = getnextacctno($env,$bornum,$dbh);
+    my $nextaccntno = C4::Accounts::getnextacctno($env,$bornum,$dbh);
     $uquery = "insert into accountlines
       (borrowernumber,accountno,date,amount,description,accounttype,amountoutstanding)
       values ($bornum,$nextaccntno,now(),0-$amount,'Book Returned',

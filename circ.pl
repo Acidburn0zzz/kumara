@@ -5,7 +5,7 @@
 $done = "Issues";                                                                
 my $i=0;
 while ($done eq "Issues") {                                                      
-  my @args=('./borrwraper.pl',@ARGV);
+  my @args=('./testissue.pl',@ARGV);
   eval{system(@args)};
   $exit_value  = $? >> 8;
   if ($exit_value){
