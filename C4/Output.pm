@@ -12,7 +12,7 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
-&startmenu &endmenu);
+&startmenu &endmenu &mkheadr &center &endcenter);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -69,14 +69,14 @@ sub endmenu{
 }
 
 sub mktablehdr {
-  my $string="<table cellpadding=0 cellspacing=2 border=0>\n";
+  my $string="<table border=0>\n";
   return($string);
 }
 
 sub mktablerow {
-  my ($cols,@data)=@_;
+  my ($cols,$colour,@data)=@_;
   my $i=0;
-  my $string="<tr valign=top>";
+  my $string="<tr valign=top bgcolor=$colour>";
   while ($i <$cols){
     $string=$string."<td>$data[$i]</td>";
     $i++;
@@ -100,6 +100,27 @@ sub mklink {
   my $string="<a href=$url>$text</a>";
   return ($string);
 }
+
+sub mkheadr {
+  my ($type,$text)=@_;
+  my $string;
+  if ($type eq '1'){
+    $string="<FONT SIZE=6><em>$text</em></FONT><br>";
+  }
+  return ($string);
+}
+
+sub center {
+  my ($text)=@_;
+  my $string="<CENTER>\n";
+  return ($string);
+}  
+
+sub endcenter {
+  my ($text)=@_;
+  my $string="</CENTER>\n";
+  return ($string);
+}  
 
 END { }       # module clean-up code here (global destructor)
     
