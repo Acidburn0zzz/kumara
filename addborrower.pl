@@ -14,7 +14,7 @@ my $data;
 my $cardnumber;
 my $action=$input->param('act');
 if ($action eq "M") {
-  my $cardnumber =$input->param('item');
+  $cardnumber =$input->param('item');
   $cardnumber =uc $cardnumber;
   $data=borrdata($cardnumber);
   if ($data->{borrowernumber} eq "") {
