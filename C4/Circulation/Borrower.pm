@@ -335,7 +335,7 @@ sub reserveslist {
   my @items;
   my $x=0;
   my $query="Select * from reserves where
-  borrowenumber='$borrower->{'borrowernumber'}' and found='W' and
+  borrowernumber='$borrower->{'borrowernumber'}' and found='W' and
   cancellationdate is null";
   my $sth=$dbh->prepare($query);
   $sth->execute;
