@@ -62,7 +62,8 @@ $inputs{'bibitemnum'}="hidden\t$data->{'biblioitemnumber'}\t21";
 
 print <<printend
 
-<BLOCKQUOTE><FONT SIZE=6><em>$data->{'title'} ($data->{'author'})<br>
+<BLOCKQUOTE><FONT SIZE=6>
+<em><a href=/cgi-bin/koha/detail.pl?bib=$data->{'biblionumber'}&type=intra>$data->{'title'} ($data->{'author'})</a><br>
 Modify Group - $data->{'description'}</em></FONT><br>             
 <form action=updatebibitem.pl method=post>
 <table border=0 cellspacing=0 cellpadding=5 align=left>

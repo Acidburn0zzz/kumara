@@ -8,8 +8,8 @@ use C4::Output;
 use C4::Search;
 
 my $input= new CGI;
-print $input->header;
-print $input->dump;
+#print $input->header;
+#print $input->dump;
 
 
 my $bibitemnum=checkinp($input->param('bibitemnum'));
@@ -49,12 +49,12 @@ my $volumeddesc=checkinp($input->param('Volume'));
 my (@items)=itemissues($bibitemnum);
 #print @items;           
 my $count=@items;
-print $count;
+#print $count;
 my @barcodes;
 
 
 my $existing=$input->param('existing');
-if ($existing eq 'yes'){
+if ($existing eq 'YES'){
 #  print "yes";
   my $group=$input->param('existinggroup');
   #go thru items assing selected ones to group
@@ -65,6 +65,7 @@ if ($existing eq 'yes'){
       moditem($items[$i]->{'itemnumber'},$group);
     }
   }
+  $bibitemnum=$group;
 } else {
     my $flag;
     my $flag2;

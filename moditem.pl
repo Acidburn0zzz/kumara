@@ -104,7 +104,7 @@ my $rightside=mkform3('updateitem.pl',%inputs);
 
 
 print mktablehdr();
-print mktablerow(2,'white',$format,$rightside);
+print mktablerow(1,'white',$rightside);
 
 print mktableft();
 

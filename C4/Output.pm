@@ -232,7 +232,7 @@ sub mkform3{
   }
   my $temp=join("\n",@order);
   $string=$string.$temp;
-  $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
+  $string=$string.mktablerow(1,'white','<input type=submit>');
   $string=$string.mktableft;
   $string=$string."</form>";
 }

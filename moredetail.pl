@@ -51,7 +51,7 @@ $dewey=~ s/\.$//;
 print <<printend
 <br>
 <a href=/cgi-bin/koha/request.pl?bib=$bib><img src=/images/requests.gif width=120 height=42 border=0 align=right border=0></a>
-<FONT SIZE=6><em>$data->{'title'} ($data->{'author'})</em></FONT><P>
+<FONT SIZE=6><em><a href=/cgi-bin/koha/detail.pl?bib=$bib&type=intra>$data->{'title'} ($data->{'author'})</a></em></FONT><P>
 <p>
 <form action=/cgi-bin/koha/modbibitem.pl>
 <input type=hidden name=bibitem value=$bi>

@@ -60,16 +60,16 @@ my $volumeddesc=checkinp($input->param('Volume'));
 
 #have to check how many items are attached to this bibitem, if one, just change it,
 #if more than one, we must create a new one.
-my $number=countitems($bibitemnum);
-if ($number > 1){
+#my $number=countitems($bibitemnum);
+#if ($number > 1){
 #   print $number;
   #check if bibitemneeds modifying
-  my $needsmod=needsmod($bibitemnum,$itemtype);
-  if ($needsmod != 1){
-    $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
-  }
-} 
-modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
+#  my $needsmod=needsmod($bibitemnum,$itemtype);
+#  if ($needsmod != 1){
+#    $bibitemnum=newbiblioitem($bibnum,$itemtype,$volumeddesc,$classification);
+#  }
+#} 
+#modbibitem($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc);
 moditem($itemnum,$bibitemnum,$barcode,$notes);
 
 print $input->redirect("moredetail.pl?type=intra&bib=$bibnum&bi=$bibitemnum");
