@@ -10,10 +10,10 @@ use C4::Acquisitions;
 #use Date::Manip;
 
 my $input = new CGI;
-print $input->header;
+#print $input->header;
 #print startpage();
 #print startmenu('acquisitions');
-#print $input->dump;
+#print $input->Dump;
 my $basketno=$input->param('basketno');
 my $count=$input->param('number');
 for (my $i=0;$i<$count;$i++){
