@@ -12,6 +12,11 @@ use C4::Output;
 my $input=new CGI;
 my $time=$input->param('time');
 print $input->header;
+
+print startpage;
+print startmenu('report');
+print center;
+
 my $date;
 my $date2;
 if ($time eq 'yesterday'){
@@ -37,7 +42,7 @@ my @payments=TotalPaid($date);
 my $count=@payments;
 my $total=0;
 print mktablehdr;
-print mktablerow(5,'white','Name','Type','Date/time','Amount', 'Branch');
+print mktablerow(5,'#99cc33',bold('Name'),bold('Type'),bold('Date/time'),bold('Amount'), bold('Branch'),'/images/background-mem.gif');
 for (my $i=0;$i<$count;$i++){
   my $hour=substr($payments[$i]{'timestamp'},8,2);
   my  $min=substr($payments[$i]{'timestamp'},10,2);
@@ -60,7 +65,7 @@ for (my $i=0;$i<$count;$i++){
   ,$branch);
 }
 print mktableft;
-
+print endcenter;
 print "<p><b>$total</b>";
 
 my $issues=Count('issue','C',$date,$date2);
@@ -75,3 +80,6 @@ $returns=Count('return','F',$date,$date2);
 print "<br>Returns Foxton: $returns";
 $returns=Count('return','S',$date,$date2);
 print "<br>Returns Shannon: $returns";
+
+print endmenu('report');
+print endpage;
