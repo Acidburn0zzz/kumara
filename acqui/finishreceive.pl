@@ -9,13 +9,14 @@ use CGI;
 use C4::Search;
 
 my $input=new CGI;
-#print $input->header;
+print $input->header;
 
 my $user=$input->remote_user;
 #print $input->dump;
 my $biblio=$input->param('biblio');
 my $ordnum=$input->param('ordnum');
 my $quantrec=$input->param('quantityrec');
+my $notes=$input->param('notes');
 my $cost=$input->param('cost');
 my $invoiceno=$input->param('invoice');
 my $id=$input->param('id');
@@ -26,7 +27,7 @@ my $pubdate=$data->{'publicationdate'};
 my $class=$data->{'classification'};
 my $dewey=$data->{'dewey'};
 my $subclass=$data->{'subclass'};
-my $notes=$data->{'notes'};
+
 my $size=$data->{'size'};
 my $illus=$data->{'illus'};
 my $pages=$data->{'pages'};
@@ -63,6 +64,7 @@ if ($itemtype =~ /PER/){
 receiveorder($biblio,$ordnum,$quantrec,$user,$cost,$invoiceno,$bibitemno,$freight);
 modbiblio($biblio,$title,$author,$copyright,$series);
 modbibitem($bibitemno,$itemtype,$isbn,$publisher,$pubdate,$class,$dewey,$subclass,$illus,$pages,$volinf,$notes,$size);
+print $notes;
 my $barcode=$input->param('barcode');
 my @barcodes;
 if ($barcode =~ /\,/){
