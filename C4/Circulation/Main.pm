@@ -13,6 +13,7 @@ use C4::Circulation::Borrower;
 use C4::Reserves;
 use C4::Interface;
 use C4::Security;
+use C4::Format;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   

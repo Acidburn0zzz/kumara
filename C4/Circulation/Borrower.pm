@@ -67,7 +67,6 @@ sub findborrower  {
   my $borrower;
   my $reason = "";
   my $book;
-  #my $sillytest = &olwen($env); 
   while (($bornum eq '') && ($reason eq "")) {
     #get borrowerbarcode from scanner
     titlepanel($env,$env->{'sysarea'},"Borrower Entry");
@@ -85,15 +84,15 @@ sub findborrower  {
         $iss_sth->execute;
         if (my $issdata  = $iss_sth->fetchrow_hashref) {
            $bornum=$issdata->{'borrowernumber'};
-	   $iss_sth->finish;
 	   $sth = $dbh->prepare("Select * from borrowers 
 	     where borrowernumber =  '$bornum'");
 	   $sth->execute;
 	   $borrower=$sth->fetchrow_hashref;
-	   $sth->finish;
+	   $sth->finish;  
          } else {
            error_msg($env,"Item $book not found");
          } 
+	 $iss_sth->finish;
       }
     } 
   } 
@@ -204,6 +203,7 @@ sub Borenq {
   my $reason;
   $env->{'sysarea'} = "Enquiries";
   while ($reason eq "") {
+    $env->{'sysarea'} = "Enquiries";
     ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
     if ($reason eq "") {
       my ($data,$reason)=&borrowerwindow($env,$borrower);
@@ -221,6 +221,11 @@ sub Borenq {
   return $reason;
 }  
 
+sub modifyuser {
+  my ($env,$borrower) = @_;
+  debug_msg($env,"Please use intranet");
+  #return;
+}
 
 
 END { }       # module clean-up code here (global destructor)
