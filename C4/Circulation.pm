@@ -10,6 +10,7 @@ use C4::Circulation::Issues;
 use C4::Circulation::Returns;
 use C4::Circulation::Renewals;
 use C4::Circulation::Borrower;
+use C4::Reserves;
 use C4::Interface;
 use C4::Security;
 
@@ -64,22 +65,23 @@ sub Start_circ{
   while ($donext eq 'Circ') {
     clearscreen();
     my ($reason,$data) = menu('console','Circulation', 
-    ('Issues','Returns','Borrower Enquiries','Log In'));
+    ('Issues','Returns','Borrower Enquiries','Reserves','Log In'));
 
     if ($data eq 'Issues') {  
       $donext=Issue($env); #C4::Circulation::Issues
       debug_msg("","do next $donext");
     } elsif ($data eq 'Returns') {
       $donext=Returns($env); #C4::Circulation::Returns
+    } elsif ($data eq 'Borrower Enquiries'){
+      $donext=Borenq($env); #C4::Circulation::Borrower
+    } elsif ($data eq 'Reserves'){
+      $donext=EnterReserves($env); #C4::Circulation::Reserves
     } elsif ($data eq 'Log In') {
-      debug_msg("","New user"); 
       &endint($env);
       &Login($env);   #C4::Security
       &startint($env,'Circulation');
     } elsif ($data eq 'Quit') { 
       $donext = $data;
-    }  elsif ($data eq 'Borrower Enquiries'){
-      $donext=Borenq($env); #C4::Circulation::Borrower
     }
     debug_msg($env,"donext -  $donext");
   }

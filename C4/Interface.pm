@@ -82,7 +82,7 @@ sub menu {
 sub menu2 {
   my ($title,@items)=@_;
   my $numitems=@items;
-  my $panel = Newt::Panel(1, 4, $title);
+  my $panel = Newt::Panel(1, $numitems+1, $title);
   my @buttons;
   my $i=0;
   while ($i < $numitems) {
