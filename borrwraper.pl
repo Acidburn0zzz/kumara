@@ -11,7 +11,8 @@ use C4::Circulation::Borrower;
 my %env = (
   branchcode => $ARGV[0], usercode => $ARGV[1], proccode => "lgon", borrowernumber => "",
   logintime  => "", lasttime => "", tempuser => "", debug => "9",
-  telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5]
+  telnet => $ARGV[2], queue => $ARGV[3], printtype => $ARGV[4], brdata => $ARGV[5],
+  bcard=>$ARGV[6]  
       );
 my ($env) = \%env;                                                                  
   startint();
