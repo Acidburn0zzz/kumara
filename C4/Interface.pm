@@ -3,8 +3,9 @@ package C4::Interface; #asummes C4/Interface
 #uses Newt
 
 use strict;
-use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11
-NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP);
+use Newt qw(NEWT_ANCHOR_LEFT NEWT_FLAG_SCROLL NEWT_KEY_F11 NEWT_KEY_F10
+NEWT_KEY_F1 NEWT_KEY_F2 NEWT_KEY_F12
+NEWT_FLAG_RETURNEXIT NEWT_EXIT_HOTKEY NEWT_FLAG_WRAP NEWT_FLAG_MULTIPLE);
 use C4::Circulation;
 
 require Exporter;
@@ -69,7 +70,7 @@ sub startint {
 sub menu {
   my ($type,$title,@items)=@_;
   if ($type eq 'console'){
-    my ($data,$reason)=list($title,@items);
+    my ($reason,$data)=list($title,@items);
     return($reason,$data);
   } 
 }
@@ -106,19 +107,20 @@ sub helptext {
 sub list {
   my ($title,@items)=@_;
   my $numitems=@items;
-  my $panel = Newt::Panel(70, 4, $title);
-  my $li = Newt::Listbox($numitems, NEWT_FLAG_SCROLL | NEWT_FLAG_RETURNEXIT);
+  my $panel = Newt::Panel(4, 4, $title);
+  my $li = Newt::Listbox($numitems,NEWT_FLAG_RETURNEXIT | NEWT_FLAG_MULTIPLE);
   $li->Add(@items);
   $panel->Add(0,0,$li,NEWT_ANCHOR_LEFT);
   $panel->AddHotKey(NEWT_KEY_F11);
    my ($reason,$data)=$panel->Run();
-  if ($reason eq NEWT_EXIT_HOTKEY) {   
-    if ($data eq NEWT_KEY_F11) {  
-        $reason="Quit";         
-    }
-  }
-  my $stuff=$li->Get();
-  return($stuff,$reason);
+#  if ($reason eq NEWT_EXIT_HOTKEY) {   
+#    if ($data eq NEWT_KEY_F11) {  
+#        $reason="Quit";         
+#    }
+#  }
+  my @stuff=$li->Get();
+    $data=$stuff[0];
+  return($reason,$data);
 }
 
 sub dialog {
@@ -127,12 +129,19 @@ sub dialog {
   my $label=Newt::Label($name);
   my $panel1=Newt::Panel(2,4,$name);
   $panel1->AddHotKey(NEWT_KEY_F11);
+  $panel1->AddHotKey(NEWT_KEY_F10);
   $panel1->Add(0,0,$label,NEWT_ANCHOR_LEFT);
   $panel1->Add(1,0,$entry,NEWT_ANCHOR_LEFT);
   my ($reason,$data)=$panel1->Run();
   if ($reason eq NEWT_EXIT_HOTKEY) {   
     if ($data eq NEWT_KEY_F11) {  
-        $reason="Quit";         
+        $reason="Finished user";         
+    }
+    if ($data eq NEWT_KEY_F10) {  
+        $reason="Finished issues";         
+    }
+    if ($data eq NEWT_KEY_F12){
+      $reason="Quit"
     }
   }
 #  Newt::Finished();
