@@ -331,7 +331,7 @@ sub modsubject {
     if (my $data=$sth->fetchrow_hashref){
       
     } else {
-      $error="$subject[$i] does not exist";
+      $error="$subject[$i] does not exist in the subject authority file";
     }
     $sth->finish;
   }

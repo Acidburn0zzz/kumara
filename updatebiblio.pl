@@ -34,7 +34,7 @@ if ($itemtype ne 'NF'){
   $classification=$class;
 }
 if ($class =~/[0-9]+/){
-   print $class;
+#   print $class;
    $dewey= $class;
    $dewey=~ s/[a-z]+//gi;
    my @temp=split(/[0-9]+\.[0-9]+/,$class);
@@ -60,10 +60,11 @@ my @sub=split(/\|/,$subject);
 my $addauthor=checkinp($input->param('Additional'));
 modaddauthor($bibnum,$addauthor);
 
-
+#print $input->header;
 my $error=modsubject($bibnum,@sub);
+
 if ($error ne ''){
-  print $input->header();
+  print $input->header;
 #  print $input->dump;
   print $error;
 } else {
