@@ -52,10 +52,12 @@ for (my $i=0;$i<$count;$i++){
     '',
     $charges[$i2]->{'amount'},$charges[$i2]->{'amountoutstanding'});
   }
-
+  my $time2="$payments[$i]{'date'} $time";
+  my $branch=Getpaidbranch($time2);
+  
   print mktablerow(6,'white',"$payments[$i]{'firstname'} <b>$payments[$i]{'surname'}</b>"
   ,$payments[$i]{'accounttype'},"$payments[$i]{'date'} $time",$payments[$i]{'amount'}
-  ,$payments[$i]{'branchcode'});
+  ,$branch);
 }
 print mktableft;
 

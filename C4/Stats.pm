@@ -14,7 +14,7 @@ $VERSION = 0.01;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&UpdateStats &statsreport &Count &Overdues &TotalOwing
-&TotalPaid &getcharges);
+&TotalPaid &getcharges &Getpaidbranch);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -171,7 +171,7 @@ sub getcharges{
   my $dbh=C4Connect;
   my $timestamp2=$timestamp-1;
   my $query="Select * from accountlines where borrowernumber=$borrowerno
-  and timestamp < '$timestamp' and accounttype <> 'Pay'";
+  and timestamp <= '$timestamp' and accounttype <> 'Pay'";
   my $sth=$dbh->prepare($query);
 #  print $query,"<br>";
   $sth->execute;
@@ -186,6 +186,20 @@ sub getcharges{
   $dbh->disconnect;
   return(@results);
 }
+
+sub Getpaidbranch{
+  my($date)=@_;
+  my $dbh=C4Connect;
+  my $query="select * from statistics where type='payment' and datetime='$date'";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+#  print $query;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data->{'branch'});
+}
+
 END { }       # module clean-up code here (global destructor)
   
     
