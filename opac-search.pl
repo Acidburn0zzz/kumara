@@ -19,6 +19,7 @@ my %search;
 
 
 my $keyword=$input->param('keyword');
+#$keyword=~ s/'/\'/g;
 $search{'keyword'}=$keyword;
 
 my @results;
@@ -39,12 +40,8 @@ my @results;
 
 ($count,@results)=&OpacSearch(\$blah,'loose',\%search,$num,$offset);
 
-print "You searched on ";
-while ( my ($key, $value) = each %search) {                                 
-  if ($value ne ''){
-    print bold("$key $value,");
-  }                          
-}
+print "You searched on <b>$keyword</b>";
+
 print " $count results found";
 my $offset2=$num+$offset;
 my $disp=$offset+1;

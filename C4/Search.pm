@@ -66,6 +66,7 @@ sub NewBorrowerNumber {
 sub OpacSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
+  $search->{'keyword'}=~ s/'/\\'/g;
   my @key=split(' ',$search->{'keyword'});
   my $count=@key;
   my $i=1;
@@ -107,12 +108,13 @@ sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
   $search->{'keyword'}=~ s/ +$//;
+  $search->{'keyword'}=~ s/'/\\'/;
   my @key=split(' ',$search->{'keyword'});
   my $count=@key;
   my $i=1;
   my @results;
-  my $query ="Select * from biblio where 
-  (title like '%$key[0]%'";
+  my $query ="Select * from biblio where
+  (title like '%$key[0]%' or ";
   while ($i < $count){
     $query=$query." and title like '%$key[$i]%'";
     $i++;
@@ -173,7 +175,10 @@ sub CatSearch  {
   my $dbh = &C4Connect;
   my $query = '';
     my @results;
+  $search->{'title'}=~ s/'/\\'/g;
+    $search->{'author'}=~ s/'/\\'/g;
   my $title = lc($search->{'title'}); 
+  
   if ($type eq 'loose') {
       if ($search->{'author'} ne ''){
         my @key=split(' ',$search->{'author'});
@@ -181,7 +186,8 @@ sub CatSearch  {
 	my $i=1;
         $query="select count(*) from
          biblio,biblioitems
-         where biblioitems.biblionumber=biblio.biblionumber and (biblio.author like '%$key[0]%'";    
+         where biblioitems.biblionumber=biblio.biblionumber and
+(biblio.author like '%$key[0]%'";    
 	 while ($i < $count){ 
            $query=$query." and author like '%$key[$i]%'";   
            $i++;       
@@ -200,10 +206,12 @@ sub CatSearch  {
 	    my $i=1;
             $query="select count(*) from biblio,bibliosubtitle
 	    where
-(biblio.biblionumber=bibliosubtitle.biblionumber) and
-	    ((title like '%$key[0]%' or subtitle like '%$key[0]%')";
+            (biblio.biblionumber=bibliosubtitle.biblionumber) and
+	    ((title like '$key[0]%' or title like '% $key[0]%'
+	    or subtitle like '$key[0]%' or title like '% $key[0]%')";
 	    while ($i<$count){
-	      $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
+	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%' 
+	      subtitle like '$key[$i]%' or subtitle like '% $key[$i]%')";
 	      $i++;
 	    }
 	    $query=$query.")";
@@ -225,8 +233,9 @@ sub CatSearch  {
       $query="select count(*) from items,biblio ";
       if ($search->{'item'} ne ''){
         my $search2=uc $search->{'item'};
-        $query=$query." where barcode='$search2' and
-        items.biblionumber=biblio.biblionumber ";
+        $query=$query." where 
+        items.biblionumber=biblio.biblionumber 
+	and barcode='$search2'";
       }
       if ($search->{'isbn'} ne ''){
         my $search2=uc $search->{'isbn'};
@@ -235,25 +244,26 @@ sub CatSearch  {
 	$sth1->execute;
         my $i2=0;
 	while (my $data=$sth1->fetchrow_hashref) {
-	   $query="select * from biblioitems,items,biblio where
-           biblioitems.biblioitemnumber = '$data->{'biblioitemnumber'}' 
-	   and biblioitems.biblionumber =
-           biblio.biblionumber and items.biblioitemnumber =
-           biblioitems.biblioitemnumber";
+	   $query="select * from items,biblio where
+           biblio.biblionumber = $data->{'biblionumber'}
+           and items.biblionumber = biblio.biblionumber";
 	   my $sth=$dbh->prepare($query);
-	   $sth->execute;
-	   my $data=$sth->fetchrow_hashref;
+#	   $sth->execute;
+#	   my $data=$sth->fetchrow_hashref;
 	   $results[$i2]="$data->{'author'}\t$data->{'title'}\t$data->{'biblionumber'}";
            $i2++; 
-	   $sth->finish;
+#	   $sth->finish;
 	}
 	$sth1->finish;
       }
-    }
+  }
 #print $query;
   my $sth=$dbh->prepare($query);
+#  if ($search->{'isbn'} eq ''){
     $sth->execute;
+#  } else {
   my $count=0;
+ 
   if ($type eq 'subject'){ 
     while (my $data=$sth->fetchrow_arrayref){
       $count++;
@@ -359,7 +369,8 @@ sub ItemInfo {
     my $isth=$dbh->prepare($iquery);
     $isth->execute;
     if (my $idata=$isth->fetchrow_hashref){
-      $datedue = $idata->{'date_due'};
+      my @temp=split('-',$idata->{'date_due'});
+      $datedue = "$temp[2]/$temp[1]/$temp[0]";
     }
 
     $isth->finish;

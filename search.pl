@@ -82,6 +82,7 @@ if ($itemnumber ne '' || $isbn ne ''){
 print "You searched on ";
 while ( my ($key, $value) = each %search) {                                 
   if ($value ne ''){
+    $value=~ s/\\//g;
     print bold("$key $value,");
   }                          
 }
