@@ -158,6 +158,50 @@ sub returnrecord {
   my $sth = $dbh->prepare($query);
   $sth->execute;
   $sth->finish;
+  # check for charge made for book
+  my $query = "select * from accountlines 
+    where (borrowernumber = '$bornum') 
+    and (itemnumber = '$itemno')
+    and (accounttype = 'L')";
+  my $sth = $dbh->prepare($query);
+  $sth->execute;
+  if (my $data = $sth->fetchrow_hashref) {
+    # writeoff this amount 
+    my $offset;
+    my $amount = $data->{'amount'};
+    my $acctno = $data->{'accountno'};
+    my $amountleft;
+    if ($data->{'amountoutstanding'} == $amount) {
+       $offset = $data->{'amount'};
+       $amountleft = 0;
+    } else {
+       $offset = $amount - $data->{'amountoutstanding'};
+       $amountleft = $data->{'amountoutstanding'} - $amount;
+    }
+    my $uquery = "update accountlines
+      set accounttype = 'LR',amountoutstanding='0'
+      where (borrowernumber = '$bornum')
+      and (itemnumber = '$itemno')
+      and (accountno = '$acctno') ";
+    my $usth = $dbh->prepare($uquery);
+    $usth->execute();
+    $usth->finish;
+    my $nextaccntno = getnextacctno($env,$bornum,$dbh);
+    $uquery = "insert into accountlines
+      (borrowernumber,accountno,date,amount,description,accounttype,amountoutstanding)
+      values ($bornum,$nextaccntno,now(),0-$amount,'Book Returned',
+      'CR',$amountleft)";
+    $usth = $dbh->prepare($uquery);
+    $usth->execute;
+    $usth->finish;
+    $uquery = "insert into accountoffsets
+      (borrowernumber, accountno, offsetaccount,  offsetamount)
+      values ($bornum,$data->{'accountno'},$nextaccntno,$offset)";
+    $usth = $dbh->prepare($uquery);
+    $usth->execute;
+    $usth->finish;
+  } 
+  $sth->finish;
   UpdateStats($env,'branch','return','0');
   return($amt_owing);
 }
