@@ -69,7 +69,7 @@ sub findborrower  {
   my $book;
   while (($bornum eq '') && ($reason ne "Finished issues")) {
     #get borrowerbarcode from scanner
-    ($borcode,$reason,$book)=&scanborrower(); C4::Circulation
+    ($borcode,$reason,$book)=&scanborrower(); #C4::Circulation
     if ($borcode ne '') {
       #  output(1,1,$borcode);
       my $ucborcode = uc $borcode;

@@ -67,12 +67,13 @@ sub Start_circ{
 
     if ($data eq 'Issues') {  
       $donext=Issue($env); #C4::Circulation::Issues
+      debug_msg("","do next $donext");
     } elsif ($data eq 'Returns') {
       $donext=Returns($env); #C4::Circulation::Returns
     } elsif ($data eq 'Log In') {
       debug_msg("","New user"); 
       &endint($env);
-      &Login($env); #C4::Security
+      &Login($env);   #C4::Security
       &startint($env,'Circulation');
     } elsif ($data eq 'Quit') { 
       $donext = $data;
@@ -205,7 +206,7 @@ sub scanborrower {
   my ($number,$reason,$book)=&borrower_dialog($env); #C4::Interface
   $number= $number;
   $book=uc $book;
-  debug_msg("",$reason);
+#  debug_msg("",$reason);
   return ($number,$reason,$book);
 }
 

@@ -63,6 +63,7 @@ sub Issue  {
     #clear help
     helptext('');
     clearscreen();
+    
     my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
       #C4::Circulation::Borrowers
     my $done;
@@ -75,19 +76,23 @@ sub Issue  {
       #now check items 
       clearscreen();
       my ($items,$items2)=pastitems($env,$bornum,$dbh); #from Circulation.pm
-      my $done = "No";
+      $done = "No";
       my $row2=5;
       my $it2p=0;
       while ($done eq 'No'){
         ($done,$items2,$row2,$it2p) =&processitems($env,$bornum,$borrower,$items,$items2,$row2,$it2p);
       }    
       $dbh->disconnect;  
+#      debug_msg("","after processitems done = $done");
     }
     if ($done ne 'Circ'){
-      Issue($env);
+#      debug_msg("","calling issue again with $done");
+      $done=Issue($env);
+      
     }
     if ($done ne 'Quit'){
-      return($done);
+#      debug_msg("","returning $done");
+      return($done); #to C4::Circulation
     }
 }    
 
