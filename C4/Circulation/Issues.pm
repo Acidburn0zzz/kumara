@@ -67,6 +67,7 @@ sub Issue  {
     clearscreen();
     my $done;
     my ($items,$items2);
+    $env->{'sysarea'} = "Issues";
     my ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
       #C4::Circulation::Borrowers
     if ($reason ne "") {

@@ -62,6 +62,7 @@ sub findborrower  {
   my ($env,$dbh) = @_;
   helptext('');
   clearscreen();
+  titlepanel($env,$env->{'sysarea'},"Borrower Entry");
   my $bornum = "";
   my $borrower = "";
   my $sth = "";
@@ -201,6 +202,7 @@ sub Borenq {
   my $issuesallowed;
   my $borrower;
   my $reason;
+  $env->{'sysarea'} = "Enquiries";
   while ($reason eq "") {
     ($bornum,$issuesallowed,$borrower,$reason) = &findborrower($env,$dbh);
     if ($reason eq "") {
