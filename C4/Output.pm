@@ -13,7 +13,7 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&startpage &endpage &mktablehdr &mktableft &mktablerow &mklink
 &startmenu &endmenu &mkheadr &center &endcenter &mkform &mkform2 &bold
-&gotopage &mkformnotable);
+&gotopage &mkformnotable &mkform3);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -179,6 +179,55 @@ sub mkform{
     $i2++;
   }
   #$string=$string.join("\n",@order);
+  $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
+  $string=$string.mktableft;
+  $string=$string."</form>";
+}
+
+sub mkform3{
+  my ($action,%inputs)=@_;
+  my $string="<form action=$action method=post>\n";
+  $string=$string.mktablehdr();
+  my $key;
+  my @keys=sort keys %inputs;
+  my @order;  
+  my $count=@keys;
+  my $i2=0;
+  while ( $i2<$count) {
+    my $value=$inputs{$keys[$i2]};
+    my @data=split('\t',$value);
+    my $posn = $data[2];
+    if ($data[0] eq 'hidden'){
+      $order[$posn]="<input type=hidden name=$keys[$i2] value=\"$data[1]\">\n";
+    } else {
+      my $text;
+      if ($data[0] eq 'radio') {
+        $text="<input type=radio name=$keys[$i2] value=$data[1]>$data[1]
+	<input type=radio name=$keys[$i2] value=$data[2]>$data[2]";
+      } 
+      if ($data[0] eq 'text') {
+        $text="<input type=$data[0] name=$keys[$i2] value=\"$data[1]\">";
+      }
+      if ($data[0] eq 'textarea') {
+        $text="<textarea name=$keys[$i2] wrap=physical cols=40 rows=4>$data[1]</textarea>";
+      }
+      if ($data[0] eq 'select') {
+        $text="<select name=$keys[$i2]>";
+	my $i=1;
+       	while ($data[$i] ne "") {
+	  my $val = $data[$i+1];
+      	  $text = $text."<option value=$data[$i]>$val";
+	  $i = $i+2;
+	}
+	$text=$text."</select>";
+      }	
+#      $string=$string.mktablerow(2,'white',$keys[$i2],$text);
+      $order[$posn]=mktablerow(2,'white',$keys[$i2],$text);
+    }
+    $i2++;
+  }
+  my $temp=join("\n",@order);
+  $string=$string.$temp;
   $string=$string.mktablerow(2,'white','<input type=submit>','<input type=reset>');
   $string=$string.mktableft;
   $string=$string."</form>";

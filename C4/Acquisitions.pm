@@ -14,7 +14,7 @@ $VERSION = 0.01;
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
-&getcurrencies);
+&getcurrencies &modsubtitle &modsubject);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -281,30 +281,65 @@ sub newbiblio {
 }
 
 sub modbiblio {
-  my ($bibnum,$title,$author,$copyright)=@_;
+  my ($bibnum,$title,$author,$copyright,$seriestitle,$serial,$unititle,$notes)=@_;
   my $dbh=C4Connect;
   $title=~ s/\'/\\\'/g;
   $author=~ s/\'/\\\'/g;
   my $query="update biblio set title='$title',
-  author='$author',copyrightdate='$copyright' where
+  author='$author',copyrightdate='$copyright',
+  seriestitle='$seriestitle',serial='$serial',unititle='$unititle',notes='$notes'
+  where
   biblionumber=$bibnum";
   my $sth=$dbh->prepare($query);
-#    print $query;
+    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;
     return($bibnum);
+}
 
+sub modsubtitle {
+  my ($bibnum,$subtitle)=@_;
+  my $dbh=C4Connect;
+  my $query="update bibliosubtitle set subtitle='$subtitle' where biblionumber=$bibnum";
+  print $query;
+  my $sth=$dbh->prepare($query);
+  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub modsubject {
+  my ($bibnum,@subject)=@_;
+  my $dbh=C4Connect;
+  my $count=@subject;
+  my $query="Delete from bibliosubject where biblionumber=$bibnum";
+#  print $query;
+  my $sth=$dbh->prepare($query);
+  print $query;
+  $sth->execute;
+  $sth->finish;
+  for (my $i=0;$i<$count;$i++){
+    $sth=$dbh->prepare("Insert into bibliosubject values ('$subject[$i]',$bibnum)");
+    print $subject[$i];
+    $sth->execute;
+    $sth->finish;
+  }
+  $dbh->disconnect;
 }
 
 sub modbibitem {
-  my ($bibitemnum,$itemtype,$isbn)=@_;
+  my ($bibitemnum,$itemtype,$isbn,$publishercode,$publicationdate,$classification,$dewey,$subclass,$illus,$pages,$volumeddesc)=@_;
   my $dbh=C4Connect;
   my $query="update biblioitems set itemtype='$itemtype',
-  isbn='$isbn' where
+  isbn='$isbn',publishercode='$publishercode',publicationyear='$publicationdate',
+  classification='$classification',dewey='$dewey',subclass='$subclass',illus='$illus',
+  pages='$pages',volumeddesc='$volumeddesc'
+  where
   biblioitemnumber=$bibitemnum";
   my $sth=$dbh->prepare($query);
-#    print $query;
+    print $query;
   $sth->execute;
   $sth->finish;
   $dbh->disconnect;

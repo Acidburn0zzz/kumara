@@ -17,7 +17,7 @@ $VERSION = 0.01;
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
 &OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
-&getboracctrecord &ItemType &itemissues &FrontSearch); 
+&getboracctrecord &ItemType &itemissues &FrontSearch &subject &subtitle); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -588,7 +588,7 @@ sub bibitemdata {
   my $dbh=C4Connect;
   my $query="Select * from biblio,biblioitems,itemtypes where biblio.biblionumber=
   biblioitems.biblionumber and biblioitemnumber=$bibitem and
-biblioitems.itemtype=itemtypes.itemtype";
+  biblioitems.itemtype=itemtypes.itemtype";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -597,6 +597,42 @@ biblioitems.itemtype=itemtypes.itemtype";
   $dbh->disconnect;
   return($data);
 }
+
+sub subject {
+  my ($bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from bibliosubject where biblionumber=$bibnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@results);
+}
+
+sub subtitle {
+  my ($bibnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Select * from bibliosubtitle where biblionumber=$bibnum";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,\@results);
+}
+
+
 
 sub itemissues {
   my ($bibitem)=@_;
