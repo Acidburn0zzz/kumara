@@ -20,7 +20,7 @@ my $borrower=$input->param('member');
 my $branch=$input->param('pickup');
 my @rank=$input->param('rank-request');
 my $type=$input->param('type');
-my $bornum=borrdata($borrower);
+my $bornum=borrdata($borrower,'');
 if ($type eq 'str8' && $bornum ne ''){
 my $count=@bibitems;
 @bibitems=sort @bibitems;
