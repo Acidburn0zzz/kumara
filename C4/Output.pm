@@ -68,7 +68,7 @@ sub startmenu{
   if ($type eq 'issue') {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-top.inc');
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-top.inc');
+    open (FILE,'/usr/local/www/opac/htdocs/includes/opac-top.inc');
   } elsif ($type eq 'member') {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/member-top.inc');
   } else {
@@ -87,7 +87,7 @@ sub endmenu{
   if ($type eq 'issue'){
     open (FILE,'/usr/local/www/hdl/htdocs/includes/issues-bottom.inc');
   } elsif ($type eq 'opac') {
-    open (FILE,'/usr/local/www/hdl/htdocs/includes/opac-bottom.inc');
+    open (FILE,'/usr/local/www/opac/htdocs/includes/opac-bottom.inc');
   } elsif ($type eq 'member') {
     open (FILE,'/usr/local/www/hdl/htdocs/includes/member-bottom.inc');
   } else {

@@ -31,7 +31,7 @@ if ($num eq ''){
   $num=10;
 }
 print startpage();
-print startmenu();
+print startmenu('opac');
 print mkheadr(1,'Opac Search Results');
 print center();
 my $count;
@@ -100,5 +100,5 @@ if ($offset < $count){
 }
 
 print endcenter();
-print endmenu();
+print endmenu('opac');
 print endpage();
