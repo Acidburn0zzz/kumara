@@ -236,10 +236,16 @@ sub ItemInfo {
       $datedue = $idata->{'date_due'};
     }
 
-$isth->finish;
-
-$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
-     $i++;
+    $isth->finish;
+    my $class = $data->{'classification'};
+    my $dewey = $data->{'dewey'};
+    $dewey =~ s/0+$//;
+    $class = $class.$dewey;
+    $class = $class.$data->{'subclass'};
+ #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
+     $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class;
+  
+    $i++;
   }
   $sth->finish;
   $dbh->disconnect;
