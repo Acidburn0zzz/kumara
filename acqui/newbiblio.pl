@@ -63,6 +63,18 @@ print <<printend
 <input type=hidden name=basket value=$basket>
 <input type=hidden name=supplier value=$id>
 <input type=hidden name=biblio value=$biblio>
+<input type=hidden name=discount value=$booksellers[0]->{'discount'}>
+<input type=hidden name=listinc value=$booksellers[0]->{'listincgst'}>
+<input type=hidden name=currency value=$booksellers[0]->{'listprice'}>
+<input type=hidden name=applygst value=$booksellers[0]->{'gstreg'}>
+printend
+;
+my ($count2,@currencies)=getcurrencies;
+for (my $i=0;$i<$count2;$i++){
+  print "<input type=hidden name=\"$currencies[$i]->{'currency'}\" value=$currencies[0]->{'rate'}>";
+}
+
+print <<printend;
 <a href=basket.pl?basket=$basket><img src=/images/view-basket.gif width=187 heigth=42 border=0 align=right alt="View Basket"></a> 
 <FONT SIZE=6><em>$ordnum - Order Details </em></FONT><br>
 Shopping Basket For: $booksellers[0]->{'name'}

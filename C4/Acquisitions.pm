@@ -13,7 +13,8 @@ $VERSION = 0.01;
 @EXPORT = qw(&getorders &bookseller &breakdown &basket &newbasket &bookfunds
 &ordersearch &newbiblio &newbiblioitem &newsubject &newsubtitle &neworder
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
- &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem);
+ &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
+&getcurrencies);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -423,6 +424,22 @@ sub curconvert {
   my $price=$price / $cur;
   return($price);
 }
+
+sub getcurrencies {
+  my $dbh=C4Connect;
+  my $query="Select * from currency";
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my @results;
+  my $i=0;
+  while (my $data=$sth->fetchrow_hashref){
+    $results[$i]=$data;
+    $i++;
+  }
+  $sth->finish;
+  $dbh->disconnect;
+  return($i,@results);
+} 
 
 sub updatesup {
    my ($data)=@_;

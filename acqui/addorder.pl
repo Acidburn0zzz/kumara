@@ -13,7 +13,7 @@ my $input = new CGI;
 print $input->header;
 print startpage();
 print startmenu('acquisitions');
-
+print $input->dump;
 my $existing=$input->param('existing');
 my $title=$input->param('title');
 $title=~ s/\'/\\\'/g;
@@ -35,6 +35,9 @@ my $bookfund=$input->param('bookfund');
 my $who=$input->remote_user;
 my $bibnum;
 my $bibitemnum;
+my $rrp=$input->param('rrp');
+my $ecost=$input->param('ecost');
+my $gst=$input->param('GST');
 #check to see if biblio exists
 if ($existing eq 'no'){
   #if it doesnt create it

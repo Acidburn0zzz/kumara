@@ -39,7 +39,7 @@ $booksellers[0]->{'address3'}, $booksellers[0]->{'address4'}
 <FORM ACTION="/cgi-bin/koha/acqui/newbasket2.pl" method=post>
 <input type=hidden name=id value="$id">
 <input type=hidden name=basket value="$basket">
-<b> Search Keyword, Title or Author: </b><INPUT TYPE="text"  SIZE="25"   NAME="search"> 
+<b> Search Keyword or Title: </b><INPUT TYPE="text"  SIZE="25"   NAME="search"> 
 
 </form>
 
