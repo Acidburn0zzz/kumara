@@ -8,7 +8,6 @@ use strict;
 use CGI;
 use C4::Output;
 use C4::Database;
-
 my $input = new CGI;
 print $input->header;
 print startpage();
