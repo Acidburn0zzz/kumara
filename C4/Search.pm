@@ -344,10 +344,11 @@ sub CatSearch  {
 	   $query.= "and ( itemtype='$temp[0]'";
 	   for (my $i=1;$i<$count;$i++){
 	     $query.=" or itemtype='$temp[$i]'";
-	   }
-	   $query.=")";
-
 	 }
+	   $query.=") ";
+           
+	 }
+	 $query.=" group by biblio.biblionumber";
       } else {
           if ($search->{'title'} ne ''){
 	   if ($search->{'ttype'} eq 'exact'){
@@ -402,6 +403,7 @@ sub CatSearch  {
 	  }
 	 
       }
+      $query .=" group by biblio.biblionumber";
   } 
   if ($type eq 'subject'){
     my @key=split(' ',$search->{'subject'});
@@ -466,14 +468,14 @@ sub CatSearch  {
     $query=$query." group by biblio.biblionumber";
 #    $query=~ s/count\(\*\)/count\(biblio.biblionumber\)/;
   } 
-  if ($type eq 'subject'){ 
+#  if ($type eq 'subject'){ 
     while (my $data=$sth->fetchrow_arrayref){
       $count++;
     }
-  } else {
-    my $data=$sth->fetchrow_arrayref;
-    $count=$data->[0];
-  }
+#  } else {
+#    my $data=$sth->fetchrow_arrayref;
+#    $count=$data->[0];
+#  }
   $sth->finish;
 #  print $query;
   $query=~ s/count\(\*\)/\*/g;
