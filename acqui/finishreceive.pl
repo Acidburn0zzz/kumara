@@ -25,6 +25,7 @@ my $bookfund=$input->param('bookfund');
 my $itemtype=$input->param('format');
 my $isbn=$input->param('ISBN');
 my $bookseller=$input->param('bookseller');
+$id=$bookseller;
 my $title=$input->param('title');
 my $author=$input->param('author');
 my $copyright=$input->param('copyright');
