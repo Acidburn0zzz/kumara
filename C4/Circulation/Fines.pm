@@ -103,9 +103,11 @@ sub UpdateFine {
   my $sth=$dbh->prepare($query);
 #  print "$query\n";
   $sth->execute;
+
   if (my $data=$sth->fetchrow_hashref){
     print "in accounts ...";
     if ($data->{'amount'} != $amount){
+      
       print "updating";
       my $diff=$amount - $data->{'amount'};
       my $out=$data->{'amountoutstanding'}+$diff;
@@ -120,6 +122,12 @@ and (accounttype='FU' or accounttype='O');";
       print "no update needed $data->{'amount'}"
     }
   } else {
+    my $query2="select title from biblio,items where items.itemnumber=$itemnum
+    and biblio.biblionumber=items.biblionumber";
+    my $sth4=$dbh->prepare($query2);
+    $sth4->execute;
+    my $title=$sth4->fetchrow_hashref;
+    $sth4->finish;
     print "not in account";
     my $query2="Select max(accountno) from accountlines";
     my $sth3=$dbh->prepare($query2);
@@ -127,10 +135,11 @@ and (accounttype='FU' or accounttype='O');";
     my @accountno=$sth3->fetchrow_array;
     $sth3->finish;
     $accountno[0]++;
+    $title->{'title'}=~ s/\'/\\\'/g;
     $query2="Insert into accountlines
     (borrowernumber,itemnumber,date,amount,
     description,accounttype,amountoutstanding,accountno) values
-    ($bornum,$itemnum,now(),$amount,'Overdue Item','FU',
+    ($bornum,$itemnum,now(),$amount,'Overdue Item $title->{'title'}','FU',
     $amount,$accountno[0])";
     my $sth2=$dbh->prepare($query2);
     $sth2->execute;

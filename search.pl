@@ -120,7 +120,8 @@ while ($i < $count2){
       my $word=$stuff[0];
 #      print $word;
       $word=~ s/([a-z]) +([a-z])/$1%20$2/ig;
-      $word=~ s/ //g;
+      $word=~ s/  //g;
+      $word=~ s/ /%20/g;
       $word=~ s/\,/\,%20/g;
       $word=~ s/\n//g;
       my $url="/cgi-bin/koha/search.pl?author=$word&type=$type";

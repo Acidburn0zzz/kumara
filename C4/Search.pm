@@ -120,7 +120,7 @@ sub KeywordSearch {
     $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
     $i++;
   }
-  $query=$query.") group by biblionumber order by author,title";
+  $query=$query.") group by biblio.biblionumber order by author,title";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -492,7 +492,7 @@ sub itemissues {
   my $dbh=C4Connect;
   my $query="Select * from items where 
   items.biblioitemnumber=$bibitem";
-  print $query;
+#  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
@@ -507,6 +507,19 @@ and returndate is NULL and issues.borrowernumber=borrowers.borrowernumber";
       $data->{'card'}=$data2->{'cardnumber'};
     } else {
       $data->{'date_due'}='Available';
+    }
+    $sth2->finish;
+    $query2="select * from issues,borrowers where itemnumber=$data->{'itemnumber'}
+    and issues.borrowernumber=borrowers.borrowernumber 
+    order by date_due desc";
+    my $sth2=$dbh->prepare($query2);
+#   print $query2;
+    $sth2->execute;
+    for (my $i2=0;$i2<2;$i2++){
+      if (my $data2=$sth2->fetchrow_hashref){
+        $data->{"timestamp$i2"}=$data2->{'timestamp'};
+        $data->{"card$i2"}=$data2->{'cardnumber'};
+      }
     }
     $sth2->finish;
     $results[$i]=$data;

@@ -54,13 +54,13 @@ Sex: $data->{'sex'}<P>
 Postal Address: $data->{'streetaddress'}, $data->{'city'}<BR>
 Home Address: $data->{'streetaddress'}, $data->{'city'}<BR>
 Phone (Home): $data->{'phone'}<BR>
-Phone (Daytime): $data->{'dayphone'}<BR>
-Fax: $data->{'faxumber'}<BR>
+Phone (Daytime): $data->{'phoneday'}<BR>
+Fax: $data->{'faxnumber'}<BR>
 E-mail: <a href="mailto:$data->{'emailaddress'}">$data->{'emailaddress'}</a><P>
 Alternative Contact:$data->{'contactname'}<BR>
-Phone: $data->{'contphone'}<BR>
-Relationship: $data->{'contrelationship'}<BR>
-Notes: $data->{'contnotes'}<P>
+Phone: $data->{'altphone'}<BR>
+Relationship: $data->{'altrelationship'}<BR>
+Notes: $data->{'altnotes'}<P>
 Guarantees: <A HREF="sam.html">Guarantor goes here</a><P>
 
 General Notes: <A HREF="popbox.html" onclick="messenger(200,250,'Form that lets you add to and delete notes.'); return false">

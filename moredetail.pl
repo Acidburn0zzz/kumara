@@ -87,13 +87,43 @@ print <<printend
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/modify-mem.gif"> 
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
 <br>
+printend
+;
+$items[$i]->{'itemlost'}=~ s/0/No/;
+$items[$i]->{'itemlost'}=~ s/1/Yes/;
+$items[$i]->{'withdrawn'}=~ s/0/No/;
+$items[$i]->{'withdrawn'}=~ s/1/Yes/;
+$items[$i]->{'replacementprice'}+=0.00;
+my $year=substr($items[$i]->{'timestamp0'},0,4);
+my $mon=substr($items[$i]->{'timestamp0'},4,2);
+my $day=substr($items[$i]->{'timestamp0'},6,2);
+$items[$i]->{'timestamp0'}="$day/$mon/$year";
+my @temp=split('-',$items[$i]->{'dateaccessioned'});
+$items[$i]->{'dateaccessioned'}="$temp[2]/$temp[1]/$temp[0]";
+print <<printend
 <FONT SIZE=2  face="arial, helvetica">
-Due Date: $items[$i]->{'date_due'}<br>
-Member: $items[$i]->{'card'}<br>
-Last seen: $items[$i]->{'datalastseen'}<br>
-No. issues: $items[$i]->{'issues'}<br>
-No. Reserves: $items[$i]->{'reserves'}<br>
-Notes: $items[$i]->{'itemnotes'}
+Home Branch: $items[$i]->{'homebranch'}<br>
+Last seen: $items[$i]->{'datelastseen'}<br>
+Last borrowed: $items[$i]->{'timestamp0'}<br>
+Currently on issue to: $items[$i]->{'card0'}<br>
+Last Borrower 1: $items[$i]->{'card0'}<br>
+Last Borrower 2: $items[$i]->{'card1'}<br>
+Current Branch: $items[$i]->{'holdingbranch'}<br>
+Replacement Price: $items[$i]->{'replacementprice'}<br>
+Item lost:$items[$i]->{'itemlost'}<br>
+paid by:<br>
+Notes: $items[$i]->{'itemnotes'}<br>
+Renewals: $items[$i]->{'renewals'}<br>
+Requests: put in current reserves<br>
+  waiting: <br>
+Accession Date: $items[$i]->{'dateaccessioned'}<br>
+Cancelled: $items[$i]->{'withdrawn'}<br>
+Total Issues: $items[$i]->{'issues'}<br>
+Group Number: $bi <br>
+Biblio number: $bib <br>
+
+
+
 </font>
 </TD>
 </tr>
