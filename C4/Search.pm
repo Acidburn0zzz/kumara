@@ -85,6 +85,7 @@ sub CatSearch  {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
   my $query = '';
+    my @results;
   my $title = lc($search->{'title'}); 
   if ($type eq 'loose') {
       if ($search->{'author'} ne ''){
@@ -128,38 +129,14 @@ sub CatSearch  {
 	#
 	# Commented code does not work properly, but would be much faster 
 	# if it did
-	# Can't make it return the biblionumber properly
+	# Can't make it returne the biblionumber properly
 	#
         my $query1 = "select * from biblioitems where isbn='$search2'";
         #debug_msg($env,$query1);
-#markers
-	#my $sth1=$dbh->prepare($query);
-	#$sth1->execute;
-	#my @biblioarr;
-	#my $bibcnt=0;
-	#while (my @data=$sth1->fetchrow_hashref) {
-        #  debug_msg($env,$data->{'biblionumber'});
-        #  @biblioarr[$bibcnt] = 
-	#    "biblio.biblionumber = '".$data->{'biblionumber'}."'";
-	#  $bibcnt++;
-	#};
-	#$sth1->finish();
-	#my $bibsel = join(" or ",@biblioarr);
-        #debug_msg($env,$bibsel);
-        #$query = "select count(*) from items,biblio,biblioitems ";
-	#$query=$query." where ($bibsel) ";
-	#$query=$query." and items.biblionumber=biblioitems.biblionumber and";
-        #$query=$query." biblioitems.biblionumber=biblio.biblionumber";
-        $query="select count(*) from items,biblio,biblioitems ";
-        my $search2=uc $search->{'isbn'};
-        $query=$query." where biblioitems.isbn='$search2' and
-        items.biblioitemnumber=biblioitems.biblioitemnumber 
-        and biblioitems.biblionumber=biblio.biblionumber";
-# marker 1
-	my $sth1=$dbh->prepare($query);
+	my $sth1=$dbh->prepare($query1);
 	$sth1->execute;
         my $i2=0;
-	while (my @data=$sth1->fetchrow_hashref) {
+	while (my $data=$sth1->fetchrow_hashref) {
 	   $query="select * from biblioitems,items,biblio where
            biblioitems.biblioitemnumber = '$data->{'biblioitemnumber'}' 
 	   and biblioitems.biblionumber =
@@ -169,10 +146,10 @@ sub CatSearch  {
 	   $sth->execute;
 	   my $data=$sth->fetchrow_hashref;
            $results[$i2]="$data->{'biblionumber'}\t$data->{'title'}\t$data->{'author'}";
-           $i2++;
+           $i2++; 
 	   $sth->finish;
 	}
->>>>>>> 1.41
+	$sth1->finish;
       }
     }
 #print $query;
@@ -194,7 +171,7 @@ sub CatSearch  {
   my $i=0;
   my $i2=0;
   my $limit=$num+$offset;
-  my @results;
+
   if ($search->{'title'} ne '' || $search->{'author'} ne '' ){
     while ((my $data=$sth->fetchrow_hashref) && $i < $limit){
       if ($i >= $offset){
