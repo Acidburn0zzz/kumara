@@ -102,15 +102,15 @@ sub CatSearch  {
       last SWITCH;
     };
     $query="Select * from catalogueentry where catalogueentry like
-    '%$searchstring%' and entrytype like '$type%'";
+    '%$searchstring%' and entrytype like '%$type%'";
     last SWITCH;
   }
   print "$query\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   while (my $data=$sth->fetchrow_hashref){
-    print "$data->{'catalogueentry.catalogueentry'}
-    $data->{'biblio.biblionumber'} \n";
+    print "$data->{'catalogueentry'}
+    $data->{'biblionumber'} \n";
   }
   $sth->execute;
   $sth->finish;
