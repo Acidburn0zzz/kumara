@@ -114,7 +114,8 @@ sub processitems {
      my ($item,$charge,$datedue) = &issueitem($env,$dbh,$itemnum,$bornum,$items);
      if ($datedue ne "") {
        my $line = formatitem($env,$item,$datedue,$charge);
-       $items2->[$it2p] = $line;
+       unshift @$items2,$line;
+       #$items2->[$it2p] = $line;
        $item->{'date_due'} = $datedue;
        $item->{'charge'} = $charge;
        $itemsdet->[$it2p] = $item;
