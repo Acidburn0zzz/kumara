@@ -6,8 +6,7 @@ use strict;
 require Exporter;
 use DBI;
 use C4::Database;
-use C4::Accounts;
-use C4::Interface;
+use C4::Circulation::Issues;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
   
@@ -15,7 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&Start_circ &Issue);
+@EXPORT = qw(&Start_circ);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -69,82 +68,6 @@ sub Start_circ{
   }
 }
 
-sub Issue  {
-  my $dbh=&C4Connect;
-  #clear help
-  helptext('');
-  clearscreen();
-  #get borrowerbarcode from scanner
-  my ($borcode,$reason)=&scanborrower();
-#  output(1,1,$borcode);
-  my $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
-  $sth->execute;
-  my $borrower=$sth->fetchrow_hashref;
-  my $bornum=$borrower->{'borrowernumber'};
-  $sth->finish;
-  while ($bornum eq ''){
-    #If borrower not found enter loop until borrower is found
-    output(1,1,"Borrower not found, please rescan or reenter borrower code");
-    ($borcode,$reason)=&scanborrower();
-    $sth=$dbh->prepare("Select * from borrowers where cardnumber='$borcode'");
-    $sth->execute;
-    $borrower=$sth->fetchrow_hashref;
-    $bornum=$borrower->{'borrowernumber'};
-    $sth->finish;
-    
-   } 
-    my $borrowers=join(' ',($borrower->{'title'},$borrower->{'firstname'},
-    $borrower->{'surname'}));
-    output(1,1,$borrowers);
-    #process borrower traps (could be function)
-    #check first GNA trap (no address this is the 22nd item in the table)
-    if ($borrower->{'gonenoaddress'} == 1){
-      #got to membership update and update member info
-      output(20,1,"Borrower has no address");
-    }
-    #check if member has a card reported as lost
-    if ($borrower->{'lost'} ==1){
-      #updae member info
-      output(20,1,"Borrower has lost card");
-    }
-    #check the notes field if notes exist display them
-    if ($borrower->{'borrowernotes'} ne ''){
-      #display notes
-      #deal with notes as issue_process.doc
-      output(20,1,$borrower->{'borrowernotes'});
-    }
-    #check if borrower has overdue items
-    #call overdue checker
-    &checkoverdues($bornum,$dbh);
-    #check amountowing
-    my $amount=checkaccount($bornum,$dbh);    #from C4::Accounts
-    #check if borrower has any items waiting
-    &checkwaiting;
-    #deal with any money still owing
-#    output(30,1,$amount);
-    if ($amount > 0){
-      &reconcileaccount($dbh,$bornum,$amount);
-    }
-    #deal with alternative loans
-    #now check items 
-    clearscreen();
-    my $items=pastitems($bornum,$dbh);
-    my $items2;
-    my $done;
-    my $row2=5;
-    ($done,$items2,$row2)=&processitems($bornum,$borrower,$items,$items2,$row2);
-    while ($done eq 'No'){
-      ($done,$items2,$row2)=&processitems($bornum,$borrower,$items,$items2,$row2);
-    }    
-    $dbh->disconnect;  
-    if ($done ne 'Circ'){
-      Issue();
-    }
-    if ($done ne 'Quit'){
-      return($done);
-    }
-}    
-
 sub pastitems{
   #Get list of all items borrower has currently on issue
   my ($bornum,$dbh)=@_;
@@ -159,90 +82,6 @@ sub pastitems{
      $i++;
   }
   return(\@items);
-}
- 
-
-sub processitems {
-  #process a users items
-#  clearscreen();
-#  output(1,1,"Processing Items");
-  helptext("F11 Ends processing for current borrower  F10 ends issues");
-  my ($bornum,$borrower,$items,$items2,$row2)=@_;
-  my $dbh=&C4Connect;  
-  my $row=5;
-#  my $count=$$items;
-  my $i=0;
-  while ($items->[$i]){
-    output (1,$row,$items->[$i]);
-    $i++;
-    $row++;
-  }
-  #my ($itemnum,$reason)=issuewindow('Issues',$items,$items2,$borrower,"Borrower barcode");
-#  $itemnum=uc $itemnum;
-  my ($itemnum,$reason)=&scanbook();
-  my $query="Select * from items,biblio where barcode = '$itemnum' and items.biblionumber=biblio.biblionumber";
-  my $sth=$dbh->prepare($query);  
-  $sth->execute;
-  my $item=$sth->fetchrow_hashref;  
-  $items2=$item;
-  $sth->finish;
-  #check if item is restricted
-  if ($item->{'restricted'} == 1 ){
-    output(20,1,"whoop whoop restricted");
-    #check borrowers status to take out restricted items
-    # if borrower allowed {
-    #  book issued
-    # } else {
-    #  next item
-    # }
-  } else {
-    #check if item is on issue already
-    &previousissue($item->{'itemnumber'},$dbh,$bornum);
-    #check reserve
-    &checkreserve;
-    #if charge deal with it
-    #now mark as issued
-    &updateissues($item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
-    output(40,$row2,$item->{'title'});
-    $row2++;
-  }
-  $dbh->disconnect;
-  #check to see if more books to process for this user
-  if ($reason eq 'Finished user'){
-    return('New borrower');
-  } else {
-    if ($reason ne 'Finished issues'){
-      #return No to let them no that we wish to process more Items for borrower
-      return('No',$items2,$row2);
-    } else  {
-      return('Circ');
-    }
-  }
-}
-
-sub updateissues{
-  # issue the book
-   my ($itemno,$bitno,$dbh,$bornum)=@_;
-   my $loanlength=21;
-   my $query="Select loanlength from biblioitems,itemtypes
-   where (biblioitems.biblioitemnumber='$bitno') 
-   and (biblioitems.itemtype = itemtypes.itemtype)";
-#   print "\n$query\n";
-   my $ow = getc;
-   my $sth=$dbh->prepare($query);
-   $sth->execute;
-   if (my $data=$sth->fetchrow_hashref) {
-      $loanlength = $data->{'loanlength'}
-   }
-   $sth->finish;
-   # this ought to also insert the branch, but doen't do so yet.
-   $query = "Insert into issues (borrowernumber,itemnumber,date_due)
-   values ($bornum,$itemno,datetime('now'::abstime)+$loanlength)";
-   my $sth=$dbh->prepare($query);
-#   print "\n$query\n";
-   my $ow = getc;
-   $sth->execute;
-   $sth->finish;
 }
 
 sub checkoverdues{
