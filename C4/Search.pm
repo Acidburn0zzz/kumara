@@ -349,9 +349,11 @@ sub bibdata {
 sub BornameSearch  {
   my ($env,$searchstring,$type)=@_;
   my $dbh = &C4Connect;
-  my $query="Select * from borrowers where surname like
-  '%$searchstring%' or firstname like '%$searchstring%' or othernames like 
-  '%$searchstring' order by surname,firstname";
+  $searchstring = lc $searchstring;
+  my $query="Select * from borrowers where lower(surname) like
+  '%$searchstring%' or lower(firstname) like '%$searchstring%' 
+  or lower(othernames) like 
+  '%$searchstring' order by lower(surname),lower(firstname)";
   #print $query,"\n";
   my $sth=$dbh->prepare($query);
   $sth->execute;
