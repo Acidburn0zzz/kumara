@@ -15,6 +15,7 @@ print $input->dump;
 #get all the data into a hash
 my @names=$input->param;
 my %data;
+my $problems;
 foreach my $key (@names){
   $data{$key}=$input->param($key);
 }
@@ -26,10 +27,23 @@ if ($data{'type'} eq 'biblio'){
   $num++;
   $data{'biblionumber'}=$num;
 } elsif ($data{'type'} eq 'borrowers') {
-  my $bornum=getmax('borrowers','borrowernumber');
-  my $num=$bornum->{'max'};
-  $num++;
-  $data{'borrowernumber'}=$num;
-  $data{'branchcode'}="L";
-}  
-&sqlinsert($data{'type'},%data);
+  # required fields
+  my @reqflds = ("cardnumber","surname","firstname",
+    "streetaddress","phone","altstreetaddress","altphone","dateofbirth","contactname");       
+  $problems = checkflds(\@reqflds,\%data); 
+  if ($updtype eq "M") {
+    $keyfld = "borrowernumber";
+  } else {
+    my $bornum=getmax('borrowers','borrowernumber');
+    my $num=$bornum->{'max'};
+    $num++;
+    $data{'borrowernumber'}=$num;
+    $data{'branchcode'}="L";
+  }
+}
+if {$updtype eq "M"}
+  &sqlupdate($data{'type'},$keyfld,$data{keyfld},%data);
+} else {  
+  &sqlinsert($data{'type'},%data);
+}
+

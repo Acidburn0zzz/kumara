@@ -362,7 +362,22 @@ sub BornameSearch  {
   $sth->finish;
   $dbh->disconnect;
 }
-			    
+
+sub borrdata {
+  my ($cardnumber)=@_;
+  $cardnumber = uc $cardnumber
+  my $dbh=C4Connect;
+  my $query="Select * from borrowers where cardnumber='$cardnumber'";
+  #  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $dbh->disconnect;
+  return($data);
+}
+		  
+			   
 END { }       # module clean-up code here (global destructor)
 
 

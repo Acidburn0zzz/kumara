@@ -156,7 +156,8 @@ sub mkform2{
   while ( my ($key, $value) = each %inputs) {
     my @data=split('\t',$value);
     my $posn = shift(@data);
-    my $ltext = shift(@data);
+    my $reqd =  shift(@data);
+    my $ltext = shift(@data);    
     if ($data[0] eq 'hidden'){
       $string=$string."<input type=hidden name=$key value=\"$data[1]\">\n";
     } else {
@@ -164,24 +165,29 @@ sub mkform2{
       if ($data[0] eq 'radio') {
         $text="<input type=radio name=$key value=$data[1]>$data[1]
 	<input type=radio name=$key value=$data[2]>$data[2]";
-      } 
-      if ($data[0] eq 'text') {
+      } elsif ($data[0] eq 'text') {
         $text="<input type=$data[0] name=$key value=\"$data[1]\">";
-      }
-      if ($data[0] eq 'textarea') {
+      } elsif ($data[0] eq 'textarea') {
         $text="<textarea name=$key wrap=physical cols=40 rows=4>$data[1]</textarea>";
-      }
-      if ($data[0] eq 'select') {
+      } elsif ($data[0] eq 'select') {
         $text="<select name=$key>";
-	my $i=1;
+	my $sel=$data[1];
+	my $i=2;
        	while ($data[$i] ne "") {
 	  my $val = $data[$i+1];
-      	  $text = $text."<option value=$data[$i]>$val";
+       	  $text = $text."<option value=\"$data[$i]\"";
+	  if ($data[$i] eq $sel) {
+	     $text = $text." selected";
+	  }   
+          $text = $text.">$val";
 	  $i = $i+2;
 	}
 	$text=$text."</select>";
-      }	
+      }
       #$string=$string.mktablerow(2,'white',$key,$text);
+      if ($reqd = "R") {
+        $ltext = $ltext." (Req)";
+	}
       @order[$posn] =mktablerow(2,'white',$ltext,$text);
     }
   }

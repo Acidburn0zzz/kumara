@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.01;
     
 @ISA = qw(Exporter);
-@EXPORT = qw(&C4Connect &sqlinsert &getmax &makelist);
+@EXPORT = qw(&C4Connect &sqlinsert &sqlupdate &getmax &makelist);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -60,6 +60,7 @@ sub C4Connect  {
 sub sqlinsert {
   my ($table,%data)=@_;
   my $dbh=C4Connect;
+  my $updtype = "I";
   my $query="INSERT INTO $table \(";
   while (my ($key,$value) = each %data){
     if ($key ne 'type'){
@@ -80,6 +81,28 @@ sub sqlinsert {
   $sth->finish;
   $dbh->disconnect;
 }
+
+sub sqlupdate {
+  my ($table,$keyfld,$keyval,%data)=@_;
+  my $dbh=C4Connect;
+  my $query="UPDATE $table SET ";
+  my @sets;
+  while (my ($key,$value) = each %data){
+    if ($key ne 'type'){
+      my $temp = " ".$key."='".$value."' "; 
+      push(@sets,$temp);
+    }
+  }
+  my $fsets = join(",", @sets);
+  $query=$query.$fsets." WHERE $keyfld = '$keyval'";
+  $query=~ s/\,$/\)/;
+  print $query;
+  my $sth=$dbh->prepare($query);
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
 
 sub getmax {
   my ($table,$item)=@_;
