@@ -95,7 +95,7 @@ sub invoice {
   my $query="Select * from aqorders,biblio,biblioitems where
   booksellerinvoicenumber='$invoice' 
   and biblio.biblionumber=aqorders.biblionumber and biblioitems.biblioitemnumber=
-  aqorders.biblioitemnumber";
+  aqorders.biblioitemnumber group by aqorders.biblioitemnumber";
   my $i=0;
   my @results;
   my $sth=$dbh->prepare($query);
