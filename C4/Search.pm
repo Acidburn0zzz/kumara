@@ -1013,8 +1013,10 @@ sub ItemType {
 sub bibitems {
   my ($bibnum)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from biblioitems,itemtypes where
-  biblionumber='$bibnum' and biblioitems.itemtype=itemtypes.itemtype";
+  my $query="Select * from biblioitems,itemtypes,items where
+  biblioitems.biblionumber='$bibnum' and biblioitems.itemtype=itemtypes.itemtype and
+  biblioitems.biblioitemnumber=items.biblioitemnumber group by
+  itemtypes.itemtype";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;
