@@ -16,7 +16,8 @@ $VERSION = 0.01;
 @ISA = qw(Exporter);
 @EXPORT = qw(&CatSearch &BornameSearch &ItemInfo &KeywordSearch &subsearch
 &itemdata &bibdata &GetItems &borrdata &getacctlist &itemnodata &itemcount
-&OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues); 
+&OpacSearch &borrdata2 &NewBorrowerNumber &bibitemdata &borrissues
+&getboracctrecord); 
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 		  
 # your exported package globals go here,
@@ -597,6 +598,7 @@ sub getacctlist {
       and items.biblionumber = biblio.biblionumber
       and accountlines.amountoutstanding<>0 order by date";
    my $sth=$dbh->prepare($query);
+   print $query;
    $sth->execute;
    my $total=0;
    while (my $data=$sth->fetchrow_hashref){
@@ -605,6 +607,29 @@ sub getacctlist {
       $total = $total+ $data->{'amountoutstanding'};
    }
    return ($numlines,\@acctlines,$total);
+   $sth->finish;
+   $dbh->disconnect;
+}
+
+sub getboracctrecord {
+   my ($env,$params) = @_;
+   my $dbh=C4Connect;
+   my @acctlines;
+   my $numlines;
+   my $query = "Select * from accountlines
+   where borrowernumber = $params->{'borrowernumber'} ";
+   my $sth=$dbh->prepare($query);
+   print $query;
+   $sth->execute;
+   my $total=0;
+   while (my $data=$sth->fetchrow_hashref){
+      $acctlines[$numlines] = $data;
+      $numlines++;
+      $total = $total+ $data->{'amountoutstanding'};
+   }
+   return ($numlines,\@acctlines,$total);
+   $sth->finish;
+   $dbh->disconnect;
 }
 
 sub itemcount { 
