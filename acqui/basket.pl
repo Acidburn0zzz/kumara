@@ -37,7 +37,7 @@ $results[0]->{'entrydate'};
 <b>Search ISBN, Title or Author:</b> <INPUT TYPE="text"  SIZE="25"   NAME="recieve">
 </form>
 <p>
-<FORM ACTION="/cgi-bin/koha/acquire.pl" method=post name=orderform>
+<FORM ACTION="/cgi-bin/koha/acqui/modorders.pl" method=post name=orderform>
 <table border=0 cellspacing=0 cellpadding=5>
 <tr valign=top bgcolor=#99cc33>
 <td background="/images/background-mem.gif"><b>ORDER</b></td>
@@ -64,12 +64,15 @@ print <<EOP
 <td>\$<input type=text name=eup$i size=6 value="$results[$i]->{'ecost'}" onchange='update(this.form)'></td>
 <td><input type=text name=quantity$i size=6 value=$results[$i]->{'quantity'} onchange='update(this.form)'></td>
 <td>\$<input type=text name=total$i size=10 value=16.95></td>
-
+<input type=hidden name=ordnum$i value=$results[$i]->{'ordernumber'}>
+<input type=hidden name=bibnum$i value=$results[$i]->{'biblionumber'}>
 </tr>
 
 EOP
 ;
 }
+print "<input type=hidden name=number value=$count>
+<input type=hidden name=basketno value=\"$basket\">";
 print <<EOP
 <tr valign=top bgcolor=white>
 

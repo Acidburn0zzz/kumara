@@ -15,7 +15,7 @@ $VERSION = 0.01;
  &newordernum &modbiblio &modorder &getsingleorder &invoice &receiveorder
  &bookfundbreakdown &curconvert &updatesup &insertsup &makeitems &modbibitem
 &getcurrencies &modsubtitle &modsubject &modaddauthor &moditem &countitems 
-&findall &needsmod &delitem &delbibitem);
+&findall &needsmod &delitem &delbibitem &delorder);
 %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
 
 # your exported package globals go here,
@@ -467,6 +467,18 @@ sub neworder {
   $query="insert into aqorderbreakdown (ordernumber,bookfundid) values
   ($ordnum,'$bookfund')";
   $sth=$dbh->prepare($query);
+#  print $query;
+  $sth->execute;
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub delorder {
+  my ($bibnum,$ordnum)=@_;
+  my $dbh=C4Connect;
+  my $query="Delete from aqorders where biblionumber='$bibnum' and
+  ordernumber='$ordnum'";
+  my $sth=$dbh->prepare($query);
 #  print $query;
   $sth->execute;
   $sth->finish;

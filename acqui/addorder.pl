@@ -40,22 +40,29 @@ my $rrp=$input->param('rrp');
 my $ecost=$input->param('ecost');
 my $gst=$input->param('GST');
 #check to see if biblio exists
-if ($existing eq 'no'){
-  #if it doesnt create it
-  $bibnum=newbiblio($title,$author,$copyright);
-  $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
-  newsubtitle($bibnum);
-  modbiblio($bibnum,$title,$author,$copyright,$series);
-} else {
-  $bibnum=$input->param('biblio');
-  $bibitemnum=$input->param('bibitemnum');
-  if ($bibitemnum eq ''){
-    $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
-  }
-  modbiblio($bibnum,$title,$author,$copyright,$series);
+if ($quantity ne '0'){
 
+  if ($existing eq 'no'){
+    #if it doesnt create it
+    $bibnum=newbiblio($title,$author,$copyright);
+    $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
+    newsubtitle($bibnum);
+    modbiblio($bibnum,$title,$author,$copyright,$series);
+  } else {
+    $bibnum=$input->param('biblio');
+    $bibitemnum=$input->param('bibitemnum');
+    if ($bibitemnum eq ''){
+      $bibitemnum=newbiblioitem($bibnum,$itemtype,$isbn);
+    }
+    modbiblio($bibnum,$title,$author,$copyright,$series);
+  }
+  neworder($bibnum,$title,$ordnum,$basketno,$quantity,$listprice,$supplier,$who,$notes,$bookfund,$bibitemnum,$rrp,$ecost,$gst);
+} else {
+  #print $input->header;
+  #print "del";
+  $bibnum=$input->param('biblio');
+  delorder($bibnum,$ordnum);
 }
-neworder($bibnum,$title,$ordnum,$basketno,$quantity,$listprice,$supplier,$who,$notes,$bookfund,$bibitemnum,$rrp,$ecost,$gst);
 
 print $input->redirect("newbasket.pl?id=$supplier&basket=$basketno");
 #print $input->dump;
