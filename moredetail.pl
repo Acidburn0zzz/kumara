@@ -56,18 +56,18 @@ print <<printend
 <INPUT TYPE="image" name="submit"  VALUE="modify" height=42  WIDTH=93 BORDER=0 src="/images/delete-mem.gif"> 
 <br>
 <FONT SIZE=2  face="arial, helvetica">
-Biblionumber:$bib<br>
-Item Type:$data->{'itemtype'}<br>
-Loan Length: $data->{'loanlength'}<br>
-Rental Charge: $data->{'rentalscharge'}<br>
-Classification:$data->{'classification'}$data->{'dewey'}$data->{'subclass'}<br>
-ISBN: $data->{'isbn'}<br>
-Publisher: <br>
-Place:<br>
-Date:$data->{'publicationdate'}<br>
-Pages:$data->{'pages'}<br>
-Illus:$data->{'illus'}<br>
-No. of Items:$count
+<b>Biblionumber:</b> $bib<br>
+<b>Item Type:</b> $data->{'itemtype'}<br>
+<b>Loan Length:</b> $data->{'loanlength'}<br>
+<b>Rental Charge:</b> $data->{'rentalscharge'}<br>
+<b>Classification:</b> $data->{'classification'}$data->{'dewey'}$data->{'subclass'}<br>
+<b>ISBN:</b> $data->{'isbn'}<br>
+<b>Publisher:</b> $data->{'publishercode'} <br>
+<b>Place:</b><br>
+<b>Date:</b> $data->{'publicationdate'}<br>
+<b>Pages:</b> $data->{'pages'}<br>
+<b>Illus:</b> $data->{'illus'}<br>
+<b>No. of Items:</b> $count
 </font>
 </TD>
 </tr>
@@ -102,25 +102,25 @@ my @temp=split('-',$items[$i]->{'dateaccessioned'});
 $items[$i]->{'dateaccessioned'}="$temp[2]/$temp[1]/$temp[0]";
 print <<printend
 <FONT SIZE=2  face="arial, helvetica">
-Home Branch: $items[$i]->{'homebranch'}<br>
-Last seen: $items[$i]->{'datelastseen'}<br>
-Last borrowed: $items[$i]->{'timestamp0'}<br>
-Currently on issue to: $items[$i]->{'card0'}<br>
-Last Borrower 1: $items[$i]->{'card0'}<br>
-Last Borrower 2: $items[$i]->{'card1'}<br>
-Current Branch: $items[$i]->{'holdingbranch'}<br>
-Replacement Price: $items[$i]->{'replacementprice'}<br>
-Item lost:$items[$i]->{'itemlost'}<br>
-paid by:<br>
-Notes: $items[$i]->{'itemnotes'}<br>
-Renewals: $items[$i]->{'renewals'}<br>
-Requests: put in current reserves<br>
+<b>Home Branch:</b> $items[$i]->{'homebranch'}<br>
+<b>Last seen:</b> $items[$i]->{'datelastseen'}<br>
+<b>Last borrowed:</b> $items[$i]->{'timestamp0'}<br>
+<b>Currently on issue to:</b> $items[$i]->{'card0'}<br>
+<b>Last Borrower 1:</b> $items[$i]->{'card0'}<br>
+<b>Last Borrower 2:</b> $items[$i]->{'card1'}<br>
+<b>Current Branch:</b> $items[$i]->{'holdingbranch'}<br>
+<b>Replacement Price:</b> $items[$i]->{'replacementprice'}<br>
+<b>Item lost:</b> $items[$i]->{'itemlost'}<br>
+<b>paid by:</b><br>
+<b>Notes:</b> $items[$i]->{'itemnotes'}<br>
+<b>Renewals:</b> $items[$i]->{'renewals'}<br>
+<b>Requests:</b> put in current reserves<br>
   waiting: <br>
-Accession Date: $items[$i]->{'dateaccessioned'}<br>
-Cancelled: $items[$i]->{'withdrawn'}<br>
-Total Issues: $items[$i]->{'issues'}<br>
-Group Number: $bi <br>
-Biblio number: $bib <br>
+<b>Accession Date: $items[$i]->{'dateaccessioned'}<br>
+<b>Cancelled: $items[$i]->{'withdrawn'}<br>
+<b>Total Issues:</b> $items[$i]->{'issues'}<br>
+<b>Group Number:</b> $bi <br>
+<b>Biblio number:</b> $bib <br>
 
 
 

@@ -53,6 +53,7 @@ sub remoteprint {
   my $file=time;
   my $queue = $env->{'queue'};
   open(PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";  
+#  print $queue;
   #open (FILE,">/tmp/$file");
   my $i=0;
   print PRINTER "$borrower->{'cardnumber'}\r\n";

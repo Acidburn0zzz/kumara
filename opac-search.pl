@@ -33,19 +33,19 @@ if ($num eq ''){
 }
 print startpage();
 print startmenu('opac');
-print mkheadr(1,'Opac Search Results');
+print mkheadr(1,"Opac Search Results for $keyword");
 print center();
 my $count;
 my @results;
 
 ($count,@results)=&OpacSearch(\$blah,'loose',\%search,$num,$offset);
 
-print "You searched on <b>$keyword</b>";
+#print "You searched on <b>$keyword</b>";
 
 print " $count results found";
 my $offset2=$num+$offset;
 my $disp=$offset+1;
-print "<br> Results $disp to $offset2 displayed";
+print ", Results $disp to $offset2 displayed";
 print mktablehdr;
 
 print mktablerow(4,'#99cccc','<b>TITLE</b>','<b>AUTHOR</b>','<b>COUNT</b>',bold('BRANCH'));
@@ -107,13 +107,17 @@ while ($i < $count2){
     $i++;
 }
 $offset=$num+$offset;
-print mktablerow(4,'#99cccc',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
-print mktableft();
 if ($offset < $count){
     my $search="num=$num&offset=$offset&keyword=$keyword";
-    my $stuff=mklink("/cgi-bin/koha/opac-search.pl?$search",'Next');
-    print $stuff;
+    my $stuff=mklink("/cgi-bin/koha/opac-search.pl?$search",'Next Results');
+#    print $stuff;
+    print "<tr valign=top bgcolor=#99cccc><td colspan=4>$stuff 
+    </td></tr>";
+} else {
+  print mktablerow(4,'#99cccc',' &nbsp; ',' &nbsp; ',' &nbsp;',' &nbsp;');
 }
+print mktableft();
+
 
 print endcenter();
 print endmenu('opac');

@@ -265,8 +265,13 @@ print ">X - Temporary Visitor
 if ($data->{'area'} eq 'Z'){
   print " Selected";
 }
+print ">Z - Interloan Libraries
+<OPTION value=V";
+if ($data->{'area'} eq 'V'){
+  print " Selected";
+}
+print ">V - Villlage";
 print <<printend
->Z - Interloan Libraries
 </SELECT></td></tr>
 <tr valign=top bgcolor=white>
 <td  COLSPAN=3><FONT SIZE=2>Postal Address*</FONT></td>

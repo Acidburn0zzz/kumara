@@ -65,6 +65,7 @@ biblio.biblionumber=$bib";
     reserves.borrowernumber=borrowers.borrowernumber and reserves.biblionumber
     =biblio.biblionumber";
   }
+  $query.=" order by priority";
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $i=0;

@@ -58,7 +58,7 @@ if ($insert eq ''){
     $ok=1;
   }
   #we are printing confirmation page
-  print mkheadr(1,'Confirm New Adult Member');
+  print mkheadr(1,'Confirm Record');
   if ($ok ==0){
    print mktablehdr;
    print mktablerow(2,$main,bold('NEW MEMBER'),"",$image);
@@ -73,7 +73,7 @@ if ($insert eq ''){
    print mktablerow(2,$main,bold('MEMBERSHIP DETAILS'),"",$image);
    print mktablerow(2,'white',bold('Membership Number'),$data{'borrowernumber'});
    print mktablerow(2,'white',bold('Cardnumber'),$data{'cardnumber'});
-   print mktablerow(2,'white',bold('Membership Category'),$data{'category'});
+   print mktablerow(2,'white',bold('Membership Category'),$data{'categorycode'});
    print mktablerow(2,'white',bold('Area'),$data{'area'});
    print mktablerow(2,'white',bold('Fee'),$data{'fee'});
    if ($data{'joining'} eq ''){
@@ -114,7 +114,7 @@ if ($insert eq ''){
    print mktablerow(2,$main,bold('ALTERNATIVE CONTACT DETAILS'),"",$image);
    print mktablerow(2,'white',bold('Name'),$data{'contactname'});
    print mktablerow(2,'white',bold('Phone'),$data{'altphone'});
-   print mktablerow(2,'white',bold('Relationship'),$data{'relation'});
+   print mktablerow(2,'white',bold('Relationship'),$data{'altrelationship'});
    print mktablerow(2,'white',bold('Notes'),$data{'altnotes'});
    print mktablerow(2,$main,bold('Notes'),"",$image);
    print mktablerow(2,'white',bold('General Notes'),$data{'borrowernotes'});

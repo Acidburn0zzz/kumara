@@ -73,51 +73,51 @@ printend
 ;
 if ($type ne 'opac'){
 print <<printend
-Subtitle: $dat->{'subtitle'}<br>
-Author: $dat->{'author'}<br>
-Additional Author: <br>
-Seriestitle: $dat->{'seriestitle'}<br>
-Subject: $dat->{'subject'}<br>
-Copyright:$dat->{'copyrightdate'}<br>
-Notes: $dat->{'notes'}<br>
-Unititle: $dat->{'unititle'}<br>
-Analytical Author: <br>
-Analytical Title: <br>
-Serial: $dat->{'serial'}<br>
-Total Number of Items: $count
+<b>Subtitle:</b> $dat->{'subtitle'}<br>
+<b>Author:</b> $dat->{'author'}<br>
+<b>Additional Author:</b> <br>
+<b>Series Title:</b> $dat->{'seriestitle'}<br>
+<b>Subject:</b> $dat->{'subject'}<br>
+<b>Copyright:</b> $dat->{'copyrightdate'}<br>
+<b>Notes:</b> $dat->{'notes'}<br>
+<b>Unititle:</b> $dat->{'unititle'}<br>
+<b>Analytical Author:</b> <br>
+<b>Analytical Title:</b> <br>
+<b>Serial:</b> $dat->{'serial'}<br>
+<b>Total Number of Items:</b> $count
 <p>
 printend
 ;
 }
 else {
 if ($dat->{'subtitle'} ne ''){
-  print "Subtitle: $dat->{'subtitle'}<br>";
+  print "<b>Subtitle:</b> $dat->{'subtitle'}<br>";
 }
 if ($dat->{'author'} ne ''){
-  print "Author: $dat->{'author'}<br>";
+  print "<b>Author:</b> $dat->{'author'}<br>";
 }
 #Additional Author: <br>
 if ($dat->{'seriestitle'} ne ''){
-  print "Seriestitle: $dat->{'seriestitle'}<br>";
+  print "<b>Seriestitle:</b> $dat->{'seriestitle'}<br>";
 }
 if ($dat->{'subject'} ne ''){
-  print "Subject: $dat->{'subject'}<br>";
+  print "<b>Subject:</b> $dat->{'subject'}<br>";
 }
 if ($dat->{'copyrightdate'} ne ''){
-  print "Copyright:$dat->{'copyrightdate'}<br>";
+  print "<b>Copyright:</b> $dat->{'copyrightdate'}<br>";
 }
 if ($dat->{'notes'} ne ''){
-  print "Notes: $dat->{'notes'}<br>";
+  print "<b>Notes:</b> $dat->{'notes'}<br>";
 }
 if ($dat->{'unititle'} ne ''){
-  print "Unititle: $dat->{'unititle'}<br>";
+  print "<b>Unititle:</b> $dat->{'unititle'}<br>";
 }
 #Analytical Author: <br>
 #Analytical Title: <br>
 if ($dat->{'serial'} ne '0'){
- print "Serial: Yes<br>";
+ print "<b>Serial:</b> Yes<br>";
 }
-print "Total Number of Items: $count
+print "<b>Total Number of Items:</b> $count
 <p>
 ";
 
@@ -142,9 +142,10 @@ my $i=0;
 print center();
 print mktablehdr;
 if ($type eq 'opac'){
-  print mktablerow(5,$main,'Itemtype','Class','Branch','DateDue','Lastseen'); 
+
+  print mktablerow(5,$main,'Item Type','Class','Branch','Date Due','Last Seen'); 
 } else {
-  print mktablerow(6,$main,'Itemtype','Class','Location','DateDue','Lastseen','Barcode',"/images/background-mem.gif"); 
+  print mktablerow(6,$main,'Itemtype','Class','Location','Date Due','Last Seen','Barcode',"/images/background-mem.gif"); 
 }
 my $colour=1;
 while ($i < $count){
@@ -157,18 +158,34 @@ while ($i < $count){
   }
   if ($colour == 1){
     if ($type ne 'opac'){
-      print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);
+      if ($results[6] eq 'PER'){
+        print mktablerow(7,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1],$results[9]);
+      } else {
+            print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);
+      }
     } else {
        $results[6]=ItemType($results[6]);
-       print mktablerow(5,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7]);
+       if ($results[6] =~ /Periodical/){
+          print mktablerow(6,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7],$results[9]);
+	} else {
+         print mktablerow(5,$secondary,$results[6],$results[4],$results[3],$results[2],$results[7]);
+       }       
     } 
     $colour=0;                                                                                
   } else{                                                                                     
     if ($type ne 'opac'){
-      print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
+      if ($results[6] eq 'PER'){
+      print mktablerow(7,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1],$results[9]);                                          
+      }else{
+            print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[1]);                                          
+      }
     } else {
       $results[6]=ItemType($results[6]);
-      print mktablerow(5,'white',$results[6],$results[4],$results[3],$results[2],$results[7]);                                          
+       if ($results[6] =~ /Periodical/){
+          print mktablerow(6,'white',$results[6],$results[4],$results[3],$results[2],$results[7],$results[9]);
+	} else {
+         print mktablerow(5,'white',$results[6],$results[4],$results[3],$results[2],$results[7]);
+       }       
     }
     $colour=1;                                                                                
   }

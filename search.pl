@@ -108,6 +108,12 @@ if ($type ne 'opac'){
   }
 }
 my $count2=@results;
+if ($keyword ne '' && $offset > 0){
+  $count2=$count-$offset;
+  if ($count2 > 10){
+    $count2=10;
+  }
+}
 #print $count2;
 my $i=0;
 my $colour=1;

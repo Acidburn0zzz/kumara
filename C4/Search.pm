@@ -83,6 +83,10 @@ sub OpacSearch {
     $query=$query." and (author like '$key[$i]%' or author like '% $key[$i]%')";
     $i++;
   }
+  $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0]%')";
+  for ($i=1;$i<$count;$i++){
+    $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
+  }
   $query=$query.") order by title";
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -188,12 +192,20 @@ sub KeywordSearch {
   my @results;
   my $query ="Select * from biblio,bibliosubtitle where
   biblio.biblionumber=bibliosubtitle.biblionumber and
-  ((title like '%$key[0]%' or subtitle like '%$key[0]%')";
+  (((title like '$key[0]%' or title like '% $key[0]%')";
   while ($i < $count){
-    $query=$query." and (title like '%$key[$i]%' or subtitle like '%$key[$i]%')";
+    $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%')";
     $i++;
   }
-  $query=$query.") group by biblio.biblionumber order by author,title";
+  $query.= ") or ((subtitle like '$key[0]%' or subtitle like '% $key[0]%')";
+  for ($i=1;$i<$count;$i++){
+    $query.= " and (subtitle like '$key[$i]%' or subtitle like '% $key[$i]%')";
+  }
+  $query.= ") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0]%')";
+  for ($i=1;$i<$count;$i++){
+    $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
+  }
+  $query=$query.")) group by biblio.biblionumber order by author,title";
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
@@ -213,7 +225,7 @@ sub KeywordSearch {
     $sth2->execute;
     while (my $data2=$sth2->fetchrow_hashref){
 
-$results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$data->{'copyrightdate'}";
+$results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$data2->{'copyrightdate'}";
 #      print $results[$i];
       $i++;   
     }
@@ -224,7 +236,9 @@ $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$
   my @res;
   my $count=@results;
   $i=1;
-  $res[0]=$results[0];
+  if ($count > 0){
+    $res[0]=$results[0];
+  }
   while ($i2 < $count){
     if ($results[$i2] ne $res[$i-1]){
       $res[$i]=$results[$i2];
@@ -242,6 +256,7 @@ $results[$i]="$data2->{'author'}\t$data2->{'title'}\t$data2->{'biblionumber'}\t$
   }
   $sth->finish;
   $dbh->disconnect;
+  $i--;
   return($i,@res2);
 }
 
@@ -282,14 +297,20 @@ sub CatSearch  {
             $query="select count(*) from biblio,bibliosubtitle
 	    where
             (biblio.biblionumber=bibliosubtitle.biblionumber) and
-	    ((title like '$key[0]%' or title like '% $key[0]%'
-	    or subtitle like '$key[0]%' or title like '% $key[0]%')";
+	    (((title like '$key[0]%' or title like '% $key[0]%')";
 	    while ($i<$count){
-	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%' or
-	      subtitle like '$key[$i]%' or subtitle like '% $key[$i]%')";
+	      $query=$query." and (title like '$key[$i]%' or title like '% $key[$i]%')";
 	      $i++;
 	    }
-	    $query=$query.")";
+	    $query.=") or ((subtitle like '$key[0]%' or subtitle like '% $key[0]%')";
+	    for ($i=1;$i<$count;$i++){
+	      $query.=" and (subtitle like '$key[$i]%' or subtitle like '% $key[$i]%')";
+	    }
+	    $query.=") or ((seriestitle like '$key[0]%' or seriestitle like '% $key[0]%')";
+	    for ($i=1;$i<$count;$i++){
+	      $query.=" and (seriestitle like '$key[$i]%' or seriestitle like '% $key[$i]%')";
+	    }
+	    $query=$query."))";
 #	    if ($search->{'class'} ne ''){
 #	      $query.=" and biblioitems.itemtype='$search->{'class'}'";
 #	    }
@@ -301,8 +322,15 @@ sub CatSearch  {
       }
   } 
   if ($type eq 'subject'){
-    $query="select distinct(subject) from bibliosubject where subject like
-    '$search->{'subject'}%'";
+    my @key=split(' ',$search->{'subject'});
+    my $count=@key;
+    my $i=1;
+    $query="select distinct(subject) from bibliosubject where( subject like
+    '$key[0]%' or subject like '% $key[0]%')";
+    while ($i<$count){
+      $query.=" and (subject like '$key[$i]]%' or subject like '% $key[$i]%')";
+      $i++;
+    }
   }
   if ($type eq 'precise'){
       $query="select count(*) from items,biblio ";
@@ -465,7 +493,7 @@ sub ItemInfo {
  #   $results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$data->{'dewey'}";
     my @temp=split('-',$data->{'datelastseen'});
     my $date="$temp[2]/$temp[1]/$temp[0]";
-$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class\t$data->{'itemnumber'}\t$data->{'itemtype'}\t$date\t$data->{'biblioitemnumber'}";
+$results[$i]="$data->{'title'}\t$data->{'barcode'}\t$datedue\t$data->{'branchname'}\t$class\t$data->{'itemnumber'}\t$data->{'itemtype'}\t$date\t$data->{'biblioitemnumber'}\t$data->{'volumeddesc'}";
 
     $i++;
   }
@@ -532,14 +560,22 @@ sub itemdata {
 sub bibdata {
   my ($bibnum,$type)=@_;
   my $dbh=C4Connect;
-  my $query="Select * from biblio,biblioitems,bibliosubject,bibliosubtitle where biblio.biblionumber=$bibnum
-  and biblioitems.biblionumber=$bibnum and
-(bibliosubject.biblionumber=$bibnum or bibliosubject.biblionumber=1) and 
+  my $query="Select * from biblio,biblioitems,bibliosubtitle where biblio.biblionumber=$bibnum
+  and biblioitems.biblionumber=$bibnum and 
 (bibliosubtitle.biblionumber=$bibnum)"; 
 #  print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
   my $data=$sth->fetchrow_hashref;
+  $sth->finish;
+  $query="Select * from bibliosubject where biblionumber='$bibnum'";
+  $sth=$dbh->prepare($query);
+  $sth->execute;
+  while (my $dat=$sth->fetchrow_hashref){
+    $data->{'subject'}.=", $dat->{'subject'}";
+
+  }
+  #print $query;
   $sth->finish;
   $dbh->disconnect;
   return($data);
@@ -631,8 +667,8 @@ sub BornameSearch  {
   ";
   for (my $i=1;$i<$count;$i++){
     $query=$query." and (surname like '%$data[$i]%'                   
-    or firstname  like '%$data[$i]%'                     
-    or othernames like '%$data[$i]%')";
+    or firstname  like '$data[$i]%'                     
+    or othernames like '$data[$i]%')";
   }
   $query=$query.") or cardnumber = '$searchstring'
   order by surname,firstname";
