@@ -54,19 +54,21 @@ my $priv_func = sub {
 sub KeywordSearch {
   my ($env,$type,$search,$num,$offset)=@_;
   my $dbh = &C4Connect;
-  my $query ="Select count(*) from biblio where author ~* '$search->{'keyword'}' or
-  title ~* '$search->{'keyword'}'";
-#    print $query;
+  my $query ="Select count(*) from biblio where author like
+'%$search->{'keyword'}%' or
+  title like '%$search->{'keyword'}%'";
+
   my $sth=$dbh->prepare($query);
-#  $sth->execute;
-  my $count2=$sth->fetchrow_hashref;
+  $sth->execute;
+  my $count2=$sth->fetchrow_arrayref;
   $sth->finish;  
   my $i=0;
-  my $count=$count2->{'count'};
+  my $count=$count2->[0];
   my @results;
   $query=~ s/count\(\*\)/\*/;
-  $query=$query." order by title limit $num,$offset";
+  $query=$query." order by title limit $offset,$num";
   $sth=$dbh->prepare($query);
+#      print $query;
   $sth->execute;
 #
   while (my $data=$sth->fetchrow_hashref){
@@ -86,16 +88,16 @@ sub CatSearch  {
   my $title = lc($search->{'title'}); 
   if ($type eq 'loose') {
       if ($search->{'author'} ne ''){
-        $query="select biblio.biblionumber,title,author from
+        $query="select count(*) from
          biblio
-         where biblio.author ~* '$search->{'author'}'";     
+         where biblio.author like '%$search->{'author'}%'";     
          if ($search->{'title'} ne ''){ 
-	   $query=$query. " and title ~* '$search->{'title'}'";
+	   $query=$query. " and title like '%$search->{'title'}%'";
 	 }
       } else {
           if ($search->{'title'} ne ''){
-            $query="select biblionumber,title,author from biblio
-	    where title ~* '$search->{'title'}'";	 
+            $query="select count(*) from biblio
+	    where title like '%$search->{'title'}%'";	 
 	 }
       }
   } 
@@ -157,22 +159,15 @@ sub CatSearch  {
 #print $query;
   my $sth=$dbh->prepare($query);
   $sth->execute;
-  my $count2=0;
-  if ($type eq 'precise'){
-    my $count=$sth->fetchrow_hashref;
-    $count2=$count->{'count'};
-  } else {
-    while (my $count = $sth->fetchrow_hashref){
-      $count2++;
-    }
-  }
+  my $data=$sth->fetchrow_arrayref;
+  my $count=$data->[0];
   $sth->finish;
   $query=~ s/count\(\*\)/\*/g;
   if ($type ne 'precise' && $type ne 'subject'){
-    $query=$query." order by title limit $num,$offset";
+    $query=$query." order by title limit $offset,$num";
   } else {
     if ($type eq 'subject'){
-      $query=$query." order by subject limit $num,$offset";
+      $query=$query." order by subject limit $offset,$num";
     }
   }
   $sth=$dbh->prepare($query);
@@ -206,7 +201,7 @@ sub CatSearch  {
   #only update stats if search is from opac
 #  updatesearchstats($dbh,$query);
   $dbh->disconnect;
-  return($count2,@results);
+  return($count,@results);
 }
 
 sub updatesearchstats{

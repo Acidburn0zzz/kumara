@@ -52,8 +52,12 @@ my $priv_func = sub {
 
 sub C4Connect  {
   my $dbname="c4"; 
-  my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", "chris", "");
-
+#  my $dbh = DBI->connect("dbi:Pg:dbname=$dbname", "chris", "");
+   my $database='c4test';
+   my $hostname='localhost';
+   my $user='hdl';
+   my $pass='testing';
+   my $dbh=DBI->connect("DBI:mysql:$database:$hostname",$user,$pass);
   return $dbh;
 }    
 
