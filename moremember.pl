@@ -153,7 +153,6 @@ print <<printend
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Due</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Itemtype</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Charge</b></TD>
-<td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Status</b></TD>
 <td  bgcolor="99cc33" background="/images/background-mem.gif"><B>Renew</b></TD>
 </TR>
 printend
@@ -176,11 +175,11 @@ for (my $i=0;$i<$count;$i++){
   print "<TD>$itemtype</td>";
   print "<TD>$charge</td>";
 
-  if ($datedue < $today){
-    print "<td>Overdue</td>";
-  } else {
-    print "<td> &nbsp; </td>";
-  }
+#  if ($datedue < $today){
+#    print "<td>Overdue</td>";
+#  } else {
+#    print "<td> &nbsp; </td>";
+#  }
   #check item is not reserved
   my ($rescount,$reserves)=FindReserves($issue->[$i]{'biblionumber'},'');
   if ($rescount >0){
