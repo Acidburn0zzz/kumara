@@ -96,7 +96,7 @@ print <<printend
 printend
 ;
 my $blah;
-my @data=ItemInfo(\$blah,$bib);
+my @data=ItemInfo(\$blah,$bib,'intra');
 my $count2=@data;
 for ($i=0;$i<$count2;$i++){
   my @stuff=split('\t',$data[$i]);
