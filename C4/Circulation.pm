@@ -131,9 +131,10 @@ sub Issue  {
     my $items=pastitems($bornum,$dbh);
     my $items2;
     my $done;
-    ($done,$items2)=&processitems($bornum,$borrower,$items,$items2);
+    my $row2=5;
+    ($done,$items2,$row2)=&processitems($bornum,$borrower,$items,$items2,$row2);
     while ($done eq 'No'){
-      ($done,$items2)=&processitems($bornum,$borrower,$items,$items2);
+      ($done,$items2,$row2)=&processitems($bornum,$borrower,$items,$items2,$row2);
     }    
     $dbh->disconnect;  
     if ($done ne 'Circ'){
@@ -166,7 +167,7 @@ sub processitems {
 #  clearscreen();
 #  output(1,1,"Processing Items");
   helptext("F11 Ends processing for current borrower  F10 ends issues");
-  my ($bornum,$borrower,$items,$items2)=@_;
+  my ($bornum,$borrower,$items,$items2,$row2)=@_;
   my $dbh=&C4Connect;  
   my $row=5;
 #  my $count=$$items;
@@ -202,6 +203,8 @@ sub processitems {
     #if charge deal with it
     #now mark as issued
     &updateissues($item->{'itemnumber'},$item->{'biblioitemnumber'},$dbh,$bornum);
+    output(40,$row2,$item->{'title'});
+    $row2++;
   }
   $dbh->disconnect;
   #check to see if more books to process for this user
@@ -210,7 +213,7 @@ sub processitems {
   } else {
     if ($reason ne 'Finished issues'){
       #return No to let them no that we wish to process more Items for borrower
-      return('No',$items2);
+      return('No',$items2,$row2);
     } else  {
       return('Circ');
     }
