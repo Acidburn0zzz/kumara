@@ -207,7 +207,7 @@ while ($i < $count){
 print mktableft();
 print "<p>";
 print mktablehdr();
-
+if ($type ne 'opac'){
 print <<printend
 <TR VALIGN=TOP>
 <TD  bgcolor="99cc33" background="/images/background-mem.gif" colspan=2><p><b>HELP</b><br>
@@ -217,6 +217,7 @@ print <<printend
    </TR>
 printend
 ;
+}
 print mktableft();
 print endcenter();
 print "<br clear=all>";
