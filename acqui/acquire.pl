@@ -181,12 +181,12 @@ print <<EOP
 <TR VALIGN=TOP>
 <TD>
 Budgeted Cost </td>
-<td><input type=text size=20 name=ecost value=$results[0]->{'ecost'}>
+<td><input type=text size=20 name=ecost value="$results[0]->{'ecost'}">
 </td>
 </tr>
 <TR VALIGN=TOP bgcolor=#ffffcc>
 <TD><B>Actual Cost *</B></td>
-<td><input type=text size=20 name=cost value=$results[0]->{'unitprice'}>
+<td><input type=text size=20 name=cost value="$results[0]->{'unitprice'}">
 </td>
 </tr>
 <TR VALIGN=TOP bgcolor=#ffffcc>
@@ -195,7 +195,7 @@ Budgeted Cost </td>
 <input type=hidden name=invoice value=$invoice>
 <TR VALIGN=TOP>
 <TD>Notes</td>
-<td><input type=text size=20 name=notes>
+<td><input type=text size=20 name=notes value="$results[0]->{'notes'}">
 </td>
 </tr>
 </table>
