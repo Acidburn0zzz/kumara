@@ -39,11 +39,16 @@ for (my $i=1;$i<$count3;$i++){
 #the value is a tab separated list, the first item being the input type
 $inputs{'Author'}="text\t$data->{'author'}\t0";
 $inputs{'Title'}="text\t$data->{'title'}\t1";
-if ($data->{'dewey'} == 0){
-  $data->{'dewey'}='';
-}
+my $dewey = $data->{'dewey'};                                                      
+$dewey =~ s/0+$//;                                                                 
+if ($dewey eq "000.") { $dewey = "";};                                             
+if ($dewey < 10){$dewey='00'.$dewey;}                                              
+if ($dewey < 100 && $dewey > 10){$dewey='0'.$dewey;}                               
+if ($dewey <= 0){                                                                  
+  $dewey='';                                                                       
+} 
 
-$inputs{'Class'}="text\t$data->{'classification'}$data->{'dewey'}$data->{'subclass'}\t2";
+$inputs{'Class'}="text\t$data->{'classification'}$dewey$data->{'subclass'}\t2";
 $inputs{'Item Type'}="text\t$data->{'itemtype'}\t3";
 $inputs{'Subject'}="textarea\t$sub\t4";
 $inputs{'Publisher'}="text\t$data->{'publishercode'}\t5";
