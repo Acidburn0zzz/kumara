@@ -56,7 +56,11 @@ sub remoteprint {
   #debug_msg($env,"In print");
   my $file=time;
   my $queue = $env->{'queue'};
-  open(PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";  
+  if ($queue eq "") {
+    open (PRINTER,">/tmp/kohaiss");
+  } else {  
+    open(PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";
+  }  
 #  print $queue;
   #open (FILE,">/tmp/$file");
   my $i=0;
@@ -76,9 +80,9 @@ sub remoteprint {
     print PRINTER "$itemdata->{'datedue'}\r\n";
     $i++;
   }
-  print PRINTER "\r\n\r\n";
+  print PRINTER "\r\n\r\n\r\n\r\n\r\n\r\n\r\n";
   if ($env->{'printtype'} eq "docket"){
-    print chr(27).chr(105);
+    #print chr(27).chr(105);
   } 
   close PRINTER;
   #system("lpr /tmp/$file");
@@ -88,8 +92,11 @@ sub printreserve {
   my($env,$resrec,$rbordata,$itemdata)=@_;
   my $file=time;
   my $queue = $env->{'queue'};
-  open(PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";
-  #open (FILE,">/tmp/$file");
+  #if ($queue eq "") {
+    open (PRINTER,">/tmp/kohares");
+  #} else {
+  #  open (PRINTER, "| lpr -P $queue") or die "Couldn't write to queue:$!\n";
+  #}  
   print PRINTER "Collect at $resrec->{'branchcode'}\r\n\r\n";
   print PRINTER "$rbordata->{'surname'}; $rbordata->{'firstname'}\r\n";
   print PRINTER "$rbordata->{'cardnumber'}\r\n";
@@ -101,12 +108,12 @@ sub printreserve {
   print PRINTER "$itemdata->{'barcode'}\r\n";
   print PRINTER "$itemdata->{'title'}\r\n";
   print PRINTER "$itemdata->{'author'}";
-  print PRINTER "\r\n\r\n";
+  print PRINTER "\r\n\r\n\r\n\r\n\r\n\r\n\r\n";
   if ($env->{'printtype'} eq "docket"){ 
-    print chr(27).chr(105);
+    #print chr(27).char(105);
   }  
   close PRINTER;
-  #system("lpr /tmp/$file");
+  #system("lpr /tmp/$file"); 
 }
 END { }       # module clean-up code here (global destructor)
   
